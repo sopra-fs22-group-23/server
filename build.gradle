@@ -2,13 +2,16 @@ plugins {
     id 'org.springframework.boot' version '2.6.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'idea'
     id 'jacoco'
     id "org.sonarqube" version "3.3"
 }
 
 group = 'ch.uzh.ifi.sopra22'
 version = '1.0.0'
-sourceCompatibility = '17'
+sourceCompatibility = 1.17
+targetCompatibility = 1.17
+
 
 
 
