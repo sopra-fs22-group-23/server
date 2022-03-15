@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # uncomment tokens for assignment 2-4
-      # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # auto-generated
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # auto-generated
       #sonar token: bbb85ead62e6abec0c1ce14722ec91c1a75a7bd1
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       HEROKU_KEY: ${{ secrets.HEROKU_API_KEY }}
