@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs22.rest.dto;
+package ch.uzh.ifi.sopra22.rest.dto;
 
 
 import java.util.Date;

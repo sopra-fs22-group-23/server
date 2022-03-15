@@ -1,10 +1,10 @@
-package ch.uzh.ifi.hase.soprafs22.rest.mapper;
+package ch.uzh.ifi.sopra22.rest.mapper;
 
-import ch.uzh.ifi.hase.soprafs22.entity.User;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserGetDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserGetLoginDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPutDTO;
+import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.rest.dto.UserGetDTO;
+import ch.uzh.ifi.sopra22.rest.dto.UserGetLoginDTO;
+import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
+import ch.uzh.ifi.sopra22.rest.dto.UserPutDTO;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 

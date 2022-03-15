@@ -1,8 +1,7 @@
-package ch.uzh.ifi.hase.soprafs22.payroll;
+package ch.uzh.ifi.sopra22.payroll;
 
-import ch.uzh.ifi.hase.soprafs22.entity.User;
-import ch.uzh.ifi.hase.soprafs22.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs22.service.UserService;
+import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs22.exceptions;
+package ch.uzh.ifi.sopra22.exceptions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs22;
+package ch.uzh.ifi.sopra22;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

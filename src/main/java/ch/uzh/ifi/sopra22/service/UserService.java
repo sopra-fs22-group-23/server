@@ -1,9 +1,8 @@
-package ch.uzh.ifi.hase.soprafs22.service;
+package ch.uzh.ifi.sopra22.service;
 
 
-import ch.uzh.ifi.hase.soprafs22.entity.User;
-import ch.uzh.ifi.hase.soprafs22.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs22.rest.dto.UserPutDTO;
+import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

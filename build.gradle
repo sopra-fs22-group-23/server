@@ -7,14 +7,9 @@ plugins {
     id "org.sonarqube" version "3.1.1"
 }
 
-group 'ch.uzh.ifi.hase'
+group 'ch.uzh.ifi'
 version '1.0.0'
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(15))
-    }
-}
 
 configurations {
     developmentOnly
@@ -28,7 +23,7 @@ repositories {
 }
 
 springBoot {
-    mainClass.set('ch.uzh.ifi.hase.soprafs22.Application')
+    mainClass.set('ch.uzh.ifi.sopra22.Application')
 }
 
 dependencies {
