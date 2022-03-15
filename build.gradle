@@ -7,13 +7,8 @@ plugins {
     id "org.sonarqube" version "3.3"
 }
 
-group = 'ch.uzh.ifi.sopra22'
+group = 'ch.uzh.ifi'
 version = '1.0.0'
-sourceCompatibility = "1.17"
-
-springBoot {
-    mainClass.set('ch.uzh.ifi.sopra22.Application')
-}
 
 configurations {
     developmentOnly
@@ -26,15 +21,21 @@ repositories {
     mavenCentral()
 }
 
+springBoot {
+    mainClass.set('ch.uzh.ifi.sopra22.Application')
+}
+
 dependencies {
+    implementation 'org.mapstruct:mapstruct:1.3.1.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
-    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
@@ -44,11 +45,6 @@ dependencies {
     }
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-}
-
-
-tasks.named('test') {
-    useJUnitPlatform()
 }
 
 bootJar {
