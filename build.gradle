@@ -11,6 +11,10 @@ group = 'ch.uzh.ifi.sopra22'
 version = '1.0.0'
 sourceCompatibility = "1.17"
 
+springBoot {
+    mainClass.set('ch.uzh.ifi.sopra22.Application')
+}
+
 configurations {
     developmentOnly
     runtimeClasspath {
@@ -45,6 +49,10 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+bootJar {
+    archiveFileName = "${archiveBaseName.get()}.${archiveExtension.get()}"
 }
 
 test {
