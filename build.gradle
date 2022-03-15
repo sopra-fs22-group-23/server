@@ -9,11 +9,7 @@ plugins {
 
 group = 'ch.uzh.ifi.sopra22'
 version = '1.0.0'
-sourceCompatibility = 1.17
-targetCompatibility = 1.17
-
-
-
+sourceCompatibility = "1.17"
 
 configurations {
     developmentOnly
