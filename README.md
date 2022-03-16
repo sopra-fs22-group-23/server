@@ -1,4 +1,27 @@
-# SoPra RESTful Service Template FS22
+#SOPRA group 23
+
+##Important links
+-  API documentation: https://sopra-fs22-group-23-server.herokuapp.com//swagger-ui/index.html#
+
+### Build
+
+```bash
+./gradlew build
+```
+
+### Run
+
+```bash
+./gradlew bootRun
+```
+
+### Test
+
+```bash
+./gradlew test
+```
+
+# Links from before
 
 ## Getting started with Spring Boot
 
@@ -35,23 +58,7 @@ You can use the local Gradle Wrapper to build the application.
 
 More Information about [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) and [Gradle](https://gradle.org/docs/).
 
-### Build
 
-```bash
-./gradlew build
-```
-
-### Run
-
-```bash
-./gradlew bootRun
-```
-
-### Test
-
-```bash
-./gradlew test
-```
 
 ### Development Mode
 
