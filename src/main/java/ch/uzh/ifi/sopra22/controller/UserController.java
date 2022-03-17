@@ -24,4 +24,18 @@ public class UserController {
     public int GETUser(@Parameter(description = "UserID") @PathVariable Long id) {
         return 100;
     }
+
+    @Operation(summary = "Create new user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User was found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Integer. class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid id supplied", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) }
+            )
+    @PostMapping(value = "/user/")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public int PostUser(@Parameter(description = "UserID") @PathVariable Long id) {
+        return 100;
+    }
 }
