@@ -1,6 +1,6 @@
-#SOPRA group 23
+# SOPRA group 23
 
-##Important links
+## Important links
 -  API documentation: https://sopra-fs22-group-23-server.herokuapp.com//swagger-ui/index.html#
 
 ### Build
