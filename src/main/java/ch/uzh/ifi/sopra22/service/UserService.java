@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,6 +38,11 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+
+    public List<User> getUsers() {
+        return this.userRepository.findAll();
+    }
+
     public User createUser(User newUser) {
         newUser.setToken(UUID.randomUUID().toString());
         newUser.setStatus(UserStatus.ONLINE);
@@ -52,6 +58,44 @@ public class UserService {
         updateRepository(newUser);
         return newUser;
     }
+
+
+    public User authenticateUser(User newUser) {
+        User userByUsername = userRepository.findByUsername(newUser.getUsername());
+        if (userByUsername == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Username not found"));
+        }
+        //System.out.println(userByUsername.getUsername());
+        String hashedNewUserPassword = hashPassword(newUser.getPassword());
+        if(!userByUsername.getPassword().equals(hashedNewUserPassword) ){
+            System.out.println("From Database: " + userByUsername.getPassword());
+            System.out.println("From Frontend: " + newUser.getPassword());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Password is incorrect"));
+        }
+
+        //updates the changes
+        userByUsername.setToken(UUID.randomUUID().toString());
+        userByUsername.setStatus(UserStatus.ONLINE);
+        //does the flushing and saving
+        updateRepository(userByUsername);
+        return userByUsername;
+    }
+
+
+    public void logout(User user) {
+        user.setStatus(UserStatus.OFFLINE);
+        updateRepository(user);
+    }
+
+    public void compareUserByToken(String userToken, String headerToken) {
+        System.out.println("UserbyID: " + userToken);
+        System.out.println("UserbyHeader: " + headerToken);
+        if (!("Bearer "+ userToken).equals(headerToken)){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Unauthorized for the update"));
+        }
+    }
+
+
     public void checkTokenExists(String token) {
         if (token == null){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,  String.format("Unauthorized for this request"));
@@ -98,8 +142,8 @@ public class UserService {
         }
     }
 
-    private void updateRepository(User newUser) {
-        userRepository.save(newUser);
+    private void updateRepository(User user) {
+        userRepository.save(user);
         userRepository.flush();
     }
     private String hashPassword(String passwordToHash) {
