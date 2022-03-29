@@ -16,10 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
@@ -69,7 +65,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].creation_date", is(user.getCreationDate())))
                 .andExpect(jsonPath("[0].birthday", is(user.getBirthday())));
     }
-
+ **/
     @Test
     public void createUser_validInput_userCreated() throws Exception {
         // given
@@ -129,7 +125,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.name", is(user.getName())))
                 .andExpect(jsonPath("$.username", is(user.getUsername())))
                 .andExpect(jsonPath("$.birthday", is(user.getBirthday())));
-    }**/
+    }
     /**
     @Test
     public void authenticateUser_validInput_userAuthenticated() throws Exception {
