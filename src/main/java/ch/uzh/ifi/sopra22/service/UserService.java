@@ -88,8 +88,6 @@ public class UserService {
     }
 
     public void compareUserByToken(String userToken, String headerToken) {
-        System.out.println("UserbyID: " + userToken);
-        System.out.println("UserbyHeader: " + headerToken);
         if (!("Bearer "+ userToken).equals(headerToken)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Unauthorized for the update"));
         }

@@ -16,6 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+
 import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
@@ -36,15 +40,16 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
-/**
+
     @Test
     public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
         // given
         User user = new User();
         user.setName("Firstname Lastname");
         user.setUsername("firstname@lastname");
-        user.setUsername("password");
+        user.setPassword("password");
         user.setId(1L);
+        user.setToken("1");
 
         List<User> allUsers = Collections.singletonList(user);
 
@@ -53,7 +58,9 @@ public class UserControllerTest {
         given(userService.getUsers()).willReturn(allUsers);
 
         // when
-        MockHttpServletRequestBuilder getRequest = get("/users").contentType(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder getRequest = get("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",user.getToken());
 
         // then
         mockMvc.perform(getRequest).andExpect(status().isOk())
@@ -61,11 +68,8 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].id", is(user.getId().intValue())))
                 .andExpect(jsonPath("$[0].name", is(user.getName())))
                 .andExpect(jsonPath("$[0].username", is(user.getUsername())))
-                .andExpect(jsonPath("$[0].logged_in", is(user.getLoggedIn())))
-                .andExpect(jsonPath("$[0].creation_date", is(user.getCreationDate())))
                 .andExpect(jsonPath("[0].birthday", is(user.getBirthday())));
     }
- **/
     @Test
     public void createUser_validInput_userCreated() throws Exception {
         // given
@@ -126,7 +130,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.username", is(user.getUsername())))
                 .andExpect(jsonPath("$.birthday", is(user.getBirthday())));
     }
-    /**
+
     @Test
     public void authenticateUser_validInput_userAuthenticated() throws Exception {
         User user = new User();
@@ -135,16 +139,14 @@ public class UserControllerTest {
         user.setUsername("testUsername");
         user.setPassword("password");
         user.setToken("1");
-        user.setLoggedIn(false);
-
         UserPostDTO userPostDTO = new UserPostDTO();
         userPostDTO.setUsername("testUsername");
         userPostDTO.setPassword("password");
 
-        given(userService.authanticateUser(Mockito.any())).willReturn(user);
+        given(userService.authenticateUser(Mockito.any())).willReturn(user);
 
         // when/then -> do the request + validate the result
-        MockHttpServletRequestBuilder postRequest = post("/user/login")
+        MockHttpServletRequestBuilder postRequest = post("/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(userPostDTO));
 
@@ -154,8 +156,6 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(user.getId().intValue())))
                 .andExpect(jsonPath("$.name", is(user.getName())))
                 .andExpect(jsonPath("$.username", is(user.getUsername())))
-                .andExpect(jsonPath("$.logged_in", is(user.getLoggedIn())))
-                .andExpect(jsonPath("$.creation_date", is(user.getCreationDate())))
                 .andExpect(jsonPath("$.birthday", is(user.getBirthday())));
 
     }
@@ -168,7 +168,6 @@ public class UserControllerTest {
         user.setUsername("testUsername");
         user.setPassword("password");
         user.setToken("1");
-        user.setLoggedIn(false);
 
         UserPostDTO userPostDTO = new UserPostDTO();
         userPostDTO.setUsername("testUsername");
@@ -177,12 +176,12 @@ public class UserControllerTest {
 
         // when/then -> do the request + validate the result
 
-        MockHttpServletRequestBuilder postRequest = post("/user/login")
+        MockHttpServletRequestBuilder postRequest = post("/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(userPostDTO));
 
         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is incorrect"))
-                .when(userService).authanticateUser(Mockito.any());
+                .when(userService).authenticateUser(Mockito.any());
 
         // then
         mockMvc.perform(postRequest)
@@ -198,7 +197,6 @@ public class UserControllerTest {
         user.setUsername("testUsername");
         user.setPassword("password");
         user.setToken("1");
-        user.setLoggedIn(false);
 
         UserPostDTO userPostDTO = new UserPostDTO();
         userPostDTO.setUsername("testUsernam");
@@ -207,12 +205,12 @@ public class UserControllerTest {
 
         // when/then -> do the request + validate the result
 
-        MockHttpServletRequestBuilder postRequest = post("/user/login")
+        MockHttpServletRequestBuilder postRequest = post("/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(userPostDTO));
 
         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username not found"))
-                .when(userService).authanticateUser(Mockito.any());
+                .when(userService).authenticateUser(Mockito.any());
 
         // then
         mockMvc.perform(postRequest)
@@ -226,12 +224,13 @@ public class UserControllerTest {
         user.setUsername("testUsername");
         user.setPassword("password");
         user.setToken("1");
-        user.setLoggedIn(false);
 
         given(userService.getUserByIDNum(Mockito.any())).willReturn(user);
 
         //when
-        MockHttpServletRequestBuilder putRequest = put("/logout/1").contentType(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder putRequest = put("/logout/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",user.getToken());
 
         //then
         mockMvc.perform(putRequest).andExpect(status().isNoContent()); //check status
@@ -245,14 +244,13 @@ public class UserControllerTest {
         user.setUsername("testUsername");
         user.setPassword("password");
         user.setToken("1");
-        user.setLoggedIn(false);
 
         given(userService.getUserByIDNum(Mockito.any())).willReturn(user);
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder getRequest = get("/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization",user.getToken());;
+                .header("Authorization",user.getToken());
 
         // then
         mockMvc.perform(getRequest)
@@ -260,10 +258,10 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(user.getId().intValue())))
                 .andExpect(jsonPath("$.name", is(user.getName())))
                 .andExpect(jsonPath("$.username", is(user.getUsername())))
-                .andExpect(jsonPath("$.logged_in", is(user.getLoggedIn())))
-                .andExpect(jsonPath("$.creation_date", is(user.getCreationDate())))
                 .andExpect(jsonPath("$.birthday", is(user.getBirthday())));
     }
+
+    /** This EndPoint is not implemented yet!!!
     @Test
     public void updateUserFromUserID_validInput() throws Exception {
         User user = new User();
@@ -272,7 +270,6 @@ public class UserControllerTest {
         user.setUsername("testUsername");
         user.setPassword("password");
         user.setToken("1");
-        user.setLoggedIn(false);
 
         UserPostDTO userPostDTO = new UserPostDTO();
         userPostDTO.setUsername("testingUsername");
