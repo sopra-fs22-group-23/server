@@ -45,6 +45,9 @@ public class User implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date birthday;
 
+    @Column()
+    private String email;
+
     public Long getId() {
         return id;
     }
@@ -99,5 +102,13 @@ public class User implements Serializable {
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
