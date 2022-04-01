@@ -2,8 +2,6 @@ package ch.uzh.ifi.sopra22.rest.dto;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
-import ch.uzh.ifi.sopra22.entity.EventLocation;
-import org.apache.tomcat.jni.Local;
 
 import java.util.Date;
 
@@ -14,8 +12,11 @@ public class EventPostDTO {
     private String picture;
     private String description;
     private Date eventDate;
-    private EventLocation eventLocation;
     private EventStatus status;
+    private String locationName;
+    private float longitude;
+    private float latitude;
+
 
     public Long getId() {
         return id;
@@ -65,19 +66,35 @@ public class EventPostDTO {
         this.eventDate = eventDate;
     }
 
-    public EventLocation getEventLocation() {
-        return eventLocation;
-    }
-
-    public void setEventLocation(EventLocation eventLocation) {
-        this.eventLocation = eventLocation;
-    }
-
     public EventStatus getStatus() {
         return status;
     }
 
     public void setStatus(EventStatus status) {
         this.status = status;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public float getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
+    }
+
+    public float getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
     }
 }

@@ -5,23 +5,33 @@ import java.io.Serializable;
 
 public class EventLocation implements Serializable {
 
-    private Long eventId;
+    private String name;
 
-    private String location;
+    private float longitude;
 
-    public Long getEventId() {
-        return eventId;
+    private float latitude;
+
+    public String getName() {
+        return name;
     }
 
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getLocation() {
-        return location;
+    public float getLongitude() {
+        return longitude;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
+    }
+
+    public float getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
     }
 }

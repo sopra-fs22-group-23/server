@@ -41,7 +41,7 @@ public class Event implements Serializable {
     private Date eventDate;
 
     @Column()
-    private EventLocation location;
+    private EventLocation eventLocation;
 
     public Long getId() {
         return id;
@@ -99,11 +99,11 @@ public class Event implements Serializable {
         this.eventDate = eventDate;
     }
 
-    public EventLocation getLocation() {
-        return location;
+    public EventLocation getEventLocation() {
+        return eventLocation;
     }
 
-    public void setLocation(EventLocation location) {
-        this.location = location;
+    public void setEventLocation(EventLocation eventLocation) {
+        this.eventLocation = eventLocation;
     }
 }

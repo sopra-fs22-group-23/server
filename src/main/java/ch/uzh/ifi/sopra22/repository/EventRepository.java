@@ -9,9 +9,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
-    Event findByTitle(String title);
+    //Event findByTitle(String title);
 
-    Event findByLocation(EventLocation location);
+    //Event findByEventLocation(EventLocation location);
 
-    Event findByEventDate(Date date);
+    //Event findByEventDate(Date date);
+
+    ;
 }
