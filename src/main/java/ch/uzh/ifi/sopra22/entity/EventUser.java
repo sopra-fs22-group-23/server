@@ -1,9 +1,10 @@
 package ch.uzh.ifi.sopra22.entity;
 
-import ch.uzh.ifi.sopra22.constants.EventUserRole;
-import ch.uzh.ifi.sopra22.constants.EventUserStatus;
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 
 import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -14,6 +15,7 @@ import java.util.Date;
 @IdClass(EventUserId.class)
 public class EventUser implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 3L;
 
     @Id

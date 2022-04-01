@@ -1,13 +1,9 @@
 package ch.uzh.ifi.sopra22.entity;
 
-import ch.uzh.ifi.sopra22.constants.EventStatus;
-
-import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 
 
-public class Location implements Serializable {
+public class EventLocation implements Serializable {
 
     private Long eventId;
 

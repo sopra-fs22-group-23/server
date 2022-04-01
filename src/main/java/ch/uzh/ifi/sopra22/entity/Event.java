@@ -1,9 +1,11 @@
 package ch.uzh.ifi.sopra22.entity;
 
-import ch.uzh.ifi.sopra22.constants.EventStatus;
-import ch.uzh.ifi.sopra22.constants.EventType;
+
+import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
+import ch.uzh.ifi.sopra22.constants.Event.EventType;
 
 import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -12,7 +14,8 @@ import java.util.Date;
 @Table(name = "EVENT")
 public class Event implements Serializable {
 
-    private static final long serialVersionUID = 2L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue
@@ -38,7 +41,7 @@ public class Event implements Serializable {
     private Date eventDate;
 
     @Column()
-    private Location location;
+    private EventLocation location;
 
     public Long getId() {
         return id;
@@ -96,13 +99,11 @@ public class Event implements Serializable {
         this.eventDate = eventDate;
     }
 
-    public Location getLocation() {
+    public EventLocation getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(EventLocation location) {
         this.location = location;
     }
-
-
 }
