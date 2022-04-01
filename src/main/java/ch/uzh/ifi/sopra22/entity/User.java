@@ -26,7 +26,7 @@ public class User implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
+    @Column()
     private String name;
 
     @Column(nullable = false, unique = true)
@@ -45,7 +45,7 @@ public class User implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date birthday;
 
-    @Column()
+    @Column(unique = true)
     private String email;
 
     public Long getId() {

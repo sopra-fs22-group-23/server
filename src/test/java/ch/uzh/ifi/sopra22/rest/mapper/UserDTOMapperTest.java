@@ -4,7 +4,6 @@ import ch.uzh.ifi.sopra22.constants.UserStatus;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.rest.dto.UserGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
-import org.hibernate.annotations.common.reflection.java.generics.IdentityTypeEnvironment;
 import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
