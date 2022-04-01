@@ -59,6 +59,29 @@ public class UserService {
         return newUser;
     }
 
+    public User editUser(User updatedUser) {
+        Optional<User> userRepo = userRepository.findById(updatedUser.getId());
+        User user = userRepo.orElse(null);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID not found");
+        }
+        if (updatedUser.getUsername() != null) {
+            user.setUsername(updatedUser.getUsername());
+        }
+        if (updatedUser.getPassword() != null) {
+            user.setPassword(hashPassword(updatedUser.getPassword()));
+        }
+        if (updatedUser.getName() != null) {
+            user.setName(updatedUser.getName());
+        }
+        if (updatedUser.getBirthday() != null) {
+            user.setBirthday(updatedUser.getBirthday());
+        }
+
+        updateRepository(user);
+
+        return user;
+    }
 
     public User authenticateUser(User newUser) {
         User userByUsername = userRepository.findByUsername(newUser.getUsername());
@@ -81,23 +104,34 @@ public class UserService {
         return userByUsername;
     }
 
-
     public void logout(User user) {
         user.setStatus(UserStatus.OFFLINE);
         updateRepository(user);
     }
 
     public void compareUserByToken(String userToken, String headerToken) {
+        System.out.println("UserbyID: " + userToken);
+        System.out.println("UserbyHeader: " + headerToken);
         if (!("Bearer "+ userToken).equals(headerToken)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Unauthorized for the update"));
         }
     }
 
-
     public void checkTokenExists(String token) {
         if (token == null){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,  String.format("Unauthorized for this request"));
         }
+    }
+
+    public User getUserByToken(String token) {
+        checkTokenExists(token);
+        User user = userRepository.findByToken(token);
+
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Token not found");
+        }
+
+        return user;
     }
 
     public User getUserByIDNum(Long userId) {
@@ -114,17 +148,6 @@ public class UserService {
         return user;
     }
 
-
-    /**
-     * This is a helper method that will check the uniqueness criteria of the
-     * username and the name
-     * defined in the User entity. The method will do nothing if the input is unique
-     * and throw an error otherwise.
-     *
-     * @param userToBeCreated
-     * @throws org.springframework.web.server.ResponseStatusException
-     * @see User
-     */
     private void checkIfUserExists(User userToBeCreated) {
         User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
         User userByName = userRepository.findByName(userToBeCreated.getName());
@@ -144,6 +167,7 @@ public class UserService {
         userRepository.save(user);
         userRepository.flush();
     }
+
     private String hashPassword(String passwordToHash) {
         String hashedPassword = null;
         try {
@@ -163,5 +187,26 @@ public class UserService {
             e.printStackTrace();
         }
         return hashedPassword;
+    }
+
+    public User validateUser(Long id, String token) {
+        User user = getUserByToken(token);
+
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is invalid");
+        }
+        if (!user.getId().equals(id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Unauthorized access (token invalid)");
+        }
+
+        return user;
+    }
+
+    public void validateToken(String token) {
+        User user = getUserByToken(token);
+
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access (token invalid)");
+        }
     }
 }
