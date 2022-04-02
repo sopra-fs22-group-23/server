@@ -35,7 +35,7 @@ public class EventUserService {
     private final UserService userService;
 
     @Autowired
-    public EventUserService(@Qualifier("eventUserRepository") EventUserRepository eventUserRepository, UserService userService) {
+    public EventUserService(@Qualifier("eventUserRepository") EventUserRepository eventUserRepository, @Qualifier("userService") UserService userService) {
         this.eventUserRepository = eventUserRepository;
         this.userService = userService;
     }

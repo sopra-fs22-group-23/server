@@ -41,7 +41,6 @@ public class EventController {
     @ResponseBody
     public List<EventGetDTO> getAvailableEvents(@RequestHeader("Authorization") String token) {
         List<Event> availableEvents = eventService.getAvailableEvents(token);
-        System.out.println("got availableEvents ###");
 
         List<EventGetDTO> eventGetDTOS = new ArrayList<>();
 
@@ -67,7 +66,7 @@ public class EventController {
 
         Event eventInput = EventDTOMapper.INSTANCE.convertEventPostDTOtoEntity(eventPostDTO);
         Event createdEvent = eventService.createEvent(eventInput);
-        EventUser admin = eventService.createDefaultAdmin(userId, createdEvent.getId());
+        //EventUser admin = eventService.createDefaultAdmin(userId, createdEvent.getId());
 
         return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(createdEvent);
     }

@@ -41,7 +41,8 @@ public class EventService {
 
 
     @Autowired
-    public EventService(@Qualifier("eventRepository") EventRepository eventRepository, UserService userService, EventUserService eventUserService) {
+    public EventService(@Qualifier("eventRepository") EventRepository eventRepository, @Qualifier("userService") UserService userService,
+                        @Qualifier("eventUserService") EventUserService eventUserService) {
         this.eventRepository = eventRepository;
         this.userService = userService;
         this.eventUserService = eventUserService;
@@ -102,7 +103,7 @@ public class EventService {
             newEvent.setTitle("My New Event");
         }
         if (newEvent.getType() == null){
-            newEvent.setType(EventType.PRIVATE);
+            newEvent.setType(EventType.PUBLIC);
         }
         if (newEvent.getDescription() == null){
             newEvent.setDescription("Please edit your event description here...");
@@ -130,8 +131,10 @@ public class EventService {
         newSignup.setEventId(eventId);
         newSignup.setRole(EventUserRole.ADMIN);
         newSignup.setStatus(EventUserStatus.CONFIRMED);
+        System.out.println("new signUp assigned");
 
         EventUser createdEventUser = eventUserService.createEventUser(newSignup);
+        System.out.println("created eventUser #");
 
         return createdEventUser;
     }
