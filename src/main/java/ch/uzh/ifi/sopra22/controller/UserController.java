@@ -136,7 +136,7 @@ public class UserController {
                                @RequestHeader("Authorization") String token, @RequestBody UserPostDTO userPostDTO) {
 
         userService.checkTokenExists(token);
-        User userRepo = userService.validateUser(userId, token);
+        User userRepo = userService.validateUser(userId, userService.parseBearerToken(token));
         userPostDTO.setId(userId);
 
         User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);

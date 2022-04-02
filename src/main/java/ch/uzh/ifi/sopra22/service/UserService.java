@@ -202,8 +202,13 @@ public class UserService {
         return user;
     }
 
+    public String parseBearerToken(String token) {
+        String[] parseToken = token.split(" ");
+        return parseToken[1];
+    }
+
     public void validateToken(String token) {
-        User user = getUserByToken(token);
+        User user = getUserByToken(parseBearerToken(token));
 
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access (token invalid)");

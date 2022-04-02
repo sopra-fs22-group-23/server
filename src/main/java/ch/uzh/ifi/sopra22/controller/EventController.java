@@ -41,6 +41,7 @@ public class EventController {
     @ResponseBody
     public List<EventGetDTO> getAvailableEvents(@RequestHeader("Authorization") String token) {
         List<Event> availableEvents = eventService.getAvailableEvents(token);
+        System.out.println("got availableEvents ###");
 
         List<EventGetDTO> eventGetDTOS = new ArrayList<>();
 

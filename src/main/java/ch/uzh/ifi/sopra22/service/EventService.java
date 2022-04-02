@@ -71,7 +71,7 @@ public class EventService {
     }
 
     private List<Event> getPublicEvents() {
-        List<Event> allEvents = this.eventRepository.findAll();
+        List<Event> allEvents = getEvents();
         List<Event> publicEvents = new ArrayList<>();
 
         for (Event allEvent : allEvents) {
@@ -86,13 +86,14 @@ public class EventService {
     public List<Event> getAvailableEvents(String token) {
         List<Event> availableEvents = getPublicEvents();
         try {
-            List<Long> eventIds = eventUserService.getEventIdsFromToken(token);
+            List<Long> eventIds = eventUserService.getEventIdsFromToken(userService.parseBearerToken(token));
             for (Long eventId : eventIds) {
                 availableEvents.add(getEventByIDNum(eventId));
             }
         } catch (Exception ignored) {
             ;
         }
+
         return availableEvents;
     }
 
@@ -114,7 +115,7 @@ public class EventService {
     }
 
     public Long validateToken(String token) {
-        User user = userService.getUserByToken(token);
+        User user = userService.getUserByToken(userService.parseBearerToken(token));
 
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is invalid");
