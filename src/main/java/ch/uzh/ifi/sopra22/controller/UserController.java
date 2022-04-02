@@ -30,7 +30,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users were found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))}),
-            @ApiResponse(responseCode = "401", description = "Unathorized for this request", content = @Content) })
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content) })
     @GetMapping(value = "/users")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -53,7 +53,7 @@ public class UserController {
             @ApiResponse(responseCode = "201", description = "User was created", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = UserGetDTO.class))}),
             @ApiResponse(responseCode = "409", description = "Conflict, user not unique", content = @Content)}
-            )
+    )
     @PostMapping(value = "/users")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
@@ -109,16 +109,40 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User was found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = UserGetDTO.class))}),
-            @ApiResponse(responseCode = "401", description = "Unathorized for this request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),
             @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
     @GetMapping(value = "/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public UserGetDTO getUserByUserID(@Parameter(description = "UserID") @PathVariable Long userId, @RequestHeader("Authorization") String token) {
         userService.checkTokenExists(token);
+        userService.validateToken(token);
 
         User user = userService.getUserByIDNum(userId);
 
         return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
+
+    @Operation(summary = "Update user with ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "User was updated", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserGetDTO.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
+    @PutMapping(value = "/users/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void updateUserByID(@Parameter(description = "UserID") @PathVariable Long userId,
+                               @RequestHeader("Authorization") String token, @RequestBody UserPostDTO userPostDTO) {
+
+        userService.checkTokenExists(token);
+        User userRepo = userService.validateUser(userId, token);
+        userPostDTO.setId(userId);
+
+        User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+
+        User updatedUser = userService.editUser(userInput);
+    }
+
+
 }

@@ -113,7 +113,7 @@ public class UserService {
         System.out.println("UserbyID: " + userToken);
         System.out.println("UserbyHeader: " + headerToken);
         if (!("Bearer "+ userToken).equals(headerToken)){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("Unauthorized for the update"));
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized for the update");
         }
     }
 

@@ -25,7 +25,6 @@ public interface EventDTOMapper {
     @Mapping(source = "status", target = "status")
     EventGetDTO convertEntityToEventGetDTO(Event event);
 
-    @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "type", target = "type")
     @Mapping(source = "picture", target = "picture")
