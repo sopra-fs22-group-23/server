@@ -19,7 +19,7 @@ public class Application {
     return new WebMvcConfigurer() {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOrigins("https://adambauer.cz").allowedMethods("*");
+        registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
       }
     };
   }

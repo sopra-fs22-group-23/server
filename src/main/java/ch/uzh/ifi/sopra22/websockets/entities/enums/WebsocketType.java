@@ -1,4 +1,4 @@
-package ch.uzh.ifi.sopra22.websockets;
+package ch.uzh.ifi.sopra22.websockets.entities.enums;
 
 public enum WebsocketType
 {
