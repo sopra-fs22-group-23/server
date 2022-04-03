@@ -13,7 +13,7 @@ import java.util.Date;
 @Controller
 public class NotificationController {
 
-    @MessageMapping("/notification")
+    @MessageMapping("/notifications")
     @SendTo("/topic/notifications")
     public OutputMessage send(final NotificationMessage message) {
         System.out.println(message.toString());
