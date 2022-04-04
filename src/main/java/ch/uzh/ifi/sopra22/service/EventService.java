@@ -80,10 +80,14 @@ public class EventService {
 
     public List<Event> getAvailableEvents(String token) {
         List<Event> availableEvents = getPublicEvents();
+        Event currentEvent;
         try {
             List<Long> eventIds = eventUserService.getEventIdsFromToken(userService.parseBearerToken(token));
             for (Long eventId : eventIds) {
-                availableEvents.add(getEventByIDNum(eventId));
+                currentEvent = getEventByIDNum(eventId);
+                if (currentEvent.getType() == EventType.PRIVATE) {
+                    availableEvents.add(getEventByIDNum(eventId));
+                }
             }
         } catch (Exception ignored) {
             ;
