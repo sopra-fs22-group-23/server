@@ -1,11 +1,6 @@
 package ch.uzh.ifi.sopra22.service;
 
-import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
-import ch.uzh.ifi.sopra22.constants.Event.EventType;
-import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
-import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
-import ch.uzh.ifi.sopra22.entity.EventUserId;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import org.slf4j.Logger;
@@ -20,8 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-
 
 
 @Service
@@ -50,11 +43,15 @@ public class EventUserService {
     }
 
     private void checkIfEventUserExists(EventUser eventUserToBe) {
-        EventUserId newId = new EventUserId(eventUserToBe.getUserId(), eventUserToBe.getEventId());
-        Optional<EventUser> eventUserById = eventUserRepository.findById(newId);
+        List<EventUser> eventUsersByUserId = eventUserRepository.findByUserId(eventUserToBe.getUserId());
+        List<Long> eventUsersEventIds = new ArrayList<>();
+        for (EventUser eventUser : eventUsersByUserId) {
+            eventUsersEventIds.add(eventUser.getEventId());
+        }
+
         String baseErrorMessage = "The EventUser provided is not unique. Therefore, the EventUser could not be created!";
 
-        if (eventUserById.isPresent()) {
+        if (eventUsersEventIds.contains(eventUserToBe.getEventId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, baseErrorMessage);
         }
     }

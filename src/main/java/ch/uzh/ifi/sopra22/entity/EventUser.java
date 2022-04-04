@@ -12,16 +12,19 @@ import java.util.Date;
 
 @Entity
 @Table(name = "EVENTUSER")
-@IdClass(EventUserId.class)
 public class EventUser implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long eventUserId;
+
+    @Column(nullable = false)
     private Long userId;
 
-    @Id
+    @Column(nullable = false)
     private Long eventId;
 
     @Column(nullable = false)
@@ -33,6 +36,14 @@ public class EventUser implements Serializable {
     @Column()
     @Temporal(TemporalType.DATE)
     private Date creationDate;
+
+    public Long getEventUserId() {
+        return eventUserId;
+    }
+
+    public void setEventUserId(Long eventUserId) {
+        this.eventUserId = eventUserId;
+    }
 
     public Long getUserId() {
         return userId;

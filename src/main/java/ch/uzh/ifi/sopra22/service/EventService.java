@@ -6,10 +6,7 @@ import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
-import ch.uzh.ifi.sopra22.entity.EventUserId;
 import ch.uzh.ifi.sopra22.entity.User;
-import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
-import ch.uzh.ifi.sopra22.service.EventUserService;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 
 @Service
@@ -131,11 +125,7 @@ public class EventService {
         newSignup.setEventId(eventId);
         newSignup.setRole(EventUserRole.ADMIN);
         newSignup.setStatus(EventUserStatus.CONFIRMED);
-        System.out.println("new signUp assigned");
 
-        EventUser createdEventUser = eventUserService.createEventUser(newSignup);
-        System.out.println("created eventUser #");
-
-        return createdEventUser;
+        return eventUserService.createEventUser(newSignup);
     }
 }
