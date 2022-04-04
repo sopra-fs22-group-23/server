@@ -5,6 +5,7 @@ import ch.uzh.ifi.sopra22.constants.UserStatus;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 
 @Entity
@@ -38,6 +39,9 @@ public class User implements Serializable {
 
     @Column(unique = true)
     private String email;
+
+    @OneToMany(mappedBy = "userId")
+    private List<EventUser> eventUsers;
 
     public Long getId() {
         return id;
@@ -102,4 +106,10 @@ public class User implements Serializable {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public List<EventUser> getEventUsers() { return eventUsers; }
+
+    public void setEventUsers(List<EventUser> eventUsers) { this.eventUsers = eventUsers; }
+
+    public void addEventUsers(EventUser eventUser) { this.eventUsers.add(eventUser); }
 }

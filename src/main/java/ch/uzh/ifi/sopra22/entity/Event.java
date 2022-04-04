@@ -3,11 +3,13 @@ package ch.uzh.ifi.sopra22.entity;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 
 @Entity
@@ -42,6 +44,9 @@ public class Event implements Serializable {
 
     @Column()
     private EventLocation eventLocation;
+
+    @OneToMany(mappedBy = "event")
+    private List<EventUser> eventUsers;
 
     public Long getId() {
         return id;
@@ -106,4 +111,10 @@ public class Event implements Serializable {
     public void setEventLocation(EventLocation eventLocation) {
         this.eventLocation = eventLocation;
     }
+
+    public List<EventUser> getEventUsers() { return eventUsers; }
+
+    public void setEventUsers(List<EventUser> eventUsers) { this.eventUsers = eventUsers; }
+
+    public void addEventUsers(EventUser eventUser) { this.eventUsers.add(eventUser); }
 }

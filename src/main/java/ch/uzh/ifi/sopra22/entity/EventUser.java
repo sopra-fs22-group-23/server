@@ -24,8 +24,14 @@ public class EventUser implements Serializable {
     @Column(nullable = false)
     private Long userId;
 
+    @ManyToOne
+    private User user;
+
     @Column(nullable = false)
     private Long eventId;
+
+    @ManyToOne
+    private Event event;
 
     @Column(nullable = false)
     private EventUserRole role;
@@ -85,4 +91,11 @@ public class EventUser implements Serializable {
         this.creationDate = creationDate;
     }
 
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
+
+    public Event getEvent() { return event; }
+
+    public void setEvent(Event event) { this.event = event; }
 }
