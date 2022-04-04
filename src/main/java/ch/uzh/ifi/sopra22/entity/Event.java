@@ -110,6 +110,7 @@ public class Event implements Serializable {
 
     public void setEventLocation(EventLocation eventLocation) {
         this.eventLocation = eventLocation;
+
     }
 
     public List<EventUser> getEventUsers() { return eventUsers; }
