@@ -4,6 +4,7 @@ import ch.uzh.ifi.sopra22.constants.UserStatus;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -40,8 +41,8 @@ public class User implements Serializable {
     @Column(unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "userId")
-    private List<EventUser> eventUsers;
+    @OneToMany(mappedBy = "user")
+    private List<EventUser> eventUsers = new ArrayList<>();
 
     public Long getId() {
         return id;

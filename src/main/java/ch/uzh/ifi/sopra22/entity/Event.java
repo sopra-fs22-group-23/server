@@ -8,6 +8,7 @@ import org.w3c.dom.stylesheets.LinkStyle;
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class Event implements Serializable {
     private EventLocation eventLocation;
 
     @OneToMany(mappedBy = "event")
-    private List<EventUser> eventUsers;
+    private List<EventUser> eventUsers = new ArrayList<>();
 
     public Long getId() {
         return id;

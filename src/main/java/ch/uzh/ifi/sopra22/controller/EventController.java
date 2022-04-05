@@ -10,6 +10,7 @@ import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
 import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.sopra22.service.EventService;
+import ch.uzh.ifi.sopra22.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,9 +27,11 @@ import java.util.List;
 @RestController
 public class EventController {
     private final EventService eventService;
+    private final UserService userService;
 
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService, UserService userService) {
         this.eventService = eventService;
+        this.userService = userService;
     }
 
     @Operation(summary = "Get a list of all public events and private events where authorized")
@@ -56,17 +59,26 @@ public class EventController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Event was created", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = EventGetDTO.class))}),
-            @ApiResponse(responseCode = "409", description = "Conflict, event not unique", content = @Content)}
+            @ApiResponse(responseCode = "409", description = "Conflict, event not unique", content = @Content),
+            @ApiResponse(responseCode = "401", description = "No user with this Token", content = @Content)}
     )
     @PostMapping(value = "/events")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public EventGetDTO createEvent(@RequestHeader("Authorization") String token, @RequestBody EventPostDTO eventPostDTO) {
-        Long userId = eventService.validateToken(token);
+        User user = eventService.validateToken(token);
 
         Event eventInput = EventDTOMapper.INSTANCE.convertEventPostDTOtoEntity(eventPostDTO);
         Event createdEvent = eventService.createEvent(eventInput);
-        EventUser admin = eventService.createDefaultAdmin(userId, createdEvent.getId());
+        EventUser admin = eventService.createDefaultAdmin(user, createdEvent.getId());
+        //to generate the bidirectional relation
+        eventService.linkEventUsertoEvent(createdEvent, admin);
+        userService.linkEventUsertoUser(user, admin);
+/**
+        List<EventUser> eventUsers = createdEvent.getEventUsers();
+        for (EventUser eventUser: eventUsers){
+            System.out.println(eventUser.getRole());
+        }*/
 
         return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(createdEvent);
     }

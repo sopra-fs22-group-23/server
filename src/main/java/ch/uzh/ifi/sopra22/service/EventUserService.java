@@ -43,15 +43,15 @@ public class EventUserService {
     }
 
     private void checkIfEventUserExists(EventUser eventUserToBe) {
-        List<EventUser> eventUsersByUserId = eventUserRepository.findByUserId(eventUserToBe.getUserId());
+        List<EventUser> eventUsersByUserId = eventUserRepository.findByUserId(eventUserToBe.getUser().getId());
         List<Long> eventUsersEventIds = new ArrayList<>();
         for (EventUser eventUser : eventUsersByUserId) {
-            eventUsersEventIds.add(eventUser.getEventId());
+            eventUsersEventIds.add(eventUser.getEvent().getId());
         }
 
         String baseErrorMessage = "The EventUser provided is not unique. Therefore, the EventUser could not be created!";
 
-        if (eventUsersEventIds.contains(eventUserToBe.getEventId())) {
+        if (eventUsersEventIds.contains(eventUserToBe.getEvent().getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, baseErrorMessage);
         }
     }
@@ -77,8 +77,8 @@ public class EventUserService {
         List<Long> eventIds = new ArrayList<>();
 
         for (int i=0; i < eventUsers.size(); i++) {
-            if (userId.equals(eventUsers.get(i).getUserId())) {
-                eventIds.add(eventUsers.get(i).getEventId());
+            if (userId.equals(eventUsers.get(i).getUser().getId())) {
+                eventIds.add(eventUsers.get(i).getEvent().getId());
             }
         }
 
