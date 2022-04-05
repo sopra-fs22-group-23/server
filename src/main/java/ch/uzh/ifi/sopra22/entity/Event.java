@@ -47,7 +47,7 @@ public class Event implements Serializable {
     private EventLocation eventLocation;
 
     @OneToMany(mappedBy = "event")
-    private List<EventUser> eventUsers = new ArrayList<>();
+    private List<EventUser> eventUsers = new ArrayList<>(); //Set<EventUser> eventUsers = new HashSet<>();
 
     public Long getId() {
         return id;

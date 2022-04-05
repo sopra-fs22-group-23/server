@@ -8,6 +8,7 @@ import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
+import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,15 +32,17 @@ public class EventService {
     private final Logger log = LoggerFactory.getLogger(EventService.class);
 
     private final EventRepository eventRepository;
+    private final EventUserRepository eventUserRepository;
 
     private final EventUserService eventUserService;
     private final UserService userService;
 
 
     @Autowired
-    public EventService(@Qualifier("eventRepository") EventRepository eventRepository, @Qualifier("userService") UserService userService,
-                        @Qualifier("eventUserService") EventUserService eventUserService) {
+    public EventService(@Qualifier("eventRepository") EventRepository eventRepository, @Qualifier("eventUserRepository") EventUserRepository eventUserRepository,
+                        @Qualifier("userService") UserService userService, @Qualifier("eventUserService") EventUserService eventUserService) {
         this.eventRepository = eventRepository;
+        this.eventUserRepository =eventUserRepository;
         this.userService = userService;
         this.eventUserService = eventUserService;
     }
@@ -64,7 +69,7 @@ public class EventService {
         }
         return event;
     }
-
+/** Not needed anymore
     private List<Event> getPublicEvents() {
         List<Event> allEvents = getEvents();
         List<Event> publicEvents = new ArrayList<>();
@@ -76,10 +81,11 @@ public class EventService {
         }
 
         return publicEvents;
-    }
+    }*/
 
     public List<Event> getAvailableEvents(String token) {
-        List<Event> availableEvents = getPublicEvents();
+        //List<Event> availableEvents = getPublicEvents();
+        List<Event> availableEvents = eventRepository.findByType(EventType.PUBLIC);
         Event currentEvent;
         try {
             List<Long> eventIds = eventUserService.getEventIdsFromToken(userService.parseBearerToken(token));
@@ -138,5 +144,35 @@ public class EventService {
     public void linkEventUsertoEvent(Event createdEvent, EventUser admin) {
         createdEvent.addEventUsers(admin);
         updateRepository(createdEvent);
+    }
+
+    public Date stringToDate(String StringDate) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = null;
+        if (StringDate != null) {
+            try {
+                date = format.parse(StringDate);
+            } catch (Exception e) {
+                System.out.println("Date Transformation not done, hence return null");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date is in the wrong format (yyyy-MM-dd)");
+            }
+        }
+        return date;
+    }
+
+    public List<Event> getQueryEventsUserRole(List<Event> availableEvents, String token, EventUserRole userRole) {
+        List<Event> eventUserAfterRole = new ArrayList<>();
+        //List<EventUser>
+        User user = userService.getUserByToken(userService.parseBearerToken(token));
+        for (Event event: availableEvents){
+            List<EventUser> eventUsers = event.getEventUsers();
+            for (EventUser eventUser : eventUsers){
+                if(eventUser.getUser() == user && eventUser.getRole() == userRole){
+                    eventUserAfterRole.add(event);
+                    break;
+                }
+            }
+        }
+        return eventUserAfterRole;
     }
 }
