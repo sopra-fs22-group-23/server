@@ -108,9 +108,4 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public List<EventUser> getEventUsers() { return eventUsers; }
-
-    public void setEventUsers(List<EventUser> eventUsers) { this.eventUsers = eventUsers; }
-
-    public void addEventUsers(EventUser eventUser) { this.eventUsers.add(eventUser); }
 }
