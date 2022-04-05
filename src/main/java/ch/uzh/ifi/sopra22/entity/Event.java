@@ -114,4 +114,10 @@ public class Event implements Serializable {
         this.eventLocation = eventLocation;
 
     }
+    
+    public List<EventUser> getEventUsers() { return eventUsers; }
+
+    public void setEventUsers(List<EventUser> eventUsers) { this.eventUsers = eventUsers; }
+
+    public void addEventUsers(EventUser eventUser) { this.eventUsers.add(eventUser); }
 }
