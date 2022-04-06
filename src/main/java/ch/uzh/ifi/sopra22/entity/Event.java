@@ -46,6 +46,7 @@ public class Event implements Serializable {
     @Column()
     private EventLocation eventLocation;
 
+
     @OneToMany(mappedBy = "event")
     private List<EventUser> eventUsers = new ArrayList<>(); //Set<EventUser> eventUsers = new HashSet<>();
 
@@ -111,8 +112,9 @@ public class Event implements Serializable {
 
     public void setEventLocation(EventLocation eventLocation) {
         this.eventLocation = eventLocation;
-    }
 
+    }
+    
     public List<EventUser> getEventUsers() { return eventUsers; }
 
     public void setEventUsers(List<EventUser> eventUsers) { this.eventUsers = eventUsers; }

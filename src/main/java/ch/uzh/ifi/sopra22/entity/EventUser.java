@@ -31,10 +31,10 @@ public class EventUser implements Serializable {
 
     @ManyToOne
     private User user;
-
-
+    
     @ManyToOne
     private Event event;
+
 
     @Column(nullable = false)
     private EventUserRole role;
@@ -93,7 +93,7 @@ public class EventUser implements Serializable {
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
-
+    
     public User getUser() { return user; }
 
     public void setUser(User user) { this.user = user; }
@@ -101,4 +101,5 @@ public class EventUser implements Serializable {
     public Event getEvent() { return event; }
 
     public void setEvent(Event event) { this.event = event; }
+
 }
