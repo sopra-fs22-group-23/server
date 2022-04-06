@@ -1,5 +1,7 @@
 package ch.uzh.ifi.sopra22.controller;
 
+import ch.uzh.ifi.sopra22.constants.Event.EventType;
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
@@ -21,7 +23,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -38,18 +42,59 @@ public class EventController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Events were found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))}),
-            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content) })
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Date is in the wrong fromat (yyyy-MM-dd)")})
     @GetMapping(value = "/events")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<EventGetDTO> getAvailableEvents(@RequestHeader("Authorization") String token) {
+    public List<EventGetDTO> getAvailableEvents(@RequestHeader("Authorization") String token,
+                                                @RequestParam(required = false, name = "type") EventType eventType,
+                                                @RequestParam(required = false, name = "role") EventUserRole userRole,
+                                                @RequestParam(required = false, name = "from") String fromStringDate,
+                                                @RequestParam(required = false, name = "to") String toStringDate,
+                                                @RequestParam(required = false, name = "location") String location){
         List<Event> availableEvents = eventService.getAvailableEvents(token);
+        System.out.println("Event Type: " + eventType);
+        if (userRole != null){
+            System.out.println("query Event Role");
+            availableEvents = eventService.getQueryEventsUserRole(availableEvents,token,userRole);
+        }
+
+        //Transform date
+        Date fromDate = eventService.stringToDate(fromStringDate);
+        Date toDate = eventService.stringToDate(toStringDate);
+
+        //Go through all the Parameters
+        /**
+         List<Event> eventsByEventType = eventService.getEventsByEventType(availableEvents, eventType);
+         List<Event> eventsByUserRole = eventService.getEventsByEventUserRole(eventsByEventType, userRole, token);
+         List<Event> eventsByFromDate = eventService.getEventsByFromDate(eventsByUserRole, fromDate);
+         List<Event> eventByToDate = eventService.getEventsByToDate(eventsByFromDate, toDate);
+         List<Event> eventByLocation = eventService.getEventsByLocation(eventByToDate, location);*/
+
+        /**List<Event> eventsByUserRole;
+         if(userRole != null){
+         eventsByUserRole = eventService.getEventfromUserRole(userRole);
+         }*/
 
         List<EventGetDTO> eventGetDTOS = new ArrayList<>();
 
+
         // convert each user to the API representation
         for (Event event : availableEvents) {
-            eventGetDTOS.add(EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event));
+            //Checks the eventType, before/after dates and location by name before tranforming the representation
+            if ((eventType == null || event.getType() == eventType) && (fromDate == null || event.getEventDate().after(fromDate))
+                    && (toDate == null || event.getEventDate().before(toDate))){
+                if(location == null){
+                    eventGetDTOS.add(EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event));
+                }
+                if(event.getEventLocation().getName() != null){
+                    if (event.getEventLocation().getName().equals(location)){
+                        eventGetDTOS.add(EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event));
+                    }
+                }
+            }
+
         }
         return eventGetDTOS;
     }

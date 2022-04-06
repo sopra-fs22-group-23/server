@@ -42,7 +42,7 @@ public class User implements Serializable {
     private String email;
 
     @OneToMany(mappedBy = "user")
-    private List<EventUser> eventUsers = new ArrayList<>();
+    private List<EventUser> eventUsers = new ArrayList<>(); //private Set<EventUser> eventUsers = new HashSet<>();
 
     public Long getId() {
         return id;
