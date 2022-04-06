@@ -21,12 +21,20 @@ public class EventUser implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long eventUserId;
 
+    /**
     @Column(nullable = false)
     private Long userId;
 
-
     @Column(nullable = false)
-    private Long eventId;
+    private Long eventId;*/
+
+
+    @ManyToOne
+    private User user;
+    
+    @ManyToOne
+    private Event event;
+
 
     @Column(nullable = false)
     private EventUserRole role;
@@ -45,7 +53,7 @@ public class EventUser implements Serializable {
     public void setEventUserId(Long eventUserId) {
         this.eventUserId = eventUserId;
     }
-
+/**
     public Long getUserId() {
         return userId;
     }
@@ -60,7 +68,7 @@ public class EventUser implements Serializable {
 
     public void setEventId(Long eventId) {
         this.eventId = eventId;
-    }
+    }*/
 
     public EventUserRole getRole() {
         return role;
@@ -85,5 +93,13 @@ public class EventUser implements Serializable {
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
+    
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
+
+    public Event getEvent() { return event; }
+
+    public void setEvent(Event event) { this.event = event; }
 
 }

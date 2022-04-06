@@ -1,6 +1,7 @@
 package ch.uzh.ifi.sopra22.service;
 
 import ch.uzh.ifi.sopra22.constants.UserStatus;
+import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.UserRepository;
 import org.slf4j.Logger;
@@ -36,6 +37,11 @@ public class UserService {
     @Autowired
     public UserService(@Qualifier("userRepository") UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public void linkEventUsertoUser(User user, EventUser admin) {
+        user.addEventUsers(admin);
+        updateRepository(user);
     }
 
 
@@ -128,7 +134,7 @@ public class UserService {
         User user = userRepository.findByToken(token);
 
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Token not found");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No such user exists with this token");
         }
 
         return user;
@@ -163,7 +169,7 @@ public class UserService {
         }
     }
 
-    private void updateRepository(User user) {
+    public void updateRepository(User user) {
         userRepository.save(user);
         userRepository.flush();
     }

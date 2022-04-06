@@ -113,23 +113,30 @@ public class EventService {
         return newEvent;
     }
 
-    public Long validateToken(String token) {
+    public User validateToken(String token) {
         User user = userService.getUserByToken(userService.parseBearerToken(token));
 
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is invalid");
         }
 
-        return user.getId();
+        return user;
     }
 
-    public EventUser createDefaultAdmin(Long userId, Long eventId) {
+    public EventUser createDefaultAdmin(User user, Long eventId) {
         EventUser newSignup = new EventUser();
-        newSignup.setUserId(userId);
-        newSignup.setEventId(eventId);
+        //newSignup.setUserId(userId);
+        //newSignup.setEventId(eventId);
+        newSignup.setUser(user);
+        newSignup.setEvent(getEventByIDNum(eventId));
         newSignup.setRole(EventUserRole.ADMIN);
         newSignup.setStatus(EventUserStatus.CONFIRMED);
 
         return eventUserService.createEventUser(newSignup);
+    }
+
+    public void linkEventUsertoEvent(Event createdEvent, EventUser admin) {
+        createdEvent.addEventUsers(admin);
+        updateRepository(createdEvent);
     }
 }
