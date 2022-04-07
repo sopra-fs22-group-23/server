@@ -125,7 +125,7 @@ public class UserService {
 
     public void checkTokenExists(String token) {
         if (token == null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,  String.format("Unauthorized for this request"));
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized for this request");
         }
     }
 

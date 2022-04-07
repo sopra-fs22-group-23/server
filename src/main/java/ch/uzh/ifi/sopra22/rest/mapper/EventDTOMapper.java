@@ -1,8 +1,11 @@
 package ch.uzh.ifi.sopra22.rest.mapper;
 
 import ch.uzh.ifi.sopra22.entity.Event;
+import ch.uzh.ifi.sopra22.entity.EventTask;
 import ch.uzh.ifi.sopra22.rest.dto.EventGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.EventPostDTO;
+import ch.uzh.ifi.sopra22.rest.dto.EventTaskGetDTO;
+import ch.uzh.ifi.sopra22.rest.dto.EventTaskPostDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -35,5 +38,15 @@ public interface EventDTOMapper {
     @Mapping(source = "longitude", target = "eventLocation.longitude")
     @Mapping(source = "status", target = "status")
     Event convertEventPostDTOtoEntity(EventPostDTO eventPostDTO);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "user.id", target = "userID")
+    @Mapping(source = "event.id", target = "eventID")
+    @Mapping(source = "description", target = "description")
+    EventTaskGetDTO convertEventTaskToEventTakGetDTO(EventTask eventTask);
+
+
+    @Mapping(source = "description", target = "description")
+    EventTask convertEventTaskPostDTOtoEntity(EventTaskPostDTO eventTaskPostDTO);
 
 }

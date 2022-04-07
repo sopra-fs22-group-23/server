@@ -3,15 +3,14 @@ package ch.uzh.ifi.sopra22.controller;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.entity.Event;
+import ch.uzh.ifi.sopra22.entity.EventTask;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
-import ch.uzh.ifi.sopra22.rest.dto.EventGetDTO;
-import ch.uzh.ifi.sopra22.rest.dto.EventPostDTO;
-import ch.uzh.ifi.sopra22.rest.dto.UserGetDTO;
-import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
+import ch.uzh.ifi.sopra22.rest.dto.*;
 import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
 import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.sopra22.service.EventService;
+import ch.uzh.ifi.sopra22.service.EventUserService;
 import ch.uzh.ifi.sopra22.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,6 +29,7 @@ import java.util.List;
 
 @RestController
 public class EventController {
+
     private final EventService eventService;
     private final UserService userService;
 
@@ -127,5 +127,7 @@ public class EventController {
 
         return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(createdEvent);
     }
+
+
 
 }

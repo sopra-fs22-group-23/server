@@ -1,6 +1,8 @@
 package ch.uzh.ifi.sopra22.repository;
 
 import java.util.List;
+
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +17,8 @@ public interface EventUserRepository extends JpaRepository<EventUser, Long> {
     List<EventUser> findByUser(User user);
 
     List<EventUser> findByEventId(Long eventId);
+
+    boolean existsByUserAndEvent_idAndRole(User user, Long event_id, EventUserRole role);
 
 
 }

@@ -1,5 +1,7 @@
 package ch.uzh.ifi.sopra22.service;
 
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
+import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
@@ -85,9 +87,18 @@ public class EventUserService {
         return eventIds;
     }
 
+    /**
+     * return all event ID's that are connected to the user, find out by token
+     */
     public List<Long> getEventIdsFromToken(String token) {
         User user = userService.getUserByToken(token);
         Long userId = user.getId();
         return getEventIDNums(userId);
+    }
+
+
+    public boolean canUserAccessEvent(User user, Long eventID, EventUserRole role){
+        //TODO check if event exists
+        return eventUserRepository.existsByUserAndEvent_idAndRole(user, eventID, role);
     }
 }
