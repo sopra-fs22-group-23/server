@@ -1,9 +1,11 @@
 package ch.uzh.ifi.sopra22.controller;
 
 import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.model.UploadResponseMessage;
 import ch.uzh.ifi.sopra22.rest.dto.UserGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
+import ch.uzh.ifi.sopra22.service.FileService;
 import ch.uzh.ifi.sopra22.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,19 +13,28 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class UserController {
     private final UserService userService;
+    private final FileService fileService;
 
-    public UserController(UserService userService) {
+    @Autowired
+    public UserController(UserService userService, FileService fileService){
         this.userService = userService;
+        this.fileService = fileService;
     }
 
     @Operation(summary = "Get a list of all users")
@@ -114,7 +125,7 @@ public class UserController {
     @GetMapping(value = "/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserGetDTO getUserByUserID(@Parameter(description = "UserID") @PathVariable Long userId, @RequestHeader("Authorization") String token) {
+    public UserGetDTO getUserByUserID(@Parameter(description = "userId") @PathVariable Long userId, @RequestHeader("Authorization") String token) {
         userService.checkTokenExists(token);
         userService.validateToken(token);
 
@@ -132,8 +143,9 @@ public class UserController {
     @PutMapping(value = "/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
-    public void updateUserByID(@Parameter(description = "UserID") @PathVariable Long userId,
-                               @RequestHeader("Authorization") String token, @RequestBody UserPostDTO userPostDTO) {
+    public void updateUserByID(@Parameter(description = "userId") @PathVariable Long userId,
+                               @RequestHeader("Authorization") String token,
+                               @RequestBody UserPostDTO userPostDTO) {
 
         userService.checkTokenExists(token);
         User userRepo = userService.validateUser(userId, userService.parseBearerToken(token));
@@ -142,7 +154,51 @@ public class UserController {
         User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
         User updatedUser = userService.editUser(userInput);
+
     }
+
+    @Operation(summary = "Update user with ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User profile image was saved", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
+    @PostMapping(value = "/users/{userId}/image")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public ResponseEntity<UploadResponseMessage> createProfileImage(@Parameter(description = "userId") @PathVariable Long userId,
+                                                                    @RequestHeader("Authorization") String token,
+                                                                    @RequestParam("file") MultipartFile file){
+
+        userService.checkTokenExists(token);
+        User userRepo = userService.validateUser(userId, userService.parseBearerToken(token));
+        try {
+            fileService.save(file);
+            userService.linkImageToUser(userRepo, file.getOriginalFilename());
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new UploadResponseMessage("Uploaded the file successfully: " + file.getOriginalFilename()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+                    .body(new UploadResponseMessage("Could not upload the file: " + file.getOriginalFilename() + "!"));
+        }
+    }
+
+    @Operation(summary = "Update user with ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User profile image was saved", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
+    @GetMapping(value = "/users/{userId}/image")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public ResponseEntity<Resource> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
+        User user = userService.getUserByIDNum(userId);
+
+        Resource file = fileService.load(user.getImageFile());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
+    }
+
 
 
 }

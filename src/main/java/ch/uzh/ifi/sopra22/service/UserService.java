@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -235,5 +236,10 @@ public class UserService {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access (token invalid)");
         }
+    }
+
+    public void linkImageToUser(User updatedUser, String image) {
+        updatedUser.setImageFile(image);
+        updateRepository(updatedUser);
     }
 }

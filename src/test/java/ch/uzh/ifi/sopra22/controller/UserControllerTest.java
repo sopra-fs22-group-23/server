@@ -2,6 +2,7 @@ package ch.uzh.ifi.sopra22.controller;
 
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
+import ch.uzh.ifi.sopra22.service.FileService;
 import ch.uzh.ifi.sopra22.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +41,9 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private FileService fileService;
 
     @Test
     public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
