@@ -11,6 +11,7 @@ public class UserGetDTO {
     private String username;
     private UserStatus status;
     private Date birthday;
+    private String biography;
 
     public Long getId() {
         return id;
@@ -50,5 +51,13 @@ public class UserGetDTO {
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public String getBiography() {
+        return biography;
+    }
+
+    public void setBiography(String biography) {
+        this.biography = biography;
     }
 }

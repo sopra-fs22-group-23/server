@@ -27,6 +27,7 @@ public interface UserDTOMapper {
     @Mapping(source = "username", target = "username")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "birthday", target = "birthday")
+    @Mapping(source = "biography", target = "biography")
     UserGetDTO convertEntityToUserGetDTO(User user);
 
     @Mapping(source= "id", target = "id")
@@ -34,6 +35,7 @@ public interface UserDTOMapper {
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
     @Mapping(source = "birthday", target = "birthday")
+    @Mapping(source = "biography", target = "biography")
     User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
 
 }

@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Calendar;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -183,5 +184,26 @@ public class UserServiceIntegrationTest {
     @Test
     public void compareUserByID_differentID(){
         assertThrows(ResponseStatusException.class, ()-> userService.compareUserByToken("1L","2L"));
+    }
+    @Test
+    public void editUser_validInput(){
+        assertNull(userRepository.findByUsername("testUsername"));
+
+        User testUser = new User();
+        testUser.setName("testName");
+        testUser.setUsername("testUsername");
+        testUser.setPassword("password");
+        User createdUser = userService.createUser(testUser);
+
+        createdUser.setBiography("Its me");
+        createdUser.setBirthday(Calendar.getInstance().getTime());
+
+        User actualUser = userService.editUser(createdUser);
+
+        assertEquals(actualUser.getId(), createdUser.getId());
+        assertEquals(actualUser.getUsername(), createdUser.getUsername());
+        assertEquals(actualUser.getStatus(), createdUser.getStatus());
+        assertEquals(actualUser.getBirthday(), createdUser.getBirthday());
+        assertEquals(actualUser.getBiography(), createdUser.getBiography());
     }
 }

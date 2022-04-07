@@ -83,6 +83,9 @@ public class UserService {
         if (updatedUser.getBirthday() != null) {
             user.setBirthday(updatedUser.getBirthday());
         }
+        if (updatedUser.getBiography() != null){
+            user.setBiography(updatedUser.getBiography());
+        }
 
         updateRepository(user);
 
