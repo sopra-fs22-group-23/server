@@ -275,6 +275,7 @@ public class UserControllerTest {
         userPostDTO.setUsername("testingUsername");
         userPostDTO.setBirthday(Calendar.getInstance().getTime());
         userPostDTO.setBiography("Its WeVent");
+        userPostDTO.setEmail("2@gmail.com");
 
         given(userService.validateUser(Mockito.any(),Mockito.any())).willReturn(user);
         given(userService.editUser(Mockito.any())).willReturn(user);

@@ -196,6 +196,7 @@ class UserServiceTest {
 
         createdUser.setBiography("Its me");
         createdUser.setBirthday(Calendar.getInstance().getTime());
+        createdUser.setEmail("1@gmail.com");
 
         User actualUser = userService.editUser(createdUser);
 
@@ -204,5 +205,21 @@ class UserServiceTest {
         assertEquals(actualUser.getStatus(), createdUser.getStatus());
         assertEquals(actualUser.getBirthday(), createdUser.getBirthday());
         assertEquals(actualUser.getBiography(), createdUser.getBiography());
+        assertEquals(actualUser.getEmail(), createdUser.getEmail());
+    }
+    @Test
+    public void editUser_invalidEmail(){
+        User createdUser = userService.createUser(testUser);
+
+        Mockito.verify(userRepository).save(Mockito.any());
+
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testUser));
+
+        createdUser.setBiography("Its me");
+        createdUser.setBirthday(Calendar.getInstance().getTime());
+        createdUser.setEmail("1gmail.com");
+
+        assertThrows(ResponseStatusException.class, () -> userService.editUser(createdUser));
+
     }
 }

@@ -197,6 +197,7 @@ public class UserServiceIntegrationTest {
 
         createdUser.setBiography("Its me");
         createdUser.setBirthday(Calendar.getInstance().getTime());
+        createdUser.setEmail("2@gmail.com");
 
         User actualUser = userService.editUser(createdUser);
 
@@ -205,5 +206,6 @@ public class UserServiceIntegrationTest {
         assertEquals(actualUser.getStatus(), createdUser.getStatus());
         assertEquals(actualUser.getBirthday(), createdUser.getBirthday());
         assertEquals(actualUser.getBiography(), createdUser.getBiography());
+        assertEquals(actualUser.getEmail(), createdUser.getEmail());
     }
 }
