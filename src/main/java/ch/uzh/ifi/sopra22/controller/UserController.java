@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -171,6 +172,7 @@ public class UserController {
 
         userService.checkTokenExists(token);
         User userRepo = userService.validateUser(userId, userService.parseBearerToken(token));
+        System.out.println("Get's in here");
         try {
             fileService.save(file);
             userService.linkImageToUser(userRepo, file.getOriginalFilename());
@@ -186,14 +188,22 @@ public class UserController {
     @Operation(summary = "Update user with ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User profile image was saved", content = @Content),
+            //@ApiResponse(responseCode = "400", description = "No file found for this User", content = @Content),
             @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
     @GetMapping(value = "/users/{userId}/image")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public ResponseEntity<Resource> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
         User user = userService.getUserByIDNum(userId);
 
+        if (user.getImageFile() == null){
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; NO FILE EXISTENT!!!")
+                    .body(null);
+            //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User has no image");
+        }
+
         Resource file = fileService.load(user.getImageFile());
+        System.out.println("Filename: "+ file.getFilename() + ". File length: " + file.getDescription());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                 .body(file);
