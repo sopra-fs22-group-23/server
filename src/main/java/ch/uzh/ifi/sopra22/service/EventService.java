@@ -56,7 +56,7 @@ public class EventService {
         return this.eventRepository.findAll();
     }
 
-    private Event getEventByIDNum(Long eventId) {
+    public Event getEventByIDNum(Long eventId) {
         Optional<Event> eventRepo = eventRepository.findById(eventId);
         Event event;
         try{
@@ -129,14 +129,38 @@ public class EventService {
         return user;
     }
 
-    public EventUser createDefaultAdmin(User user, Long eventId) {
+    public EventUser createDefaultAdmin(User user, Event event) {
         EventUser newSignup = new EventUser();
         //newSignup.setUserId(userId);
         //newSignup.setEventId(eventId);
         newSignup.setUser(user);
-        newSignup.setEvent(getEventByIDNum(eventId));
+        newSignup.setEvent(event);
         newSignup.setRole(EventUserRole.ADMIN);
         newSignup.setStatus(EventUserStatus.CONFIRMED);
+
+        return eventUserService.createEventUser(newSignup);
+    }
+
+    public EventUser createCollaborator(User user, Event event) {
+        EventUser newSignup = new EventUser();
+        //newSignup.setUserId(userId);
+        //newSignup.setEventId(eventId);
+        newSignup.setUser(user);
+        newSignup.setEvent(event);
+        newSignup.setRole(EventUserRole.COLLABORATOR);
+        newSignup.setStatus(EventUserStatus.CONFIRMED);
+
+        return eventUserService.createEventUser(newSignup);
+    }
+
+    public EventUser createGuest(User user, Event event) {
+        EventUser newSignup = new EventUser();
+        //newSignup.setUserId(userId);
+        //newSignup.setEventId(eventId);
+        newSignup.setUser(user);
+        newSignup.setEvent(event);
+        newSignup.setRole(EventUserRole.GUEST);
+        newSignup.setStatus(EventUserStatus.INVITED);
 
         return eventUserService.createEventUser(newSignup);
     }
@@ -174,5 +198,17 @@ public class EventService {
             }
         }
         return eventUserAfterRole;
+    }
+
+    public List<User> getUsers(Event event) {
+        List<EventUser> eventUsers = event.getEventUsers();
+        List<User> users = new ArrayList<>();
+        for (EventUser eventUser:eventUsers){
+            users.add(eventUser.getUser());
+        }
+        return users;
+    }
+
+    public void addUserToEvent(Event event, User addingUser) {
     }
 }
