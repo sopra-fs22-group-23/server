@@ -31,6 +31,9 @@ class EventServiceTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private EventUserService eventUserService;
+
     @InjectMocks
     private EventService eventService;
 
@@ -55,6 +58,30 @@ class EventServiceTest {
         // when -> any object is being save in the userRepository -> return the dummy
         // testUser
         Mockito.when(eventRepository.save(Mockito.any())).thenReturn(testEvent);
+    }
+
+    @Test
+    public void createEventUser_validInput(){
+        User user = new User();
+        user.setId(2L);
+        user.setUsername("testUser");
+        user.setToken("1");
+
+        EventUser eventUser = new EventUser();
+        eventUser.setEvent(testEvent);
+        eventUser.setUser(user);
+        eventUser.setEventUserId(3L);
+        eventUser.setRole(EventUserRole.ADMIN);
+        eventUser.setStatus(EventUserStatus.CONFIRMED);
+
+        //given
+        Mockito.when(eventUserService.createEventUser(Mockito.any())).thenReturn(eventUser);
+
+        //when
+        EventUser actualEventUser = eventService.createEventUser(user,testEvent,EventUserRole.ADMIN);
+        assertEquals(actualEventUser.getEvent(), eventUser.getEvent());
+        assertEquals(actualEventUser.getUser(), eventUser.getUser());
+        assertEquals(actualEventUser.getRole(), eventUser.getRole());
     }
 
     @Test
@@ -94,6 +121,31 @@ class EventServiceTest {
         List<Event> queryEventsUserRoleList = eventService.getQueryEventsUserRole(eventList,"Bearer 1", EventUserRole.ADMIN);
         assertEquals(queryEventsUserRoleList,eventList);
 
+    }
+
+    @Test
+    public void getUsers_validInput(){
+        User user = new User();
+        user.setId(2L);
+        user.setName("testUser");
+        user.setUsername("testUser");
+        user.setToken("1");
+
+        EventUser eventUser = new EventUser();
+        eventUser.setEvent(testEvent);
+        eventUser.setUser(user);
+        eventUser.setEventUserId(3L);
+        eventUser.setRole(EventUserRole.ADMIN);
+        eventUser.setStatus(EventUserStatus.CONFIRMED);
+
+        testEvent.addEventUsers(eventUser);
+
+        List<User> testList = eventService.getUsers(testEvent);
+
+        assertEquals(testList.size(), 1);
+        assertEquals(testList.get(0).getName(),user.getName());
+        assertEquals(testList.get(0).getUsername(), user.getUsername());
+        assertEquals(testList.get(0).getToken(), user.getToken());
     }
 
 }

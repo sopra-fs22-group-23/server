@@ -129,38 +129,14 @@ public class EventService {
         return user;
     }
 
-    public EventUser createDefaultAdmin(User user, Event event) {
+    public EventUser createEventUser(User user, Event event, EventUserRole userRole) {
         EventUser newSignup = new EventUser();
         //newSignup.setUserId(userId);
         //newSignup.setEventId(eventId);
         newSignup.setUser(user);
         newSignup.setEvent(event);
-        newSignup.setRole(EventUserRole.ADMIN);
+        newSignup.setRole(userRole);
         newSignup.setStatus(EventUserStatus.CONFIRMED);
-
-        return eventUserService.createEventUser(newSignup);
-    }
-
-    public EventUser createCollaborator(User user, Event event) {
-        EventUser newSignup = new EventUser();
-        //newSignup.setUserId(userId);
-        //newSignup.setEventId(eventId);
-        newSignup.setUser(user);
-        newSignup.setEvent(event);
-        newSignup.setRole(EventUserRole.COLLABORATOR);
-        newSignup.setStatus(EventUserStatus.CONFIRMED);
-
-        return eventUserService.createEventUser(newSignup);
-    }
-
-    public EventUser createGuest(User user, Event event) {
-        EventUser newSignup = new EventUser();
-        //newSignup.setUserId(userId);
-        //newSignup.setEventId(eventId);
-        newSignup.setUser(user);
-        newSignup.setEvent(event);
-        newSignup.setRole(EventUserRole.GUEST);
-        newSignup.setStatus(EventUserStatus.INVITED);
 
         return eventUserService.createEventUser(newSignup);
     }
@@ -207,8 +183,5 @@ public class EventService {
             users.add(eventUser.getUser());
         }
         return users;
-    }
-
-    public void addUserToEvent(Event event, User addingUser) {
     }
 }
