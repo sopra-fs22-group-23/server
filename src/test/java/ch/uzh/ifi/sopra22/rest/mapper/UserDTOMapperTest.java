@@ -23,6 +23,8 @@ class UserDTOMapperTest {
         userPostDTO.setPassword("password");
         userPostDTO.setBirthday(today);
         userPostDTO.setId(1L);
+        userPostDTO.setBiography("This is me");
+        userPostDTO.setEmail("2@gmail.com");
 
         // MAP -> Create user
         User user = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
@@ -33,6 +35,8 @@ class UserDTOMapperTest {
         assertEquals(userPostDTO.getPassword(),user.getPassword());
         assertEquals(userPostDTO.getBirthday(),user.getBirthday());
         assertEquals(userPostDTO.getId(), user.getId());
+        assertEquals(userPostDTO.getBiography(), user.getBiography());
+        assertEquals(userPostDTO.getEmail(), user.getEmail());
     }
 
     @Test
@@ -46,6 +50,7 @@ class UserDTOMapperTest {
         user.setToken("1");
         user.setId(1L);
         user.setBirthday(today);
+        user.setBiography("This is me");
 
         // MAP -> Create UserGetDTO
         UserGetDTO userGetDTO = UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
@@ -56,5 +61,6 @@ class UserDTOMapperTest {
         assertEquals(user.getUsername(), userGetDTO.getUsername());
         assertEquals(user.getStatus(), userGetDTO.getStatus());
         assertEquals(user.getBirthday(), userGetDTO.getBirthday());
+        assertEquals(user.getBiography(),userGetDTO.getBiography());
     }
 }

@@ -23,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -115,7 +114,7 @@ public class EventController {
 
         Event eventInput = EventDTOMapper.INSTANCE.convertEventPostDTOtoEntity(eventPostDTO);
         Event createdEvent = eventService.createEvent(eventInput);
-        EventUser admin = eventService.createDefaultAdmin(user, createdEvent);
+        EventUser admin = eventService.createEventUser(user, createdEvent, EventUserRole.ADMIN);
         //to generate the bidirectional relation
         eventService.linkEventUsertoEvent(createdEvent, admin);
         userService.linkEventUsertoUser(user, admin);
@@ -126,6 +125,24 @@ public class EventController {
         }*/
 
         return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(createdEvent);
+    }
+
+    @Operation(summary = "Get event with ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Event was found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = EventGetDTO.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
+    @GetMapping(value = "/events/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public EventGetDTO getUserByUserID(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token) {
+        userService.checkTokenExists(token);
+        userService.validateToken(token);
+
+        Event event =eventService.getEventByIDNum(eventId);
+
+        return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event);
     }
 
     @Operation(summary = "Get a list of all users from an Event")
@@ -175,14 +192,14 @@ public class EventController {
             addingUser = userService.createUser(userInput);
             String created_token = addingUser.getToken();
             response.addHeader("token", created_token);
-            EventUser guest = eventService.createGuest(addingUser,event);
+            EventUser guest = eventService.createEventUser(addingUser,event,EventUserRole.GUEST);
             eventService.linkEventUsertoEvent(event, guest);
             userService.linkEventUsertoUser(addingUser, guest);
 
             //eventService.addUserToEvent(event, addingUser);
         } else {
             addingUser = userService.getUserByToken(userService.parseBearerToken(token));
-            EventUser guest = eventService.createGuest(addingUser,event);
+            EventUser guest = eventService.createEventUser(addingUser,event,EventUserRole.COLLABORATOR);
             eventService.linkEventUsertoEvent(event, guest);
             userService.linkEventUsertoUser(addingUser, guest);
         }
