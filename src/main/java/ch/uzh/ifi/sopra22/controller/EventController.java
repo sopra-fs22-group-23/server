@@ -151,6 +151,24 @@ public class EventController {
         return userGetDTOs;
     }
 
+    @Operation(summary = "Get event with ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Event was found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = EventGetDTO.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
+    @GetMapping(value = "/events/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public EventGetDTO getUserByUserID(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token) {
+        userService.checkTokenExists(token);
+        userService.validateToken(token);
+
+        Event event =eventService.getEventByIDNum(eventId);
+
+        return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event);
+    }
+
     @Operation(summary = "Add a user to an event")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User was created", content = {
