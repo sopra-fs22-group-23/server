@@ -11,10 +11,13 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Calendar;
@@ -321,7 +324,52 @@ public class UserControllerTest {
         // then
         mockMvc.perform(putRequest)
                 .andExpect(status().isUnauthorized());
-    }/****/
+    }
+
+/**
+    @Test
+    public void uploadfile_validInput() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Test User");
+        user.setUsername("testUsername");
+        user.setPassword("password");
+        user.setToken("1");
+
+
+        given(userService.validateUser(Mockito.any(),Mockito.any())).willReturn(user);
+        //Mock Request
+        MockMultipartFile jsonFile = new MockMultipartFile("test.json", "", "application/json", "{\"key1\": \"value1\"}".getBytes());
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
+                .file(jsonFile)
+                .header("Authorization",user.getToken())
+                        .param("file", String.valueOf(jsonFile)))
+                .andExpect(status().isCreated());
+
+    }
+    @Test
+    public void downloadURL_validInput() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Test User");
+        user.setUsername("testUsername");
+        user.setPassword("password");
+        user.setToken("1");
+
+        MockMultipartFile jsonFile = new MockMultipartFile("test.json", "", "application/json", "{\"key1\": \"value1\"}".getBytes());
+
+        given(userService.getUserByIDNum(Mockito.any())).willReturn(user);
+        given(fileService.load(Mockito.any())).willReturn((Resource) jsonFile);
+
+        MockHttpServletRequestBuilder getRequest = get("/users/1/image")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",user.getToken());
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk());
+    }*/
+
 
     /**
      * Helper Method to convert userPostDTO into a JSON string such that the input
