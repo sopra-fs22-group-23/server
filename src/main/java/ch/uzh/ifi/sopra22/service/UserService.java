@@ -60,6 +60,9 @@ public class UserService {
         String hashedPassword = hashPassword(newUser.getPassword());
         newUser.setPassword(hashedPassword);
         checkIfUserExists(newUser);
+        if (newUser.getEmail() != null){
+            checkEmail(newUser.getEmail());
+        }
 
         updateRepository(newUser);
         return newUser;
@@ -82,6 +85,13 @@ public class UserService {
         }
         if (updatedUser.getBirthday() != null) {
             user.setBirthday(updatedUser.getBirthday());
+        }
+        if (updatedUser.getBiography() != null){
+            user.setBiography(updatedUser.getBiography());
+        }
+        if (updatedUser.getEmail() != null){
+            checkEmail(updatedUser.getEmail());
+            user.setEmail(updatedUser.getEmail());
         }
 
         updateRepository(user);
@@ -166,6 +176,12 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
         } else if (userByName != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "name", "is"));
+        }
+    }
+
+    private void checkEmail(String email){
+        if (!email.contains("@")){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email address");
         }
     }
 
