@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -193,20 +194,26 @@ public class UserController {
     @GetMapping(value = "/users/{userId}/image")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<Resource> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
+    public ResponseEntity<UploadResponseMessage> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
         User user = userService.getUserByIDNum(userId);
 
-        if (user.getImageFile() == null){
-            return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; NO FILE EXISTENT!!!")
-                    .body(null);
-            //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User has no image");
-        }
-
         Resource file = fileService.load(user.getImageFile());
-        System.out.println("Filename: "+ file.getFilename() + ". File length: " + file.getDescription());
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-                .body(file);
+        //System.out.println("Filename: "+ file.getFilename() + ". File length: " + file.getDescription());
+        try {
+            String URL = String.valueOf(file.getURL());
+            if (URL != null){
+                return ( ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                        .body(new UploadResponseMessage(URL)));
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; NO URL FOUND!!!")
+                    .body(null);
+        }
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; NO FILE EXISTENT!!!")
+                .body(null);
     }
 
 
