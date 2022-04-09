@@ -179,6 +179,9 @@ public class EventService {
         return eventTaskRepository.findAllByEvent_id(eventID);
     }
 
+    /**
+     * add task to event, checks also if event exists
+     */
     public void addTask(Long eventID, EventTask task){
         if(!eventRepository.existsById(eventID)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event with this ID does not exists");
@@ -186,6 +189,19 @@ public class EventService {
         Event e = eventRepository.findById(eventID).orElse(null);
         task.setEvent(e);
         eventTaskRepository.save(task);
+    }
+
+    public void updateTask(Long taskID, EventTask newTaskData){
+        EventTask task = eventTaskRepository.getOne(taskID);
+
+        if(newTaskData.getUser() != null){
+            task.setUser(userService.getUserByIDNum(newTaskData.getUser().getId()));
+        }
+
+        if(newTaskData.getDescription() != null){
+            task.setDescription(newTaskData.getDescription());
+        }
+
     }
 
 }

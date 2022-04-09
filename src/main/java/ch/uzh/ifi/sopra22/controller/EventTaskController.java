@@ -91,6 +91,36 @@ public class EventTaskController {
     }
 
 
+    @Operation(summary = "Update task - working only for userID and description, if one is null, it is not updated")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "task was updated", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))}),
+            @ApiResponse(responseCode = "404", description = "No such event exists - TODO", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Only Admins can access this endpoint", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Token not received, Authorization has failed", content = @Content)
+    })
+    @PutMapping(value = "/event/{eventID}/tasks/{taskID}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public List<EventTaskGetDTO> updateEventTasks(@RequestHeader("Authorization") String token,
+                                                  @PathVariable Long taskID,
+                                                  @PathVariable Long eventID,
+                                                  @RequestBody EventTaskPostDTO eventTaskPostDTO
+
+    ) {
+
+        User user = eventService.validateToken(token);//verify that user has rights to access the api - ADMIN or COLLAB
+        if(!(eventUserService.canUserAccessEvent(user, eventID, EventUserRole.ADMIN) || eventUserService.canUserAccessEvent(user, eventID, EventUserRole.COLLABORATOR))){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed to access this event");
+        }
+
+        // update task
+        eventService.updateTask(taskID, EventDTOMapper.INSTANCE.convertEventTaskPostDTOtoEntity(eventTaskPostDTO));
+
+        return getEventTaskGetDTOS(eventID);
+    }
+
+
 
     /**
      * help function to transfer tasks to DTO representation
