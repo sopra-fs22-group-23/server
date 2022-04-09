@@ -64,7 +64,7 @@ public class EventService {
         return this.eventRepository.findAll();
     }
 
-    private Event getEventByIDNum(Long eventId) {
+    public Event getEventByIDNum(Long eventId) {
         Optional<Event> eventRepo = eventRepository.findById(eventId);
         Event event;
         try{
@@ -125,13 +125,13 @@ public class EventService {
         return user;
     }
 
-    public EventUser createDefaultAdmin(User user, Long eventId) {
+    public EventUser createEventUser(User user, Event event, EventUserRole userRole) {
         EventUser newSignup = new EventUser();
         //newSignup.setUserId(userId);
         //newSignup.setEventId(eventId);
         newSignup.setUser(user);
-        newSignup.setEvent(getEventByIDNum(eventId));
-        newSignup.setRole(EventUserRole.ADMIN);
+        newSignup.setEvent(event);
+        newSignup.setRole(userRole);
         newSignup.setStatus(EventUserStatus.CONFIRMED);
 
         return eventUserService.createEventUser(newSignup);
@@ -172,6 +172,7 @@ public class EventService {
         return eventUserAfterRole;
     }
 
+
     /**
      * get all tasks according to event ID, connects only to eventTask repository
      */
@@ -202,6 +203,16 @@ public class EventService {
             task.setDescription(newTaskData.getDescription());
         }
 
+    }
+
+
+    public List<User> getUsers(Event event) {
+        List<EventUser> eventUsers = event.getEventUsers();
+        List<User> users = new ArrayList<>();
+        for (EventUser eventUser:eventUsers){
+            users.add(eventUser.getUser());
+        }
+        return users;
     }
 
 }

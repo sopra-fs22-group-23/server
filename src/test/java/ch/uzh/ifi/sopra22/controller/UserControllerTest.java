@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -260,7 +261,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.birthday", is(user.getBirthday())));
     }
 
-    /** This EndPoint is not implemented yet!!!
+
     @Test
     public void updateUserFromUserID_validInput() throws Exception {
         User user = new User();
@@ -273,8 +274,11 @@ public class UserControllerTest {
         UserPostDTO userPostDTO = new UserPostDTO();
         userPostDTO.setUsername("testingUsername");
         userPostDTO.setBirthday(Calendar.getInstance().getTime());
+        userPostDTO.setBiography("Its WeVent");
+        userPostDTO.setEmail("2@gmail.com");
 
-        given(userService.getUserByIDNum(Mockito.any())).willReturn(user);
+        given(userService.validateUser(Mockito.any(),Mockito.any())).willReturn(user);
+        given(userService.editUser(Mockito.any())).willReturn(user);
 
         //when
         MockHttpServletRequestBuilder putRequest = put("/users/1")
@@ -285,7 +289,7 @@ public class UserControllerTest {
         //then
         mockMvc.perform(putRequest).andExpect(status().isNoContent()); //check for change
     }
-    @Test
+     @Test
     public void updateUser_invaildInput() throws Exception {
         User user = new User();
         user.setId(1L);
@@ -293,13 +297,13 @@ public class UserControllerTest {
         user.setUsername("testUsername");
         user.setPassword("password");
         user.setToken("1");
-        user.setLoggedIn(false);
 
         UserPostDTO userPostDTO = new UserPostDTO();
         userPostDTO.setUsername("testingUsername");
         userPostDTO.setBirthday(Calendar.getInstance().getTime());
 
-        given(userService.getUserByIDNum(Mockito.any())).willReturn(user);
+         given(userService.validateUser(Mockito.any(),Mockito.any())).willReturn(user);
+         given(userService.editUser(Mockito.any())).willReturn(user);
 
         //when
         MockHttpServletRequestBuilder putRequest = put("/users/1")
@@ -308,12 +312,12 @@ public class UserControllerTest {
                 .header("Authorization",user.getToken());
 
         doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized for the update"))
-                .when(userService).compareUserByToken(Mockito.any(),Mockito.any());
+                .when(userService).validateUser(Mockito.any(),Mockito.any());
 
         // then
         mockMvc.perform(putRequest)
                 .andExpect(status().isUnauthorized());
-    }**/
+    }/****/
 
     /**
      * Helper Method to convert userPostDTO into a JSON string such that the input

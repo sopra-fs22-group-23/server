@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -115,7 +114,7 @@ public class EventController {
 
         Event eventInput = EventDTOMapper.INSTANCE.convertEventPostDTOtoEntity(eventPostDTO);
         Event createdEvent = eventService.createEvent(eventInput);
-        EventUser admin = eventService.createDefaultAdmin(user, createdEvent.getId());
+        EventUser admin = eventService.createEventUser(user, createdEvent, EventUserRole.ADMIN);
         //to generate the bidirectional relation
         eventService.linkEventUsertoEvent(createdEvent, admin);
         userService.linkEventUsertoUser(user, admin);
@@ -128,6 +127,86 @@ public class EventController {
         return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(createdEvent);
     }
 
+
+    @Operation(summary = "Get event with ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Event was found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = EventGetDTO.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
+    @GetMapping(value = "/events/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public EventGetDTO getUserByUserID(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token) {
+        userService.checkTokenExists(token);
+        userService.validateToken(token);
+
+        Event event =eventService.getEventByIDNum(eventId);
+
+        return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event);
+    }
+
+    @Operation(summary = "Get a list of all users from an Event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Users were found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content) })
+    @GetMapping(value = "events/{eventId}/users")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<UserGetDTO> getAllUsers(@Parameter(description = "eventId") @PathVariable Long eventId
+            ,@RequestHeader("Authorization") String token) {
+        userService.checkTokenExists(token);
+        Event event = eventService.getEventByIDNum(eventId);
+
+        List<User> users = eventService.getUsers(event);
+        List<UserGetDTO> userGetDTOs = new ArrayList<>();
+
+        // convert each user to the API representation
+        for (User user : users) {
+            userGetDTOs.add(UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+        }
+        return userGetDTOs;
+    }
+
+    @Operation(summary = "Add a user to an event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User was created", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserGetDTO.class))}),
+            @ApiResponse(responseCode = "409", description = "Conflict, user not unique", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized User, could not be found by token", content = @Content)}
+    )
+    @PostMapping(value = "/events/{eventId}/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public UserGetDTO addUserToEvent(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token,
+                                     @RequestBody(required = false) UserPostDTO userPostDTO, HttpServletResponse response) {
+        // convert API user to internal representation
+        User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+
+        //get the event
+        Event event = eventService.getEventByIDNum(eventId);
+
+        //either get a user by its token, or if no token is passed, create a new user
+        User addingUser;
+        if (token.isEmpty()) {
+            addingUser = userService.createUser(userInput);
+            String created_token = addingUser.getToken();
+            response.addHeader("token", created_token);
+            EventUser guest = eventService.createEventUser(addingUser,event,EventUserRole.GUEST);
+            eventService.linkEventUsertoEvent(event, guest);
+            userService.linkEventUsertoUser(addingUser, guest);
+
+            //eventService.addUserToEvent(event, addingUser);
+        } else {
+            addingUser = userService.getUserByToken(userService.parseBearerToken(token));
+            EventUser guest = eventService.createEventUser(addingUser,event,EventUserRole.COLLABORATOR);
+            eventService.linkEventUsertoEvent(event, guest);
+            userService.linkEventUsertoUser(addingUser, guest);
+        }
+
+        return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(addingUser);
+    }
 
 
 }

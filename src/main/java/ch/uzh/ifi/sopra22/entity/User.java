@@ -41,6 +41,9 @@ public class User implements Serializable {
     @Column(unique = true)
     private String email;
 
+    @Column()
+    private String biography;
+
     @OneToMany(mappedBy = "user")
     private List<EventUser> eventUsers = new ArrayList<>(); //private Set<EventUser> eventUsers = new HashSet<>();
 
@@ -114,4 +117,11 @@ public class User implements Serializable {
 
     public void addEventUsers(EventUser eventUser) { this.eventUsers.add(eventUser); }
 
+    public String getBiography() {
+        return biography;
+    }
+
+    public void setBiography(String biography) {
+        this.biography = biography;
+    }
 }

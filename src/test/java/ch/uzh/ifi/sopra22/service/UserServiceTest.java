@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -183,5 +184,42 @@ class UserServiceTest {
     @Test
     public void compareUserByID_mismatchingToken_fail(){
         assertThrows(ResponseStatusException.class, () -> userService.compareUserByToken("1L","2L"));
+    }
+
+    @Test
+    public void editUser_validInput(){
+        User createdUser = userService.createUser(testUser);
+
+        Mockito.verify(userRepository).save(Mockito.any());
+
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testUser));
+
+        createdUser.setBiography("Its me");
+        createdUser.setBirthday(Calendar.getInstance().getTime());
+        createdUser.setEmail("1@gmail.com");
+
+        User actualUser = userService.editUser(createdUser);
+
+        assertEquals(actualUser.getId(), createdUser.getId());
+        assertEquals(actualUser.getUsername(), createdUser.getUsername());
+        assertEquals(actualUser.getStatus(), createdUser.getStatus());
+        assertEquals(actualUser.getBirthday(), createdUser.getBirthday());
+        assertEquals(actualUser.getBiography(), createdUser.getBiography());
+        assertEquals(actualUser.getEmail(), createdUser.getEmail());
+    }
+    @Test
+    public void editUser_invalidEmail(){
+        User createdUser = userService.createUser(testUser);
+
+        Mockito.verify(userRepository).save(Mockito.any());
+
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testUser));
+
+        createdUser.setBiography("Its me");
+        createdUser.setBirthday(Calendar.getInstance().getTime());
+        createdUser.setEmail("1gmail.com");
+
+        assertThrows(ResponseStatusException.class, () -> userService.editUser(createdUser));
+
     }
 }
