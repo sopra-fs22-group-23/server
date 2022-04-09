@@ -3,17 +3,21 @@ package ch.uzh.ifi.sopra22.service;
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.constants.UserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventLocation;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
+import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import ch.uzh.ifi.sopra22.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,11 +37,22 @@ public class EventServiceIntegrationTest {
     @Autowired
     private EventRepository eventRepository;
 
+    @Qualifier("userRepository")
+    @Autowired
+    private UserRepository userRepository;
+
+    @Qualifier("eventUserRepository")
+    @Autowired
+    private EventUserRepository eventUserRepository;
+
     @Autowired
     private EventService eventService;
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EventUserService eventUserService;
 
     private User testUser;
 
@@ -46,6 +61,9 @@ public class EventServiceIntegrationTest {
     @BeforeEach
     public void setup() {
         eventRepository.deleteAll();
+        userRepository.deleteAll();
+        eventUserRepository.deleteAll();
+
 
         testEvent = new Event();
         testEvent.setTitle("We Events");
@@ -62,6 +80,13 @@ public class EventServiceIntegrationTest {
         testUser.setUsername("testUsername");
         testUser.setPassword("password");
 
+    }
+
+    @AfterEach
+    public void cleanup() {
+        eventRepository.deleteAll();
+        userRepository.deleteAll();
+        eventUserRepository.deleteAll();
     }
 
     @Test
@@ -90,6 +115,7 @@ public class EventServiceIntegrationTest {
         assertEquals(createdEvent.getType(), foundEvent.getType());
         assertEquals(createdEvent.getStatus(), foundEvent.getStatus());
     }
+
 
 
 }
