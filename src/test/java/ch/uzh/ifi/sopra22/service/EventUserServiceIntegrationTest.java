@@ -4,7 +4,6 @@ import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
-import ch.uzh.ifi.sopra22.constants.UserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventLocation;
 import ch.uzh.ifi.sopra22.entity.EventUser;
@@ -17,21 +16,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @WebAppConfiguration
 @SpringBootTest
-public class EventServiceIntegrationTest {
+public class EventUserServiceIntegrationTest {
 
     @Qualifier("eventRepository")
     @Autowired
@@ -58,6 +56,8 @@ public class EventServiceIntegrationTest {
 
     private Event testEvent;
 
+    private EventUser testEventUser;
+
     @BeforeEach
     public void setup() {
         eventRepository.deleteAll();
@@ -80,6 +80,14 @@ public class EventServiceIntegrationTest {
         testUser.setUsername("testUsername");
         testUser.setPassword("password");
 
+        testEventUser = new EventUser();
+        testEventUser.setEvent(testEvent);
+        testEventUser.setUser(testUser);
+        testEventUser.setRole(EventUserRole.ADMIN);
+        testEventUser.setStatus(EventUserStatus.CONFIRMED);
+        testEventUser.setCreationDate(new Date(System.currentTimeMillis()));
+        testEventUser.setEventUserId(5L);
+
     }
 
     @AfterEach
@@ -89,31 +97,24 @@ public class EventServiceIntegrationTest {
         eventUserRepository.deleteAll();
     }
 
-    @Test
-    public void getEvents_validInput_success(){
-        Event createdEvent = eventService.createEvent(testEvent);
-
-        // when
-        List<Event> eventList = eventRepository.findAll();
-
-        // then
-        assertEquals(createdEvent.getTitle(), eventList.get(0).getTitle());
-        assertEquals(createdEvent.getType(), eventList.get(0).getType());
-        assertEquals(createdEvent.getStatus(), eventList.get(0).getStatus());
-    }
 
     @Test
-    public void getEventById_validInput_success() {
-        Event createdEvent = eventService.createEvent(testEvent);
+    public void getEventUsers_validInput_success() {
+        ;
+        /*
+        //given
+        EventUser createdEventUser = eventUserService.createEventUser(testEventUser);
 
         //when
-        Event foundEvent = eventService.getEventByIDNum(createdEvent.getId());
+        List<EventUser> eventUsers = eventUserRepository.findAll();
 
         //then
-        assertNotNull(foundEvent);
-        assertEquals(createdEvent.getTitle(), foundEvent.getTitle());
-        assertEquals(createdEvent.getType(), foundEvent.getType());
-        assertEquals(createdEvent.getStatus(), foundEvent.getStatus());
+        assertEquals(createdEventUser.getEventUserId(), eventUsers.get(0).getEventUserId());
+        assertEquals(createdEventUser.getEvent(), eventUsers.get(0).getEvent());
+        assertEquals(createdEventUser.getUser(), eventUsers.get(0).getUser());
+        assertEquals(createdEventUser.getRole(), eventUsers.get(0).getRole());
+        assertEquals(createdEventUser.getStatus(), eventUsers.get(0).getStatus());
+        */
     }
 
 

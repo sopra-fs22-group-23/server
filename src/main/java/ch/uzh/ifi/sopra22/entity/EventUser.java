@@ -53,22 +53,6 @@ public class EventUser implements Serializable {
     public void setEventUserId(Long eventUserId) {
         this.eventUserId = eventUserId;
     }
-/**
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
-    }*/
 
     public EventUserRole getRole() {
         return role;

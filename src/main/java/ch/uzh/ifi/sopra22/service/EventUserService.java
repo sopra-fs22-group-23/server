@@ -33,13 +33,15 @@ public class EventUserService {
         this.userService = userService;
     }
 
-    private List<EventUser> getAllEventUsers() {
+    public List<EventUser> getAllEventUsers() {
         return this.eventUserRepository.findAll();
     }
 
-    private void updateRepository(EventUser eventUser) {
-        eventUserRepository.save(eventUser);
+    private EventUser updateRepository(EventUser eventUser) {
+        EventUser savedEventUser = eventUserRepository.save(eventUser);
+        System.out.println("save ok");
         eventUserRepository.flush();
+        return savedEventUser;
     }
 
     private void checkIfEventUserExists(EventUser eventUserToBe) {
@@ -67,12 +69,14 @@ public class EventUserService {
         }
 
         newEventUser.setCreationDate(new Date(System.currentTimeMillis()));
-        updateRepository(newEventUser);
+        System.out.println("date ok");
+        EventUser savedEventUser = updateRepository(newEventUser);
+        System.out.println("save ok");
 
-        return newEventUser;
+        return savedEventUser;
     }
 
-    private List<Long> getEventIDNums(Long userId) {
+    public List<Long> getEventIDNums(Long userId) {
         List<EventUser> eventUsers = getAllEventUsers();
         List<Long> eventIds = new ArrayList<>();
 
