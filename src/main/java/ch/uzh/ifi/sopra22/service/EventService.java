@@ -47,9 +47,10 @@ public class EventService {
         this.eventUserService = eventUserService;
     }
 
-    private void updateRepository(Event event) {
-        eventRepository.save(event);
+    private Event updateRepository(Event event) {
+        Event updatedEvent = eventRepository.save(event);
         eventRepository.flush();
+        return updatedEvent;
     }
 
     private List<Event> getEvents() {
@@ -69,22 +70,8 @@ public class EventService {
         }
         return event;
     }
-/** Not needed anymore
-    private List<Event> getPublicEvents() {
-        List<Event> allEvents = getEvents();
-        List<Event> publicEvents = new ArrayList<>();
-
-        for (Event allEvent : allEvents) {
-            if (allEvent.getType() == EventType.PUBLIC) {
-                publicEvents.add(allEvent);
-            }
-        }
-
-        return publicEvents;
-    }*/
 
     public List<Event> getAvailableEvents(String token) {
-        //List<Event> availableEvents = getPublicEvents();
         List<Event> availableEvents = eventRepository.findByType(EventType.PUBLIC);
         Event currentEvent;
         try {
@@ -114,9 +101,9 @@ public class EventService {
         }
 
         newEvent.setStatus(EventStatus.IN_PLANNING);
-        updateRepository(newEvent);
+        Event savedEvent = updateRepository(newEvent);
 
-        return newEvent;
+        return savedEvent;
     }
 
     public User validateToken(String token) {

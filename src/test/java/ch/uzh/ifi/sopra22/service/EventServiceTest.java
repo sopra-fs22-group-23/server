@@ -4,11 +4,13 @@ import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
+import ch.uzh.ifi.sopra22.constants.UserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventLocation;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -39,6 +41,8 @@ class EventServiceTest {
 
     private Event testEvent;
 
+    private User testUser;
+
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
@@ -56,8 +60,52 @@ class EventServiceTest {
         testEvent.setEventLocation(eventLocation);
 
         // when -> any object is being save in the userRepository -> return the dummy
-        // testUser
+
+        //given
+        testUser = new User();
+        testUser.setId(2L);
+        testUser.setUsername("username");
+        testUser.setPassword("password");
+        testUser.setName("name");
+        testUser.setToken("12345");
+
+
+
         Mockito.when(eventRepository.save(Mockito.any())).thenReturn(testEvent);
+    }
+
+    @Test
+    public void createEvent_validInput() {
+
+        Event createdEvent = eventService.createEvent(testEvent);
+
+        // then
+        Mockito.verify(eventRepository, Mockito.times(1)).save(Mockito.any());
+
+        assertEquals(createdEvent.getId(), testEvent.getId());
+        assertEquals(createdEvent.getTitle(), testEvent.getTitle());
+        assertEquals(createdEvent.getDescription(), testEvent.getDescription());
+        assertEquals(createdEvent.getType(), testEvent.getType());
+        assertEquals(createdEvent.getStatus(), testEvent.getStatus());
+    }
+
+    @Test
+    public void getAvailableEvents_validUser() {
+        Event createdEvent = eventService.createEvent(testEvent);
+
+        List<Event> eventList = new ArrayList<>();
+        eventList.add(createdEvent);
+
+        //given
+        Mockito.when(eventRepository.findByType(EventType.PUBLIC)).thenReturn(eventList);
+
+        List<Event> testEventList = eventService.getAvailableEvents(testUser.getToken());
+
+        assertEquals(1, testEventList.size());
+        assertEquals(testEvent.getId(), testEventList.get(0).getId());
+        assertEquals(testEvent.getTitle(), testEventList.get(0).getTitle());
+        assertEquals(testEvent.getStatus(), testEventList.get(0).getStatus());
+        assertEquals(testEvent.getType(), testEventList.get(0).getType());
     }
 
     @Test

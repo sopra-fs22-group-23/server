@@ -87,7 +87,7 @@ public class EventController {
                 if(location == null){
                     eventGetDTOS.add(EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event));
                 }
-                if(event.getEventLocation().getName() != null){
+                else if(event.getEventLocation().getName() != null){
                     if (event.getEventLocation().getName().equals(location)){
                         eventGetDTOS.add(EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event));
                     }
