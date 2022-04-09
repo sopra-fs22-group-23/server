@@ -5,9 +5,11 @@ import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
+import ch.uzh.ifi.sopra22.entity.EventTask;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
+import ch.uzh.ifi.sopra22.repository.EventTaskRepository;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +35,22 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final EventUserRepository eventUserRepository;
+    private final EventTaskRepository eventTaskRepository;
 
     private final EventUserService eventUserService;
     private final UserService userService;
 
 
     @Autowired
-    public EventService(@Qualifier("eventRepository") EventRepository eventRepository, @Qualifier("eventUserRepository") EventUserRepository eventUserRepository,
-                        @Qualifier("userService") UserService userService, @Qualifier("eventUserService") EventUserService eventUserService) {
+    public EventService(@Qualifier("eventRepository") EventRepository eventRepository,
+                        @Qualifier("eventUserRepository") EventUserRepository eventUserRepository,
+                        @Qualifier("eventTaskRepository") EventTaskRepository eventTaskRepository,
+                        @Qualifier("userService") UserService userService,
+                        @Qualifier("eventUserService") EventUserService eventUserService
+    ) {
         this.eventRepository = eventRepository;
         this.eventUserRepository =eventUserRepository;
+        this.eventTaskRepository =eventTaskRepository;
         this.userService = userService;
         this.eventUserService = eventUserService;
     }
@@ -69,19 +77,7 @@ public class EventService {
         }
         return event;
     }
-/** Not needed anymore
-    private List<Event> getPublicEvents() {
-        List<Event> allEvents = getEvents();
-        List<Event> publicEvents = new ArrayList<>();
 
-        for (Event allEvent : allEvents) {
-            if (allEvent.getType() == EventType.PUBLIC) {
-                publicEvents.add(allEvent);
-            }
-        }
-
-        return publicEvents;
-    }*/
 
     public List<Event> getAvailableEvents(String token) {
         //List<Event> availableEvents = getPublicEvents();
@@ -176,6 +172,40 @@ public class EventService {
         return eventUserAfterRole;
     }
 
+
+    /**
+     * get all tasks according to event ID, connects only to eventTask repository
+     */
+    public List<EventTask> getTasksByEventID(Long eventID){
+        return eventTaskRepository.findAllByEvent_id(eventID);
+    }
+
+    /**
+     * add task to event, checks also if event exists
+     */
+    public void addTask(Long eventID, EventTask task){
+        if(!eventRepository.existsById(eventID)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event with this ID does not exists");
+        }
+        Event e = eventRepository.findById(eventID).orElse(null);
+        task.setEvent(e);
+        eventTaskRepository.save(task);
+    }
+
+    public void updateTask(Long taskID, EventTask newTaskData){
+        EventTask task = eventTaskRepository.getOne(taskID);
+
+        if(newTaskData.getUser() != null){
+            task.setUser(userService.getUserByIDNum(newTaskData.getUser().getId()));
+        }
+
+        if(newTaskData.getDescription() != null){
+            task.setDescription(newTaskData.getDescription());
+        }
+
+    }
+
+
     public List<User> getUsers(Event event) {
         List<EventUser> eventUsers = event.getEventUsers();
         List<User> users = new ArrayList<>();
@@ -184,4 +214,5 @@ public class EventService {
         }
         return users;
     }
+
 }
