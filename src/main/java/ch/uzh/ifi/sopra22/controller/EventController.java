@@ -136,11 +136,11 @@ public class EventController {
     @GetMapping(value = "/events/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public EventGetDTO getUserByUserID(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token) {
+    public EventGetDTO getEventByEventId(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token) {
         userService.checkTokenExists(token);
         userService.validateToken(token);
 
-        Event event =eventService.getEventByIDNum(eventId);
+        Event event = eventService.getEventByIDNum(eventId);
 
         return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event);
     }

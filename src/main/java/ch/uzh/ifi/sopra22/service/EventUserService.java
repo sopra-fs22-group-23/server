@@ -39,7 +39,6 @@ public class EventUserService {
 
     private EventUser updateRepository(EventUser eventUser) {
         EventUser savedEventUser = eventUserRepository.save(eventUser);
-        System.out.println("save ok");
         eventUserRepository.flush();
         return savedEventUser;
     }
@@ -69,9 +68,7 @@ public class EventUserService {
         }
 
         newEventUser.setCreationDate(new Date(System.currentTimeMillis()));
-        System.out.println("date ok");
         EventUser savedEventUser = updateRepository(newEventUser);
-        System.out.println("save ok");
 
         return savedEventUser;
     }
