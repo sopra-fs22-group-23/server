@@ -196,4 +196,37 @@ class EventServiceTest {
         assertEquals(testList.get(0).getToken(), user.getToken());
     }
 
+    @Test
+    public void testupdateEvent_validInput(){ //do I have to do this, since I don't check anything
+        User user = new User();
+        user.setName("Firstname Lastname");
+        user.setUsername("firstname@lastname");
+        user.setPassword("password");
+        user.setId(2L);
+        user.setToken("1");
+
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("We Events");
+        event.setType(EventType.PUBLIC);
+        event.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        event.setEventLocation(eventLocation);
+
+        EventUser eventUser = new EventUser();
+        eventUser.setEventUserId(3L);
+        eventUser.setEvent(event);
+        eventUser.setUser(user);
+        eventUser.setStatus(EventUserStatus.CONFIRMED);
+        eventUser.setRole(EventUserRole.ADMIN);
+        event.addEventUsers(eventUser);
+
+        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(event);
+
+        eventService.updateEvent(event,user,event);
+    }
+
 }
