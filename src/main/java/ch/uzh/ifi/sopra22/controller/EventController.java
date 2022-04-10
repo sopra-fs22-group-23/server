@@ -167,13 +167,18 @@ public class EventController {
             eventService.validateTokenForEventGET(event, token);
         }
 
-        List<User> users = eventService.getUsers(event);
+        List<EventUser> eventUsers = eventService.getEventUsers(event);
         List<UserGetDTO> userGetDTOs = new ArrayList<>();
 
         // convert each user to the API representation
-        for (User user : users) {
-            userGetDTOs.add(UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+        for (EventUser eventUser : eventUsers) {
+            UserGetDTO userGetDTO = UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(eventUser.getUser());
+            userGetDTO.setEventUserRole(eventUser.getRole());
+            userGetDTO.setEventUserStatus(eventUser.getStatus());
+
+            userGetDTOs.add(userGetDTO);
         }
+
         return userGetDTOs;
     }
 
@@ -203,7 +208,12 @@ public class EventController {
         eventService.linkEventUsertoEvent(event, newSignup);
         userService.linkEventUsertoUser(addedUser, newSignup);
 
-        return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(addedUser);
+        // Modify User with EventUser attributes
+        UserGetDTO userGetDTO = UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(addedUser);
+        userGetDTO.setEventUserRole(newSignup.getRole());
+        userGetDTO.setEventUserStatus(newSignup.getStatus());
+
+        return userGetDTO;
     }
 
 

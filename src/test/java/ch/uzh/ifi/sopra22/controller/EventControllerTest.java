@@ -3,6 +3,7 @@ package ch.uzh.ifi.sopra22.controller;
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventLocation;
 import ch.uzh.ifi.sopra22.entity.EventUser;
@@ -207,12 +208,19 @@ class EventControllerTest {
         eventLocation.setLongitude(1.02F);
         event.setEventLocation(eventLocation);
 
-        List<User> allUsers = Collections.singletonList(user);
+        EventUser eventUser = new EventUser();
+        eventUser.setEvent(event);
+        eventUser.setUser(user);
+        eventUser.setEventUserId(3L);
+        eventUser.setRole(EventUserRole.GUEST);
+        eventUser.setStatus(EventUserStatus.CONFIRMED);
+
+        List<EventUser> allEventUsers = Collections.singletonList(eventUser);
 
         // this mocks the UserService -> we define above what the userService should
         // return when getUsers() is called
         given(eventService.getEventByIDNum(Mockito.any())).willReturn(event);
-        given(eventService.getUsers(Mockito.any())).willReturn(allUsers);
+        given(eventService.getEventUsers(Mockito.any())).willReturn(allEventUsers);
 
         // when
         MockHttpServletRequestBuilder getRequest = get("/events/1/users")

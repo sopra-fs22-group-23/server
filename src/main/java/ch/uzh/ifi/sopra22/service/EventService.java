@@ -294,4 +294,8 @@ public class EventService {
         return users;
     }
 
+    public List<EventUser> getEventUsers(Event event) {
+        return event.getEventUsers();
+    }
+
 }
