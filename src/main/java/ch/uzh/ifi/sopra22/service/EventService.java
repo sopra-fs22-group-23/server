@@ -125,6 +125,42 @@ public class EventService {
         return user;
     }
 
+    public void validateTokenForEventGET(Event event, String token) {
+        User user = validateToken(token);
+
+        boolean thrower = true;
+        for (EventUser eventUser : event.getEventUsers()) {
+            if (eventUser.getUser().getId() == user.getId()) {
+                thrower = false;
+                break;
+            }
+        }
+
+        if (thrower) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this event");
+        }
+
+    }
+
+    public void validateTokenForEventPUT(Event event, String token) {
+        User user = validateToken(token);
+
+        boolean thrower = true;
+        for (EventUser eventUser : event.getEventUsers()) {
+            if (eventUser.getUser().getId() == user.getId()) {
+                if (eventUser.getRole() == EventUserRole.ADMIN) {
+                    thrower = false;
+                    break;
+                }
+            }
+        }
+
+        if (thrower) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized to edit this event");
+        }
+
+    }
+
     public EventUser createEventUser(User user, Event event, EventUserRole userRole) {
         EventUser newSignup = new EventUser();
         //newSignup.setUserId(userId);

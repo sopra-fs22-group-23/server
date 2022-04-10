@@ -138,10 +138,12 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public EventGetDTO getEventByEventId(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token) {
-        userService.checkTokenExists(token);
-        userService.validateToken(token);
-
         Event event = eventService.getEventByIDNum(eventId);
+
+        if (event.getType() == EventType.PRIVATE) {
+            userService.checkTokenExists(token);
+            eventService.validateTokenForEventGET(event, token);
+        }
 
         return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event);
     }
