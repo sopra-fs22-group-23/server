@@ -55,9 +55,10 @@ public class EventService {
         this.eventUserService = eventUserService;
     }
 
-    private void updateRepository(Event event) {
-        eventRepository.save(event);
+    private Event updateRepository(Event event) {
+        Event updatedEvent = eventRepository.save(event);
         eventRepository.flush();
+        return updatedEvent;
     }
 
     private List<Event> getEvents() {
@@ -80,7 +81,6 @@ public class EventService {
 
 
     public List<Event> getAvailableEvents(String token) {
-        //List<Event> availableEvents = getPublicEvents();
         List<Event> availableEvents = eventRepository.findByType(EventType.PUBLIC);
         Event currentEvent;
         try {
@@ -110,9 +110,9 @@ public class EventService {
         }
 
         newEvent.setStatus(EventStatus.IN_PLANNING);
-        updateRepository(newEvent);
+        Event savedEvent = updateRepository(newEvent);
 
-        return newEvent;
+        return savedEvent;
     }
 
     public User validateToken(String token) {

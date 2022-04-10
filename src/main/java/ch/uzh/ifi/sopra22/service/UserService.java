@@ -186,7 +186,7 @@ public class UserService {
     }
 
     public void updateRepository(User user) {
-        userRepository.save(user);
+        User createdUser = userRepository.save(user);
         userRepository.flush();
     }
 

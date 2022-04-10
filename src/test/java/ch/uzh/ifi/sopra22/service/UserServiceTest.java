@@ -39,6 +39,7 @@ class UserServiceTest {
         testUser.setName("testName");
         testUser.setUsername("testUsername");
         testUser.setPassword("password");
+        testUser.setToken("12345");
 
         // when -> any object is being save in the userRepository -> return the dummy
         // testUser
@@ -62,6 +63,39 @@ class UserServiceTest {
         assertEquals(testUser.getUsername(), testListOfUsers.get(0).getUsername());
         assertNotNull(testListOfUsers.get(0).getToken());
         assertEquals(UserStatus.ONLINE, testListOfUsers.get(0).getStatus());
+    }
+
+    @Test
+    public void getUserByToken_success() {
+
+        //given
+        Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
+
+        User userByToken = userService.getUserByToken(testUser.getToken());
+
+        assertEquals(userByToken.getUsername(), testUser.getUsername());
+        assertEquals(userByToken.getPassword(), testUser.getPassword());
+    }
+
+    @Test
+    public void validateUser_success() {
+
+        //given
+        Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
+
+        User validUser = userService.validateUser(testUser.getId(), testUser.getToken());
+
+        assertEquals(validUser.getUsername(), testUser.getUsername());
+        assertEquals(validUser.getPassword(), testUser.getPassword());
+    }
+
+    @Test
+    public void validateUser_throwsException() {
+
+        //given
+        Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
+
+        assertThrows(ResponseStatusException.class, () -> userService.validateUser(15L, testUser.getToken()));
     }
 
     @Test
