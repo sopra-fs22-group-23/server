@@ -189,7 +189,7 @@ public class EventController {
 
         //either get a user by its token, or if no token is passed, create a new user
         User addingUser;
-        if (token.isEmpty()) {
+        if (token.isEmpty()) { //adding unregistered User to Event
             addingUser = userService.createUser(userInput);
             String created_token = addingUser.getToken();
             response.addHeader("token", created_token);
@@ -198,7 +198,7 @@ public class EventController {
             userService.linkEventUsertoUser(addingUser, guest);
 
             //eventService.addUserToEvent(event, addingUser);
-        } else {
+        } else { //Adding User to public event
             addingUser = userService.getUserByToken(userService.parseBearerToken(token));
             EventUser guest = eventService.createEventUser(addingUser,event,EventUserRole.COLLABORATOR);
             eventService.linkEventUsertoEvent(event, guest);
