@@ -253,4 +253,30 @@ public class EventService {
         return users;
     }
 
+    public void updateEvent(Event event, User user, Event eventInput) {
+        isUserAloudToUpdate(event, user);
+        if(eventInput.getTitle() != null){
+            event.setTitle(eventInput.getTitle());
+        }/**else if (eventInput.getType() != null){ //Type should not be able to be changed, or should it?
+            event.setType(eventInput.getType());
+        }*/if (eventInput.getDescription() != null){
+            event.setDescription(eventInput.getDescription());
+        } if (eventInput.getEventDate() != null){
+            event.setEventDate(eventInput.getEventDate());
+        } if (eventInput.getEventLocation() != null){
+            event.setEventLocation(eventInput.getEventLocation());
+        }
+        Event updatedEvent = updateRepository(event);
+    }
+
+    private void isUserAloudToUpdate(Event event, User user) {
+        List<EventUser> eventUsers = event.getEventUsers();
+
+        for (EventUser eventUser : eventUsers){
+            if(user == eventUser.getUser() && eventUser.getRole() ==EventUserRole.ADMIN){
+                return;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is unauthorized to update event");
+    }
 }
