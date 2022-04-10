@@ -1,13 +1,12 @@
 package ch.uzh.ifi.sopra22.repository;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
+import ch.uzh.ifi.sopra22.entity.*;
 import ch.uzh.ifi.sopra22.entity.Event;
-import ch.uzh.ifi.sopra22.entity.Event;
-import ch.uzh.ifi.sopra22.entity.EventLocation;
+
 import java.util.Date;
 import java.util.List;
 
-import ch.uzh.ifi.sopra22.entity.EventUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -20,6 +19,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     //Event findByEventDate(Date date);
 
     List<Event> findByType(EventType eventType);
+
+
 
     //List<Event> findByEventUsersContaining(EventUser eventUsers);
     ;
