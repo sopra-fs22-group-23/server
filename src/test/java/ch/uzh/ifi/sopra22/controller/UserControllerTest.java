@@ -339,12 +339,13 @@ public class UserControllerTest {
 
         given(userService.validateUser(Mockito.any(),Mockito.any())).willReturn(user);
         //Mock Request
-        MockMultipartFile jsonFile = new MockMultipartFile("test.json", "", "application/json", "{\"key1\": \"value1\"}".getBytes());
+        MockMultipartFile jsonFile = new MockMultipartFile("test.json", "test", "application/json", "{\"key1\": \"value1\"}".getBytes());
 
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
+        MockHttpServletRequestBuilder postRequest = MockMvcRequestBuilders.multipart("/users/1/image")
                 .file(jsonFile)
-                .header("Authorization",user.getToken())
-                        .param("file", String.valueOf(jsonFile)))
+                .header("Authorization",user.getToken());
+
+        mockMvc.perform(postRequest)
                 .andExpect(status().isCreated());
 
     }
