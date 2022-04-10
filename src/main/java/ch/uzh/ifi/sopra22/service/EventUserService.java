@@ -98,6 +98,7 @@ public class EventUserService {
     }
 
 
+    // Test comment
     public boolean canUserAccessEvent(User user, Long eventID, EventUserRole role){
         //TODO check if event exists
         return eventUserRepository.existsByUserAndEvent_idAndRole(user, eventID, role);
