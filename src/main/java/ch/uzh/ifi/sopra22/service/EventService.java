@@ -82,17 +82,19 @@ public class EventService {
 
     public List<Event> getAvailableEvents(String token) {
         List<Event> availableEvents = eventRepository.findByType(EventType.PUBLIC);
-        Event currentEvent;
-        try {
-            List<Long> eventIds = eventUserService.getEventIdsFromToken(userService.parseBearerToken(token));
-            for (Long eventId : eventIds) {
-                currentEvent = getEventByIDNum(eventId);
-                if (currentEvent.getType() == EventType.PRIVATE) {
-                    availableEvents.add(getEventByIDNum(eventId));
+        if (token != null) {
+            Event currentEvent;
+            try {
+                List<Long> eventIds = eventUserService.getEventIdsFromToken(userService.parseBearerToken(token));
+                for (Long eventId : eventIds) {
+                    currentEvent = getEventByIDNum(eventId);
+                    if (currentEvent.getType() == EventType.PRIVATE) {
+                        availableEvents.add(getEventByIDNum(eventId));
+                    }
                 }
+            } catch (Exception ignored) {
+                ;
             }
-        } catch (Exception ignored) {
-            ;
         }
 
         return availableEvents;
@@ -123,6 +125,42 @@ public class EventService {
         }
 
         return user;
+    }
+
+    public void validateTokenForEventGET(Event event, String token) {
+        User user = validateToken(token);
+
+        boolean thrower = true;
+        for (EventUser eventUser : event.getEventUsers()) {
+            if (eventUser.getUser().getId() == user.getId()) {
+                thrower = false;
+                break;
+            }
+        }
+
+        if (thrower) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this event");
+        }
+
+    }
+
+    public void validateTokenForEventPUT(Event event, String token) {
+        User user = validateToken(token);
+
+        boolean thrower = true;
+        for (EventUser eventUser : event.getEventUsers()) {
+            if (eventUser.getUser().getId() == user.getId()) {
+                if (eventUser.getRole() == EventUserRole.ADMIN) {
+                    thrower = false;
+                    break;
+                }
+            }
+        }
+
+        if (thrower) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized to edit this event");
+        }
+
     }
 
     public EventUser createEventUser(User user, Event event, EventUserRole userRole) {

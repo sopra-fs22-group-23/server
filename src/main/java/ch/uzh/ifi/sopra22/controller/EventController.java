@@ -46,7 +46,7 @@ public class EventController {
     @GetMapping(value = "/events")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<EventGetDTO> getAvailableEvents(@RequestHeader("Authorization") String token,
+    public List<EventGetDTO> getAvailableEvents(@RequestHeader(value = "Authorization", required = false) String token,
                                                 @RequestParam(required = false, name = "type") EventType eventType,
                                                 @RequestParam(required = false, name = "role") EventUserRole userRole,
                                                 @RequestParam(required = false, name = "from") String fromStringDate,
@@ -137,11 +137,14 @@ public class EventController {
     @GetMapping(value = "/events/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public EventGetDTO getEventByEventId(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token) {
-        userService.checkTokenExists(token);
-        userService.validateToken(token);
-
+    public EventGetDTO getEventByEventId(@Parameter(description = "eventId") @PathVariable Long eventId,
+                                         @RequestHeader(value = "Authorization", required = false) String token) {
         Event event = eventService.getEventByIDNum(eventId);
+
+        if (event.getType() == EventType.PRIVATE) {
+            userService.checkTokenExists(token);
+            eventService.validateTokenForEventGET(event, token);
+        }
 
         return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event);
     }
