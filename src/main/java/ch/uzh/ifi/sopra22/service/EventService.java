@@ -146,25 +146,6 @@ public class EventService {
         return validUser;
     }
 
-    public void validateTokenForEventPUT(Event event, String token) {
-        User user = validateToken(token);
-
-        boolean thrower = true;
-        for (EventUser eventUser : event.getEventUsers()) {
-            if (eventUser.getUser().getId() == user.getId()) {
-                if (eventUser.getRole() == EventUserRole.ADMIN) {
-                    thrower = false;
-                    break;
-                }
-            }
-        }
-
-        if (thrower) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized to edit this event");
-        }
-
-    }
-
     public EventUser createEventUser(User user, Event event, EventUserRole userRole) {
         EventUser newSignup = new EventUser();
         newSignup.setUser(user);
@@ -292,10 +273,36 @@ public class EventService {
             users.add(eventUser.getUser());
         }
         return users;
-    }
-
+   
+      
     public List<EventUser> getEventUsers(Event event) {
         return event.getEventUsers();
     }
 
+    public void updateEvent(Event event, User user, Event eventInput) {
+        isUserAloudToUpdate(event, user);
+        if(eventInput.getTitle() != null){
+            event.setTitle(eventInput.getTitle());
+        }/**else if (eventInput.getType() != null){ //Type should not be able to be changed, or should it?
+            event.setType(eventInput.getType());
+        }*/if (eventInput.getDescription() != null){
+            event.setDescription(eventInput.getDescription());
+        } if (eventInput.getEventDate() != null){
+            event.setEventDate(eventInput.getEventDate());
+        } if (eventInput.getEventLocation() != null){
+            event.setEventLocation(eventInput.getEventLocation());
+        }
+        Event updatedEvent = updateRepository(event);
+    }
+
+    private void isUserAloudToUpdate(Event event, User user) {
+        List<EventUser> eventUsers = event.getEventUsers();
+
+        for (EventUser eventUser : eventUsers){
+            if(user.getId().equals(eventUser.getUser().getId()) && eventUser.getRole() ==EventUserRole.ADMIN){
+                return;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is unauthorized to update event");
+    }
 }

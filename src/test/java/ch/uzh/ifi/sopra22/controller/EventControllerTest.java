@@ -189,6 +189,42 @@ class EventControllerTest {
     }
 
     @Test
+    public void updateSpecificEvent_valid() throws Exception {
+        User user = new User();
+        user.setName("Firstname Lastname");
+        user.setUsername("firstname@lastname");
+        user.setPassword("password");
+        user.setId(2L);
+        user.setToken("1");
+
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("We Events");
+        event.setType(EventType.PUBLIC);
+        event.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        event.setEventLocation(eventLocation);
+
+        EventPostDTO eventPostDTO = new EventPostDTO();
+        eventPostDTO.setTitle("We Events");
+        eventPostDTO.setLocationName("Zurich");
+
+        given(eventService.validateToken(Mockito.any())).willReturn(user);
+        given(eventService.getEventByIDNum(Mockito.any())).willReturn(event);
+
+        MockHttpServletRequestBuilder putRequest = put("/events/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(eventPostDTO))
+                .header("Authorization",user.getToken());
+
+        mockMvc.perform(putRequest)
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     public void getAllUsers_validInput() throws Exception {
         User user = new User();
         user.setName("Firstname Lastname");
