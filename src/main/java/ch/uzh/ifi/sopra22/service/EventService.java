@@ -82,17 +82,19 @@ public class EventService {
 
     public List<Event> getAvailableEvents(String token) {
         List<Event> availableEvents = eventRepository.findByType(EventType.PUBLIC);
-        Event currentEvent;
-        try {
-            List<Long> eventIds = eventUserService.getEventIdsFromToken(userService.parseBearerToken(token));
-            for (Long eventId : eventIds) {
-                currentEvent = getEventByIDNum(eventId);
-                if (currentEvent.getType() == EventType.PRIVATE) {
-                    availableEvents.add(getEventByIDNum(eventId));
+        if (token != null) {
+            Event currentEvent;
+            try {
+                List<Long> eventIds = eventUserService.getEventIdsFromToken(userService.parseBearerToken(token));
+                for (Long eventId : eventIds) {
+                    currentEvent = getEventByIDNum(eventId);
+                    if (currentEvent.getType() == EventType.PRIVATE) {
+                        availableEvents.add(getEventByIDNum(eventId));
+                    }
                 }
+            } catch (Exception ignored) {
+                ;
             }
-        } catch (Exception ignored) {
-            ;
         }
 
         return availableEvents;
