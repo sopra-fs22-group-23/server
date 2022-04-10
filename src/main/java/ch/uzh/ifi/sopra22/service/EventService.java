@@ -219,7 +219,7 @@ public class EventService {
         isUserAloudToUpdate(event, user);
         if(eventInput.getTitle() != null){
             event.setTitle(eventInput.getTitle());
-        }/**else if (eventInput.getType() != null){ //Type should not be able to be changed
+        }/**else if (eventInput.getType() != null){ //Type should not be able to be changed, or should it?
             event.setType(eventInput.getType());
         }*/if (eventInput.getDescription() != null){
             event.setDescription(eventInput.getDescription());
