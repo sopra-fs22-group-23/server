@@ -158,6 +158,10 @@ public class UserService {
         return user;
     }
 
+    public User getUserByPartialUser(User partialUser) {
+        return getUserByIDNum(partialUser.getId());
+    }
+
     private void checkIfUserExists(User userToBeCreated) {
         User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
         User userByName = userRepository.findByName(userToBeCreated.getName());

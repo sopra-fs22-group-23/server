@@ -1,5 +1,7 @@
 package ch.uzh.ifi.sopra22.rest.dto;
 
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
+
 import java.util.Date;
 
 public class UserPostDTO {
@@ -10,6 +12,7 @@ public class UserPostDTO {
     private Date birthday;
     private String biography;
     private String email;
+    private EventUserRole eventUserRole;
 
     public Long getId() {
         return id;
@@ -65,5 +68,13 @@ public class UserPostDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public EventUserRole getEventUserRole() {
+        return eventUserRole;
+    }
+
+    public void setEventUserRole(EventUserRole eventUserRole) {
+        this.eventUserRole = eventUserRole;
     }
 }

@@ -255,8 +255,8 @@ class EventControllerTest {
         eventUser.setRole(EventUserRole.COLLABORATOR);
 
         given(eventService.getEventByIDNum(Mockito.any())).willReturn(event);
-        given(userService.getUserByToken(Mockito.any())).willReturn(user);
-        given(eventService.createEventUser(Mockito.any(),Mockito.any(),Mockito.any())).willReturn(eventUser);
+        given(userService.getUserByPartialUser(Mockito.any())).willReturn(user);
+        given(eventService.validEventUserPOST(Mockito.any(),Mockito.any(),Mockito.any(), Mockito.any())).willReturn(eventUser);
 
         // when
         MockHttpServletRequestBuilder postRequest = post("/events/1/users")

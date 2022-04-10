@@ -11,6 +11,7 @@ import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
 import ch.uzh.ifi.sopra22.repository.EventTaskRepository;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
+import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,13 +128,14 @@ public class EventService {
         return user;
     }
 
-    public void validateTokenForEventGET(Event event, String token) {
+    public EventUser validateTokenForEventGET(Event event, String token) {
         User user = validateToken(token);
-
+        EventUser validUser = new EventUser();
         boolean thrower = true;
         for (EventUser eventUser : event.getEventUsers()) {
             if (eventUser.getUser().getId() == user.getId()) {
                 thrower = false;
+                validUser = eventUser;
                 break;
             }
         }
@@ -141,7 +143,7 @@ public class EventService {
         if (thrower) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this event");
         }
-
+        return validUser;
     }
 
     public void validateTokenForEventPUT(Event event, String token) {
@@ -165,14 +167,53 @@ public class EventService {
 
     public EventUser createEventUser(User user, Event event, EventUserRole userRole) {
         EventUser newSignup = new EventUser();
-        //newSignup.setUserId(userId);
-        //newSignup.setEventId(eventId);
         newSignup.setUser(user);
         newSignup.setEvent(event);
         newSignup.setRole(userRole);
         newSignup.setStatus(EventUserStatus.CONFIRMED);
 
         return eventUserService.createEventUser(newSignup);
+    }
+
+    public EventUser validEventUserPOST(User inputUser, Event event, UserPostDTO userPostDTO, String token) {
+        User tokenUser = validateToken(token);
+        EventUserRole userRole = userPostDTO.getEventUserRole();
+        // Check if inputUser matches tokenUser
+        if (inputUser.getId().equals(tokenUser.getId()) && event.getType() == EventType.PUBLIC) {
+            EventUser newSignup = new EventUser();
+            newSignup.setUser(tokenUser);
+            newSignup.setEvent(event);
+            newSignup.setRole(EventUserRole.GUEST);
+            newSignup.setStatus(EventUserStatus.CONFIRMED);
+            return eventUserService.createEventUser(newSignup);
+        } else {
+            // Check if tokenUser is ADMIN or COLLABORATOR of event
+            boolean thrower = true;
+            for (EventUser eventUser : event.getEventUsers()) {
+                if (eventUser.getUser().getId().equals(tokenUser.getId()) && (eventUser.getRole() == EventUserRole.ADMIN ||
+                        eventUser.getRole() == EventUserRole.COLLABORATOR)) {
+                    thrower = false;
+                    break;
+                }
+            }
+            // Check if thrower is still active (no match with requ. roles)
+            if (thrower) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this action");
+            }
+            // Get user from posted id
+            User addedUser = userService.getUserByIDNum(inputUser.getId());
+
+            // Assign invitation eventUser
+            EventUser newInvite = new EventUser();
+            newInvite.setUser(addedUser);
+            newInvite.setEvent(event);
+            if (userRole == null) {
+                userRole = EventUserRole.GUEST;
+            }
+            newInvite.setRole(userRole);
+            newInvite.setStatus(EventUserStatus.INVITED);
+            return eventUserService.createEventUser(newInvite);
+        }
     }
 
     public void linkEventUsertoEvent(Event createdEvent, EventUser admin) {
