@@ -52,7 +52,7 @@ public class EventUserService {
             eventUsersEventIds.add(eventUser.getEvent().getId());
         }
 
-        String baseErrorMessage = "The EventUser provided is not unique. Therefore, the EventUser could not be created!";
+        String baseErrorMessage = "This user has already been signed up or invited";
 
         if (eventUsersEventIds.contains(eventUserToBe.getEvent().getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, baseErrorMessage);
