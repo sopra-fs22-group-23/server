@@ -354,7 +354,7 @@ public class EventService {
         Event updatedEvent = updateRepository(event);
     }
 
-    private void isUserAloudToUpdate(Event event, User user) {
+    public void isUserAloudToUpdate(Event event, User user) {
         List<EventUser> eventUsers = event.getEventUsers();
 
         for (EventUser eventUser : eventUsers){
@@ -365,4 +365,8 @@ public class EventService {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is unauthorized to update event");
     }
 
+    public void linkImageToEvent(Event event, String createRandomName) {
+        event.setPicture(createRandomName);
+        updateRepository(event);
+    }
 }
