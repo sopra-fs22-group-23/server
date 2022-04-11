@@ -194,7 +194,8 @@ public class UserController {
     @GetMapping(value = "/users/{userId}/image")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<UploadResponseMessage> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
+    //public ResponseEntity<UploadResponseMessage> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
+    public ResponseEntity<Resource> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
         User user = userService.getUserByIDNum(userId);
 
         Resource file = fileService.load(user.getImageFile());
@@ -204,7 +205,8 @@ public class UserController {
             if (URL != null){
                 return ( ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-                        .body(new UploadResponseMessage(URL)));
+                        .body(file));
+                //.body(new UploadResponseMessage(URL)));
             }
 
         } catch (IOException e) {
