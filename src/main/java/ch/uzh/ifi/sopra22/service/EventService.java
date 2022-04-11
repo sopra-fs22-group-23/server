@@ -191,7 +191,7 @@ public class EventService {
         EventUser validUser = new EventUser();
         boolean thrower = true;
         for (EventUser eventUser : event.getEventUsers()) {
-            if (eventUser.getUser().getId() == user.getId()) {
+            if (Objects.equals(eventUser.getUser().getId(), user.getId())) {
                 thrower = false;
                 validUser = eventUser;
                 break;

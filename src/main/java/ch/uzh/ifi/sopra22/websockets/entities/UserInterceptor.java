@@ -17,11 +17,12 @@ public class UserInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
+        assert accessor != null;
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             Object raw = message.getHeaders().get(SimpMessageHeaderAccessor.NATIVE_HEADERS);
 
             if (raw instanceof Map) {
-                Object name = ((Map) raw).get("username");
+                Object name = ((Map<?, ?>) raw).get("username");
 
                 if (name instanceof ArrayList) {
                     accessor.setUser(new WebSocketUser(((ArrayList<String>) name).get(0)));

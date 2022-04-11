@@ -192,7 +192,7 @@ public class UserService {
     private String hashPassword(String passwordToHash) {
         String hashedPassword = null;
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
 
             md.update(passwordToHash.getBytes());
 
