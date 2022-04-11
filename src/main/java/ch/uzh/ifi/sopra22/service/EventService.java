@@ -108,18 +108,18 @@ public class EventService {
             int score = 0;
             try {
                 // Contains check
-                if (event.getTitle().contains(search)) {score += containsWeight;}
-                if (event.getDescription().contains(search)) {score += containsWeight;}
+                if (event.getTitle().toLowerCase().contains(search)) {score += containsWeight;}
+                if (event.getDescription().toLowerCase().contains(search)) {score += containsWeight;}
 
                 //Check words of query (space = ' ', '_', '+')
                 List<String> words = getWordsFromString(search);
                 for (String word : words) {
-                    if (event.getTitle().contains(word)) {score += titleWeight;}
-                    if (event.getDescription().contains(word)) {score += descriptionWeight;}
-                    if (event.getEventLocation().getName().contains(word)) {score += locationNameWeight;}
+                    if (event.getTitle().toLowerCase().contains(word)) {score += titleWeight;}
+                    if (event.getDescription().toLowerCase().contains(word)) {score += descriptionWeight;}
+                    if (event.getEventLocation().getName().toLowerCase().contains(word)) {score += locationNameWeight;}
                 }
                 // last contains check to check occasionally missing locationName last in try block
-                if (event.getEventLocation().getName().contains(search)) {score += containsWeight;}
+                if (event.getEventLocation().getName().toLowerCase().contains(search)) {score += containsWeight;}
             } catch (Exception ignore) {;}
             scores.add(score);
             sortedScores.add(score);
