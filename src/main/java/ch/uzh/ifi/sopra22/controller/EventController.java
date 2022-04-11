@@ -203,6 +203,7 @@ public class EventController {
             EventUserGetDTO eventUserGetDTO = UserDTOMapper.INSTANCE.convertEntityToEventUserGetDTO(eventUser.getUser());
             eventUserGetDTO.setEventUserRole(eventUser.getRole());
             eventUserGetDTO.setEventUserStatus(eventUser.getStatus());
+            eventUserGetDTO.setEventId(eventUser.getEvent().getId());
 
             eventUserGetDTOS.add(eventUserGetDTO);
         }
@@ -240,6 +241,7 @@ public class EventController {
         EventUserGetDTO eventUserGetDTO = UserDTOMapper.INSTANCE.convertEntityToEventUserGetDTO(addedUser);
         eventUserGetDTO.setEventUserRole(newSignup.getRole());
         eventUserGetDTO.setEventUserStatus(newSignup.getStatus());
+        eventUserGetDTO.setEventId(eventId);
 
         return eventUserGetDTO;
     }

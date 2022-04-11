@@ -16,6 +16,7 @@ public class EventUserGetDTO {
     private String biography;
     private EventUserRole eventUserRole;
     private EventUserStatus eventUserStatus;
+    private Long eventId;
 
     public Long getId() {
         return id;
@@ -79,5 +80,13 @@ public class EventUserGetDTO {
 
     public void setEventUserStatus(EventUserStatus eventUserStatus) {
         this.eventUserStatus = eventUserStatus;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 }
