@@ -44,6 +44,9 @@ public class User implements Serializable {
     @Column()
     private String biography;
 
+    @Column()
+    private String imageFile;
+
     @OneToMany(mappedBy = "user")
     private List<EventUser> eventUsers = new ArrayList<>(); //private Set<EventUser> eventUsers = new HashSet<>();
 
@@ -123,5 +126,13 @@ public class User implements Serializable {
 
     public void setBiography(String biography) {
         this.biography = biography;
+    }
+
+    public String getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(String imageFile) {
+        this.imageFile = imageFile;
     }
 }

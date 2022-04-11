@@ -2,6 +2,7 @@ package ch.uzh.ifi.sopra22.controller;
 
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
+import ch.uzh.ifi.sopra22.service.FileService;
 import ch.uzh.ifi.sopra22.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,10 +11,13 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Calendar;
@@ -40,6 +44,9 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private FileService fileService;
 
     @Test
     public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
@@ -317,7 +324,53 @@ public class UserControllerTest {
         // then
         mockMvc.perform(putRequest)
                 .andExpect(status().isUnauthorized());
-    }/****/
+    }
+
+
+    @Test
+    public void uploadfile_validInput() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Test User");
+        user.setUsername("testUsername");
+        user.setPassword("password");
+        user.setToken("1");
+
+
+        given(userService.validateUser(Mockito.any(),Mockito.any())).willReturn(user);
+        //Mock Request
+        MockMultipartFile jsonFile = new MockMultipartFile("test.json", "test", "application/json", "{\"key1\": \"value1\"}".getBytes());
+
+        MockHttpServletRequestBuilder postRequest = MockMvcRequestBuilders.multipart("/users/1/image")
+                .file("file",jsonFile.getBytes())
+                .header("Authorization",user.getToken());
+
+        mockMvc.perform(postRequest)
+                .andExpect(status().isCreated());
+
+    }
+    @Test
+    public void downloadURL_validInput() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Test User");
+        user.setUsername("testUsername");
+        user.setPassword("password");
+        user.setToken("1");
+
+        MockMultipartFile jsonFile = new MockMultipartFile("test.json", "", "application/json", "{\"key1\": \"value1\"}".getBytes());
+
+        given(userService.getUserByIDNum(Mockito.any())).willReturn(user);
+        given(fileService.load(Mockito.any())).willReturn(null);
+
+        MockHttpServletRequestBuilder getRequest = get("/users/1/image")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",user.getToken());
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isBadRequest());
+    }/***/
+
 
     /**
      * Helper Method to convert userPostDTO into a JSON string such that the input
