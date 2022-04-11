@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -174,11 +175,16 @@ public class UserController {
         userService.checkTokenExists(token);
         User userRepo = userService.validateUser(userId, userService.parseBearerToken(token));
         System.out.println("Get's in here");
+        String createRandomName = fileService.createRandomName(file.getOriginalFilename());
+        //String randomString = RandomStringUtils.random(20,true,true);
+        System.out.println(createRandomName);
+        //file.setOrginalFilename(randomString);
         try {
-            fileService.save(file);
-            userService.linkImageToUser(userRepo, file.getOriginalFilename());
+            fileService.save(file,createRandomName);
+            //userService.linkImageToUser(userRepo, file.getOriginalFilename());
+            userService.linkImageToUser(userRepo,createRandomName);
 
-            return ResponseEntity.status(HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new UploadResponseMessage("Uploaded the file successfully: " + file.getOriginalFilename()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
@@ -198,24 +204,18 @@ public class UserController {
     public ResponseEntity<Resource> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
         User user = userService.getUserByIDNum(userId);
 
-        Resource file = fileService.load(user.getImageFile());
-        //System.out.println("Filename: "+ file.getFilename() + ". File length: " + file.getDescription());
         try {
-            String URL = String.valueOf(file.getURL());
-            if (URL != null){
-                return ( ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-                        .body(file));
-                //.body(new UploadResponseMessage(URL)));
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; NO URL FOUND!!!")
-                    .body(null);
+            Resource file = fileService.load(user.getImageFile());
+            return ( ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                    .body(file));
+        }catch (NullPointerException e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "there is no image");
         }
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; NO FILE EXISTENT!!!")
-                .body(null);
+        //System.out.println("Filename: "+ file.getFilename() + ". File length: " + file.getDescription());
+
+        //return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; NO FILE EXISTENT!!!")
+          //      .body(null);
     }
 
 

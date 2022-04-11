@@ -326,7 +326,7 @@ public class UserControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-/**
+
     @Test
     public void uploadfile_validInput() throws Exception {
         User user = new User();
@@ -342,7 +342,7 @@ public class UserControllerTest {
         MockMultipartFile jsonFile = new MockMultipartFile("test.json", "test", "application/json", "{\"key1\": \"value1\"}".getBytes());
 
         MockHttpServletRequestBuilder postRequest = MockMvcRequestBuilders.multipart("/users/1/image")
-                .file(jsonFile)
+                .file("file",jsonFile.getBytes())
                 .header("Authorization",user.getToken());
 
         mockMvc.perform(postRequest)
@@ -361,15 +361,15 @@ public class UserControllerTest {
         MockMultipartFile jsonFile = new MockMultipartFile("test.json", "", "application/json", "{\"key1\": \"value1\"}".getBytes());
 
         given(userService.getUserByIDNum(Mockito.any())).willReturn(user);
-        given(fileService.load(Mockito.any())).willReturn((Resource) jsonFile);
+        given(fileService.load(Mockito.any())).willReturn(null);
 
         MockHttpServletRequestBuilder getRequest = get("/users/1/image")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization",user.getToken());
 
         mockMvc.perform(getRequest)
-                .andExpect(status().isOk());
-    }*/
+                .andExpect(status().isBadRequest());
+    }/***/
 
 
     /**

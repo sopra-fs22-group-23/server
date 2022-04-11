@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import ch.uzh.ifi.sopra22.entity.User;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -33,13 +34,15 @@ public class FileService {
         }
     }
 
-    public void save(MultipartFile file) {
+    public void save(MultipartFile file, String name) {
         try {
             Path root = Paths.get(uploadPath);
             if (!Files.exists(root)) {
                 init();
             }
-            Files.copy(file.getInputStream(), root.resolve(file.getOriginalFilename()));
+            //Files.copy(file.getInputStream(), root.resolve(file.getOriginalFilename()));
+            System.out.println(file.getOriginalFilename());
+            Files.copy(file.getInputStream(), root.resolve(name));
         } catch (Exception e) {
             throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
         }
@@ -61,23 +64,9 @@ public class FileService {
         }
     }
 
-    public void deleteAll() {
-        FileSystemUtils.deleteRecursively(Paths.get(uploadPath)
-                .toFile());
-    }
-
-    public List<Path> loadAll() {
-        try {
-            Path root = Paths.get(uploadPath);
-            if (Files.exists(root)) {
-                return Files.walk(root, 1)
-                        .filter(path -> !path.equals(root))
-                        .collect(Collectors.toList());
-            }
-
-            return Collections.emptyList();
-        } catch (IOException e) {
-            throw new RuntimeException("Could not list the files!");
-        }
+    public String createRandomName(String originalFilename) {
+        String randomString = RandomStringUtils.random(20,true,true);
+        String endtype = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+        return randomString + "." + endtype;
     }
 }
