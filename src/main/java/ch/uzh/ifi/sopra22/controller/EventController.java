@@ -51,7 +51,8 @@ public class EventController {
                                                 @RequestParam(required = false, name = "role") EventUserRole userRole,
                                                 @RequestParam(required = false, name = "from") String fromStringDate,
                                                 @RequestParam(required = false, name = "to") String toStringDate,
-                                                @RequestParam(required = false, name = "location") String location){
+                                                @RequestParam(required = false, name = "location") String location,
+                                                @RequestParam(required = false, name = "search") String search){
         List<Event> availableEvents = eventService.getAvailableEvents(token);
         System.out.println("Event Type: " + eventType);
         if (userRole != null){
@@ -76,8 +77,10 @@ public class EventController {
          eventsByUserRole = eventService.getEventfromUserRole(userRole);
          }*/
 
-        List<EventGetDTO> eventGetDTOS = new ArrayList<>();
+        // change Sorting based on search score
+        availableEvents = eventService.sortEventsBySearch(availableEvents, search);
 
+        List<EventGetDTO> eventGetDTOS = new ArrayList<>();
 
         // convert each user to the API representation
         for (Event event : availableEvents) {
@@ -183,17 +186,27 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<UserGetDTO> getAllUsers(@Parameter(description = "eventId") @PathVariable Long eventId
-            ,@RequestHeader("Authorization") String token) {
-        userService.checkTokenExists(token);
+            ,@RequestHeader(value = "Authorization", required = false) String token) {
         Event event = eventService.getEventByIDNum(eventId);
 
-        List<User> users = eventService.getUsers(event);
+        // Check authorization
+        if (event.getType() == EventType.PRIVATE) {
+            userService.checkTokenExists(token);
+            eventService.validateTokenForEventGET(event, token);
+        }
+
+        List<EventUser> eventUsers = eventService.getEventUsers(event);
         List<UserGetDTO> userGetDTOs = new ArrayList<>();
 
         // convert each user to the API representation
-        for (User user : users) {
-            userGetDTOs.add(UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+        for (EventUser eventUser : eventUsers) {
+            UserGetDTO userGetDTO = UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(eventUser.getUser());
+            userGetDTO.setEventUserRole(eventUser.getRole());
+            userGetDTO.setEventUserStatus(eventUser.getStatus());
+
+            userGetDTOs.add(userGetDTO);
         }
+
         return userGetDTOs;
     }
 
@@ -207,33 +220,28 @@ public class EventController {
     @PostMapping(value = "/events/{eventId}/users")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public UserGetDTO addUserToEvent(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token,
+    public UserGetDTO addUserToEvent(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token,
                                      @RequestBody(required = false) UserPostDTO userPostDTO, HttpServletResponse response) {
         // convert API user to internal representation
         User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
-        //get the event
+        //get the event & user to be added
         Event event = eventService.getEventByIDNum(eventId);
+        User addedUser = userService.getUserByPartialUser(userInput);
 
-        //either get a user by its token, or if no token is passed, create a new user
-        User addingUser;
-        if (token.isEmpty()) { //adding unregistered User to Event
-            addingUser = userService.createUser(userInput);
-            String created_token = addingUser.getToken();
-            response.addHeader("token", created_token);
-            EventUser guest = eventService.createEventUser(addingUser,event,EventUserRole.GUEST);
-            eventService.linkEventUsertoEvent(event, guest);
-            userService.linkEventUsertoUser(addingUser, guest);
+        // Check and get eventUser
+        EventUser newSignup = eventService.validEventUserPOST(userInput, event, userPostDTO, token);
 
-            //eventService.addUserToEvent(event, addingUser);
-        } else { //Adding User to public event
-            addingUser = userService.getUserByToken(userService.parseBearerToken(token));
-            EventUser guest = eventService.createEventUser(addingUser,event,EventUserRole.COLLABORATOR);
-            eventService.linkEventUsertoEvent(event, guest);
-            userService.linkEventUsertoUser(addingUser, guest);
-        }
+        // Link up all relationships & return addedUser
+        eventService.linkEventUsertoEvent(event, newSignup);
+        userService.linkEventUsertoUser(addedUser, newSignup);
 
-        return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(addingUser);
+        // Modify User with EventUser attributes
+        UserGetDTO userGetDTO = UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(addedUser);
+        userGetDTO.setEventUserRole(newSignup.getRole());
+        userGetDTO.setEventUserStatus(newSignup.getStatus());
+
+        return userGetDTO;
     }
 
 

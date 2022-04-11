@@ -14,6 +14,7 @@ import ch.uzh.ifi.sopra22.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -62,6 +63,7 @@ class EventControllerTest {
 
         List<Event> allEvents = Collections.singletonList(event);
 
+        given(eventService.sortEventsBySearch(Mockito.any(), Mockito.any())).willReturn(allEvents);
         given(eventService.getAvailableEvents("1")).willReturn(allEvents);
         given(eventService.getQueryEventsUserRole(allEvents,"1", EventUserRole.ADMIN)).willReturn(allEvents);
         given(eventService.stringToDate("1999-01-01")).willReturn(null);
@@ -93,6 +95,7 @@ class EventControllerTest {
 
         List<Event> allEvents = Collections.singletonList(event);
 
+        given(eventService.sortEventsBySearch(Mockito.any(), Mockito.any())).willReturn(allEvents);
         given(eventService.getAvailableEvents("1")).willReturn(allEvents);
         given(eventService.getQueryEventsUserRole(allEvents,"1", EventUserRole.ADMIN)).willReturn(allEvents);
         given(eventService.stringToDate("1999-01-01")).willReturn(null);
@@ -244,12 +247,19 @@ class EventControllerTest {
         eventLocation.setLongitude(1.02F);
         event.setEventLocation(eventLocation);
 
-        List<User> allUsers = Collections.singletonList(user);
+        EventUser eventUser = new EventUser();
+        eventUser.setEvent(event);
+        eventUser.setUser(user);
+        eventUser.setEventUserId(3L);
+        eventUser.setRole(EventUserRole.GUEST);
+        eventUser.setStatus(EventUserStatus.CONFIRMED);
+
+        List<EventUser> allEventUsers = Collections.singletonList(eventUser);
 
         // this mocks the UserService -> we define above what the userService should
         // return when getUsers() is called
         given(eventService.getEventByIDNum(Mockito.any())).willReturn(event);
-        given(eventService.getUsers(Mockito.any())).willReturn(allUsers);
+        given(eventService.getEventUsers(Mockito.any())).willReturn(allEventUsers);
 
         // when
         MockHttpServletRequestBuilder getRequest = get("/events/1/users")
@@ -292,8 +302,8 @@ class EventControllerTest {
         eventUser.setRole(EventUserRole.COLLABORATOR);
 
         given(eventService.getEventByIDNum(Mockito.any())).willReturn(event);
-        given(userService.getUserByToken(Mockito.any())).willReturn(user);
-        given(eventService.createEventUser(Mockito.any(),Mockito.any(),Mockito.any())).willReturn(eventUser);
+        given(userService.getUserByPartialUser(Mockito.any())).willReturn(user);
+        given(eventService.validEventUserPOST(Mockito.any(),Mockito.any(),Mockito.any(), Mockito.any())).willReturn(eventUser);
 
         // when
         MockHttpServletRequestBuilder postRequest = post("/events/1/users")

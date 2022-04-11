@@ -11,6 +11,7 @@ import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
 import ch.uzh.ifi.sopra22.repository.EventTaskRepository;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
+import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -39,6 +37,12 @@ public class EventService {
 
     private final EventUserService eventUserService;
     private final UserService userService;
+
+    // Search constants
+    private final int containsWholeFactor = 3;
+    private final int titleWeight = 6;
+    private final int locationNameWeight = 4;
+    private final int descriptionWeight = 1;
 
 
     @Autowired
@@ -79,6 +83,61 @@ public class EventService {
         return event;
     }
 
+    public List<String> getWordsFromString(String text) {
+        List<String> words = new ArrayList<>();
+        int ref = 0;
+        for (int i=0; i < text.length(); i++) {
+            if (text.charAt(i) == ' ' || text.charAt(i) == '_' || text.charAt(i) == '+' || text.charAt(i) == '-') {
+                words.add(text.substring(ref, i));
+                ref = i + 1;
+            }
+        }
+        return words;
+    }
+
+    public List<Event> sortEventsBySearch(List<Event> availableEvents, String search) {
+        if (search == null || search.equals("")) {
+            return availableEvents;
+        }
+        List<Integer> scores = new ArrayList<>();
+        List<Integer> sortedScores = new ArrayList<>();
+        List<Event> events = new ArrayList<>();
+
+        // Assign scores to events
+        for (Event event : availableEvents) {
+            int score = 0;
+            try {
+                // Contains check
+                if (event.getTitle().toLowerCase().contains(search)) {score += containsWholeFactor * titleWeight;}
+                if (event.getDescription().toLowerCase().contains(search)) {score += containsWholeFactor * descriptionWeight;}
+
+                //Check words of query (space = ' ', '_', '+')
+                List<String> words = getWordsFromString(search);
+                for (String word : words) {
+                    if (event.getTitle().toLowerCase().contains(word)) {score += titleWeight;}
+                    if (event.getDescription().toLowerCase().contains(word)) {score += descriptionWeight;}
+                    if (event.getEventLocation().getName().toLowerCase().contains(word)) {score += locationNameWeight;}
+                }
+                // last contains check to check occasionally missing locationName last in try block
+                if (event.getEventLocation().getName().toLowerCase().contains(search)) {score += containsWholeFactor * locationNameWeight;}
+            } catch (Exception ignore) {;}
+            scores.add(score);
+            sortedScores.add(score);
+        }
+
+        // Sort events based on scores
+        Collections.sort(sortedScores); // ascending
+        Collections.reverse(sortedScores); // descending
+
+        for (int score : sortedScores) {
+            if (score <= 0) {
+                break;
+            }
+            events.add(availableEvents.get(scores.indexOf(score)));
+            scores.set(scores.indexOf(score), -1);
+        }
+        return events;
+    }
 
     public List<Event> getAvailableEvents(String token) {
         List<Event> availableEvents = eventRepository.findByType(EventType.PUBLIC);
@@ -127,13 +186,14 @@ public class EventService {
         return user;
     }
 
-    public void validateTokenForEventGET(Event event, String token) {
+    public EventUser validateTokenForEventGET(Event event, String token) {
         User user = validateToken(token);
-
+        EventUser validUser = new EventUser();
         boolean thrower = true;
         for (EventUser eventUser : event.getEventUsers()) {
             if (eventUser.getUser().getId() == user.getId()) {
                 thrower = false;
+                validUser = eventUser;
                 break;
             }
         }
@@ -141,19 +201,58 @@ public class EventService {
         if (thrower) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this event");
         }
-
+        return validUser;
     }
 
     public EventUser createEventUser(User user, Event event, EventUserRole userRole) {
         EventUser newSignup = new EventUser();
-        //newSignup.setUserId(userId);
-        //newSignup.setEventId(eventId);
         newSignup.setUser(user);
         newSignup.setEvent(event);
         newSignup.setRole(userRole);
         newSignup.setStatus(EventUserStatus.CONFIRMED);
 
         return eventUserService.createEventUser(newSignup);
+    }
+
+    public EventUser validEventUserPOST(User inputUser, Event event, UserPostDTO userPostDTO, String token) {
+        User tokenUser = validateToken(token);
+        EventUserRole userRole = userPostDTO.getEventUserRole();
+        // Check if inputUser matches tokenUser
+        if (inputUser.getId().equals(tokenUser.getId()) && event.getType() == EventType.PUBLIC) {
+            EventUser newSignup = new EventUser();
+            newSignup.setUser(tokenUser);
+            newSignup.setEvent(event);
+            newSignup.setRole(EventUserRole.GUEST);
+            newSignup.setStatus(EventUserStatus.CONFIRMED);
+            return eventUserService.createEventUser(newSignup);
+        } else {
+            // Check if tokenUser is ADMIN or COLLABORATOR of event
+            boolean thrower = true;
+            for (EventUser eventUser : event.getEventUsers()) {
+                if (eventUser.getUser().getId().equals(tokenUser.getId()) && (eventUser.getRole() == EventUserRole.ADMIN ||
+                        eventUser.getRole() == EventUserRole.COLLABORATOR)) {
+                    thrower = false;
+                    break;
+                }
+            }
+            // Check if thrower is still active (no match with requ. roles)
+            if (thrower) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this action");
+            }
+            // Get user from posted id
+            User addedUser = userService.getUserByIDNum(inputUser.getId());
+
+            // Assign invitation eventUser
+            EventUser newInvite = new EventUser();
+            newInvite.setUser(addedUser);
+            newInvite.setEvent(event);
+            if (userRole == null) {
+                userRole = EventUserRole.GUEST;
+            }
+            newInvite.setRole(userRole);
+            newInvite.setStatus(EventUserStatus.INVITED);
+            return eventUserService.createEventUser(newInvite);
+        }
     }
 
     public void linkEventUsertoEvent(Event createdEvent, EventUser admin) {
@@ -234,6 +333,11 @@ public class EventService {
         return users;
     }
 
+    public List<EventUser> getEventUsers(Event event) {
+        return event.getEventUsers();
+    }
+
+
     public void updateEvent(Event event, User user, Event eventInput) {
         isUserAloudToUpdate(event, user);
         if(eventInput.getTitle() != null){
@@ -260,4 +364,5 @@ public class EventService {
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is unauthorized to update event");
     }
+
 }

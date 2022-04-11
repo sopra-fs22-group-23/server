@@ -1,5 +1,7 @@
 package ch.uzh.ifi.sopra22.rest.dto;
 
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.constants.UserStatus;
 
 import java.util.Date;
@@ -12,6 +14,8 @@ public class UserGetDTO {
     private UserStatus status;
     private Date birthday;
     private String biography;
+    private EventUserRole eventUserRole;
+    private EventUserStatus eventUserStatus;
 
     public Long getId() {
         return id;
@@ -59,5 +63,21 @@ public class UserGetDTO {
 
     public void setBiography(String biography) {
         this.biography = biography;
+    }
+
+    public EventUserRole getEventUserRole() {
+        return eventUserRole;
+    }
+
+    public void setEventUserRole(EventUserRole eventUserRole) {
+        this.eventUserRole = eventUserRole;
+    }
+
+    public EventUserStatus getEventUserStatus() {
+        return eventUserStatus;
+    }
+
+    public void setEventUserStatus(EventUserStatus eventUserStatus) {
+        this.eventUserStatus = eventUserStatus;
     }
 }
