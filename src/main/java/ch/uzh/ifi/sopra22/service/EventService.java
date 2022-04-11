@@ -84,7 +84,7 @@ public class EventService {
         return event;
     }
 
-    public List<String> getWordsFromString(String text) {
+    private List<String> getWordsFromString(String text) {
         List<String> words = new ArrayList<>();
         int ref = 0;
         for (int i=0; i < text.length(); i++) {
@@ -93,13 +93,25 @@ public class EventService {
                 ref = i + 1;
             }
         }
+        words.add(text.substring(ref));
         return words;
+    }
+
+    private String parseString(String text) {
+        String parsedText = text.replace('+', ' ');
+        parsedText = parsedText.replace('-', ' ');
+        parsedText = parsedText.replace('_', ' ');
+        return parsedText;
     }
 
     public List<Event> sortEventsBySearch(List<Event> availableEvents, String search) {
         if (search == null || search.equals("")) {
             return availableEvents;
         }
+        // parse string to have spaces
+        search = parseString(search);
+        search = search.toLowerCase();
+
         List<Integer> scores = new ArrayList<>();
         List<Integer> sortedScores = new ArrayList<>();
         List<Event> events = new ArrayList<>();
@@ -112,12 +124,15 @@ public class EventService {
                 if (event.getTitle().toLowerCase().contains(search)) {score += containsWholeFactor * titleWeight;}
                 if (event.getDescription().toLowerCase().contains(search)) {score += containsWholeFactor * descriptionWeight;}
 
-                //Check words of query (space = ' ', '_', '+')
-                List<String> words = getWordsFromString(search);
+                //Check words of query (space = ' ', '_', '-', '+')
+                List<String> words = new ArrayList<>();
+                words = getWordsFromString(search);
                 for (String word : words) {
-                    if (event.getTitle().toLowerCase().contains(word)) {score += titleWeight;}
-                    if (event.getDescription().toLowerCase().contains(word)) {score += descriptionWeight;}
-                    if (event.getEventLocation().getName().toLowerCase().contains(word)) {score += locationNameWeight;}
+                    try {
+                        if (event.getTitle().toLowerCase().contains(word)) {score += titleWeight;}
+                        if (event.getDescription().toLowerCase().contains(word)) {score += descriptionWeight;}
+                        if (event.getEventLocation().getName().toLowerCase().contains(word)) {score += locationNameWeight;}
+                    } catch (Exception ignore) {;}
                 }
                 // last contains check to check occasionally missing locationName last in try block
                 if (event.getEventLocation().getName().toLowerCase().contains(search)) {score += containsWholeFactor * locationNameWeight;}
