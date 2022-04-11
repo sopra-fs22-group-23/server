@@ -1,6 +1,8 @@
 package ch.uzh.ifi.sopra22.rest.mapper;
 
 import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.rest.dto.EventUserGetDTO;
+import ch.uzh.ifi.sopra22.rest.dto.EventUserPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import org.mapstruct.*;
@@ -38,5 +40,22 @@ public interface UserDTOMapper {
     @Mapping(source = "biography", target = "biography")
     @Mapping(source = "email", target = "email")
     User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "birthday", target = "birthday")
+    @Mapping(source = "biography", target = "biography")
+    EventUserGetDTO convertEntityToEventUserGetDTO(User user);
+
+    @Mapping(source= "id", target = "id")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "password", target = "password")
+    @Mapping(source = "birthday", target = "birthday")
+    @Mapping(source = "biography", target = "biography")
+    @Mapping(source = "email", target = "email")
+    User convertEventUserPostDTOtoEntity(EventUserPostDTO eventUserPostDTO);
 
 }

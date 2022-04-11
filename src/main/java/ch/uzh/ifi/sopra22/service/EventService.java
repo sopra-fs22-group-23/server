@@ -11,6 +11,7 @@ import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
 import ch.uzh.ifi.sopra22.repository.EventTaskRepository;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
+import ch.uzh.ifi.sopra22.rest.dto.EventUserPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,9 +215,9 @@ public class EventService {
         return eventUserService.createEventUser(newSignup);
     }
 
-    public EventUser validEventUserPOST(User inputUser, Event event, UserPostDTO userPostDTO, String token) {
+    public EventUser validEventUserPOST(User inputUser, Event event, EventUserPostDTO eventUserPostDTO, String token) {
         User tokenUser = validateToken(token);
-        EventUserRole userRole = userPostDTO.getEventUserRole();
+        EventUserRole userRole = eventUserPostDTO.getEventUserRole();
         // Check if inputUser matches tokenUser
         if (inputUser.getId().equals(tokenUser.getId()) && event.getType() == EventType.PUBLIC) {
             EventUser newSignup = new EventUser();

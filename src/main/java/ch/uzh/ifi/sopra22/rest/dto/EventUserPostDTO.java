@@ -5,7 +5,7 @@ import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 
 import java.util.Date;
 
-public class UserPostDTO {
+public class EventUserPostDTO {
     private Long id;
     private String name;
     private String username;
@@ -13,6 +13,8 @@ public class UserPostDTO {
     private Date birthday;
     private String biography;
     private String email;
+    private EventUserRole eventUserRole;
+    private EventUserStatus eventUserStatus;
 
     public Long getId() {
         return id;
@@ -68,5 +70,21 @@ public class UserPostDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public EventUserRole getEventUserRole() {
+        return eventUserRole;
+    }
+
+    public void setEventUserRole(EventUserRole eventUserRole) {
+        this.eventUserRole = eventUserRole;
+    }
+
+    public EventUserStatus getEventUserStatus() {
+        return eventUserStatus;
+    }
+
+    public void setEventUserStatus(EventUserStatus eventUserStatus) {
+        this.eventUserStatus = eventUserStatus;
     }
 }
