@@ -160,7 +160,7 @@ public class UserController {
 
     }
 
-    @Operation(summary = "Update user with ID")
+    @Operation(summary = "Add user Image with ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User profile image was saved", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),
@@ -185,14 +185,14 @@ public class UserController {
             userService.linkImageToUser(userRepo,createRandomName);
 
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new UploadResponseMessage("Uploaded the file successfully: " + file.getOriginalFilename()));
+                    .body(new UploadResponseMessage("Uploaded the file successfully: " + createRandomName));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
                     .body(new UploadResponseMessage("Could not upload the file: " + file.getOriginalFilename() + "!"));
         }
     }
 
-    @Operation(summary = "Update user with ID")
+    @Operation(summary = "Get user picture with ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User profile image was saved", content = @Content),
             //@ApiResponse(responseCode = "400", description = "No file found for this User", content = @Content),

@@ -10,6 +10,7 @@ import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.rest.dto.EventPostDTO;
 import ch.uzh.ifi.sopra22.service.EventService;
+import ch.uzh.ifi.sopra22.service.FileService;
 import ch.uzh.ifi.sopra22.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,8 +22,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
@@ -47,6 +50,9 @@ class EventControllerTest {
 
     @MockBean
     private EventService eventService;
+
+    @MockBean
+    private FileService fileService;
 
     @Test
     void givenEvent_getAvailableEvents() throws Exception {
@@ -317,6 +323,74 @@ class EventControllerTest {
                 .andExpect(jsonPath("$.username", is(user.getUsername())))
                 .andExpect(jsonPath("$.birthday", is(user.getBirthday())));
 
+    }
+
+    @Test
+    public void uploadfile_validInput() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Test User");
+        user.setUsername("testUsername");
+        user.setPassword("password");
+        user.setToken("1");
+
+        Event event = new Event();
+        event.setId(2L);
+        event.setTitle("Test Event");
+        event.setType(EventType.PUBLIC);
+        event.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        event.setEventLocation(eventLocation);
+
+
+        given(eventService.validateToken(Mockito.any())).willReturn(user);
+        given(eventService.getEventByIDNum(Mockito.any())).willReturn(event);
+        given(fileService.createRandomName(Mockito.any())).willReturn("test.json");
+        //Mock Request
+        MockMultipartFile jsonFile = new MockMultipartFile("test.json", "test", "application/json", "{\"key1\": \"value1\"}".getBytes());
+
+        MockHttpServletRequestBuilder postRequest = MockMvcRequestBuilders.multipart("/events/2/image")
+                .file("file",jsonFile.getBytes())
+                .header("Authorization",user.getToken());
+
+        mockMvc.perform(postRequest)
+                .andExpect(status().isCreated());
+
+    }
+    @Test
+    public void downloadEvent_validInput() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Test User");
+        user.setUsername("testUsername");
+        user.setPassword("password");
+        user.setToken("1");
+
+        Event event = new Event();
+        event.setId(2L);
+        event.setTitle("Test Event");
+        event.setType(EventType.PUBLIC);
+        event.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        event.setEventLocation(eventLocation);
+
+        MockMultipartFile jsonFile = new MockMultipartFile("test.json", "", "application/json", "{\"key1\": \"value1\"}".getBytes());
+
+        given(eventService.getEventByIDNum(Mockito.any())).willReturn(event);
+        given(fileService.load(Mockito.any())).willReturn(null);
+
+        MockHttpServletRequestBuilder getRequest = get("/events/2/image")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",user.getToken());
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isBadRequest());
     }
 
     /**

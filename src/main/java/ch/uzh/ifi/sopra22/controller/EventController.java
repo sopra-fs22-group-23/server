@@ -3,14 +3,14 @@ package ch.uzh.ifi.sopra22.controller;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.entity.Event;
-import ch.uzh.ifi.sopra22.entity.EventTask;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.model.UploadResponseMessage;
 import ch.uzh.ifi.sopra22.rest.dto.*;
 import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
 import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.sopra22.service.EventService;
-import ch.uzh.ifi.sopra22.service.EventUserService;
+import ch.uzh.ifi.sopra22.service.FileService;
 import ch.uzh.ifi.sopra22.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,8 +18,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -31,10 +36,12 @@ public class EventController {
 
     private final EventService eventService;
     private final UserService userService;
+    private final FileService fileService;
 
-    public EventController(EventService eventService, UserService userService) {
+    public EventController(EventService eventService, UserService userService, FileService fileService) {
         this.eventService = eventService;
         this.userService = userService;
+        this.fileService = fileService;
     }
 
     @Operation(summary = "Get a list of all public events and private events where authorized")
@@ -242,6 +249,64 @@ public class EventController {
         userGetDTO.setEventUserStatus(newSignup.getStatus());
 
         return userGetDTO;
+    }
+
+    @Operation(summary = "Add event Image with ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Event profile image was saved", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Event was not found", content = @Content) })
+    @PostMapping(value = "/events/{eventId}/image")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public ResponseEntity<UploadResponseMessage> createProfileImage(@Parameter(description = "eventId") @PathVariable Long eventId,
+                                                                    @RequestHeader("Authorization") String token,
+                                                                    @RequestParam("file") MultipartFile file){
+
+        userService.checkTokenExists(token);
+        User user = eventService.validateToken(token);
+        Event event = eventService.getEventByIDNum(eventId);
+        eventService.isUserAloudToUpdate(event,user);
+        String createRandomName = fileService.createRandomName(file.getOriginalFilename());
+        //String randomString = RandomStringUtils.random(20,true,true);
+        System.out.println(createRandomName);
+        //file.setOrginalFilename(randomString);
+        try {
+            fileService.save(file,createRandomName);
+            eventService.linkImageToEvent(event,createRandomName);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new UploadResponseMessage("Uploaded the file successfully: " + createRandomName));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+                    .body(new UploadResponseMessage("Could not upload the file: " + file.getOriginalFilename() + "!"));
+        }
+    }
+
+    @Operation(summary = "Get event picture with ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User profile image was saved", content = @Content),
+            //@ApiResponse(responseCode = "400", description = "No file found for this User", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
+    @GetMapping(value = "/events/{eventId}/image")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    //public ResponseEntity<UploadResponseMessage> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
+    public ResponseEntity<Resource> getFile(@Parameter(description = "eventId") @PathVariable Long eventId) {
+        Event event = eventService.getEventByIDNum(eventId);
+
+        try {
+            Resource file = fileService.load(event.getPicture());
+            return ( ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                    .body(file));
+        }catch (NullPointerException e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "there is no image");
+        }
+        //System.out.println("Filename: "+ file.getFilename() + ". File length: " + file.getDescription());
+
+        //return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; NO FILE EXISTENT!!!")
+        //      .body(null);
     }
 
 

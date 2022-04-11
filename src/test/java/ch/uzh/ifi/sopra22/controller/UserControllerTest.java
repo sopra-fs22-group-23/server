@@ -350,7 +350,7 @@ public class UserControllerTest {
 
     }
     @Test
-    public void downloadURL_validInput() throws Exception {
+    public void downloadUser_validInput() throws Exception {
         User user = new User();
         user.setId(1L);
         user.setName("Test User");
@@ -369,7 +369,7 @@ public class UserControllerTest {
 
         mockMvc.perform(getRequest)
                 .andExpect(status().isBadRequest());
-    }/***/
+    }
 
 
     /**
