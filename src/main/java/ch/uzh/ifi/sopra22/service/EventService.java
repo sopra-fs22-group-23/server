@@ -22,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -40,6 +37,12 @@ public class EventService {
 
     private final EventUserService eventUserService;
     private final UserService userService;
+
+    // Search constants
+    private final int containsWeight = 10;
+    private final int titleWeight = 6;
+    private final int locationNameWeight = 4;
+    private final int descriptionWeight = 1;
 
 
     @Autowired
@@ -80,6 +83,58 @@ public class EventService {
         return event;
     }
 
+    public List<String> getWordsFromString(String text) {
+        List<String> words = new ArrayList<>();
+        int ref = 0;
+        for (int i=0; i < text.length(); i++) {
+            if (text.charAt(i) == ' ' || text.charAt(i) == '_' || text.charAt(i) == '+' || text.charAt(i) == '-') {
+                words.add(text.substring(ref, i));
+                ref = i + 1;
+            }
+        }
+        return words;
+    }
+
+    public List<Event> sortEventsBySearch(List<Event> availableEvents, String search) {
+        if (search == null) {
+            return availableEvents;
+        }
+        List<Integer> scores = new ArrayList<>();
+        List<Integer> sortedScores = new ArrayList<>();
+        List<Event> events = new ArrayList<>();
+
+        // Assign scores to events
+        for (Event event : availableEvents) {
+            int score = 0;
+            try {
+                // Contains check
+                if (event.getTitle().contains(search)) {score += containsWeight;}
+                if (event.getDescription().contains(search)) {score += containsWeight;}
+
+                //Check words of query (space = ' ', '_', '+')
+                List<String> words = getWordsFromString(search);
+                for (String word : words) {
+                    if (event.getTitle().contains(word)) {score += titleWeight;}
+                    if (event.getDescription().contains(word)) {score += descriptionWeight;}
+                    if (event.getEventLocation().getName().contains(word)) {score += locationNameWeight;}
+                }
+                // last contains check to check occasionally missing locationName last in try block
+                if (event.getEventLocation().getName().contains(search)) {score += containsWeight;}
+            } catch (Exception ignore) {;}
+            scores.add(score);
+            sortedScores.add(score);
+        }
+
+        // Sort events based on scores
+        Collections.sort(sortedScores); // ascending
+        Collections.reverse(sortedScores); // descending
+
+        for (int score : sortedScores) {
+            events.add(availableEvents.get(scores.indexOf(score)));
+            scores.set(scores.indexOf(score), -1);
+        }
+        return events;
+    }
 
     public List<Event> getAvailableEvents(String token) {
         List<Event> availableEvents = eventRepository.findByType(EventType.PUBLIC);

@@ -51,7 +51,8 @@ public class EventController {
                                                 @RequestParam(required = false, name = "role") EventUserRole userRole,
                                                 @RequestParam(required = false, name = "from") String fromStringDate,
                                                 @RequestParam(required = false, name = "to") String toStringDate,
-                                                @RequestParam(required = false, name = "location") String location){
+                                                @RequestParam(required = false, name = "location") String location,
+                                                @RequestParam(required = false, name = "search") String search){
         List<Event> availableEvents = eventService.getAvailableEvents(token);
         System.out.println("Event Type: " + eventType);
         if (userRole != null){
@@ -76,8 +77,10 @@ public class EventController {
          eventsByUserRole = eventService.getEventfromUserRole(userRole);
          }*/
 
-        List<EventGetDTO> eventGetDTOS = new ArrayList<>();
+        // change Sorting based on search score
+        availableEvents = eventService.sortEventsBySearch(availableEvents, search);
 
+        List<EventGetDTO> eventGetDTOS = new ArrayList<>();
 
         // convert each user to the API representation
         for (Event event : availableEvents) {

@@ -14,6 +14,7 @@ import ch.uzh.ifi.sopra22.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -62,6 +63,7 @@ class EventControllerTest {
 
         List<Event> allEvents = Collections.singletonList(event);
 
+        given(eventService.sortEventsBySearch(Mockito.any(), Mockito.any())).willReturn(allEvents);
         given(eventService.getAvailableEvents("1")).willReturn(allEvents);
         given(eventService.getQueryEventsUserRole(allEvents,"1", EventUserRole.ADMIN)).willReturn(allEvents);
         given(eventService.stringToDate("1999-01-01")).willReturn(null);
@@ -93,6 +95,7 @@ class EventControllerTest {
 
         List<Event> allEvents = Collections.singletonList(event);
 
+        given(eventService.sortEventsBySearch(Mockito.any(), Mockito.any())).willReturn(allEvents);
         given(eventService.getAvailableEvents("1")).willReturn(allEvents);
         given(eventService.getQueryEventsUserRole(allEvents,"1", EventUserRole.ADMIN)).willReturn(allEvents);
         given(eventService.stringToDate("1999-01-01")).willReturn(null);
