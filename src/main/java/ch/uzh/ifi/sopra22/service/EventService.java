@@ -39,7 +39,7 @@ public class EventService {
     private final UserService userService;
 
     // Search constants
-    private final int containsWeight = 10;
+    private final int containsWholeFactor = 3;
     private final int titleWeight = 6;
     private final int locationNameWeight = 4;
     private final int descriptionWeight = 1;
@@ -108,8 +108,8 @@ public class EventService {
             int score = 0;
             try {
                 // Contains check
-                if (event.getTitle().toLowerCase().contains(search)) {score += containsWeight;}
-                if (event.getDescription().toLowerCase().contains(search)) {score += containsWeight;}
+                if (event.getTitle().toLowerCase().contains(search)) {score += containsWholeFactor * titleWeight;}
+                if (event.getDescription().toLowerCase().contains(search)) {score += containsWholeFactor * descriptionWeight;}
 
                 //Check words of query (space = ' ', '_', '+')
                 List<String> words = getWordsFromString(search);
@@ -119,7 +119,7 @@ public class EventService {
                     if (event.getEventLocation().getName().toLowerCase().contains(word)) {score += locationNameWeight;}
                 }
                 // last contains check to check occasionally missing locationName last in try block
-                if (event.getEventLocation().getName().toLowerCase().contains(search)) {score += containsWeight;}
+                if (event.getEventLocation().getName().toLowerCase().contains(search)) {score += containsWholeFactor * locationNameWeight;}
             } catch (Exception ignore) {;}
             scores.add(score);
             sortedScores.add(score);
