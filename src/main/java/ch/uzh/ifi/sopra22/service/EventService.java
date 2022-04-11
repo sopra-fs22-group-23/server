@@ -96,7 +96,7 @@ public class EventService {
     }
 
     public List<Event> sortEventsBySearch(List<Event> availableEvents, String search) {
-        if (search == null) {
+        if (search == null || search.equals("")) {
             return availableEvents;
         }
         List<Integer> scores = new ArrayList<>();
@@ -130,6 +130,9 @@ public class EventService {
         Collections.reverse(sortedScores); // descending
 
         for (int score : sortedScores) {
+            if (score <= 0) {
+                break;
+            }
             events.add(availableEvents.get(scores.indexOf(score)));
             scores.set(scores.indexOf(score), -1);
         }
