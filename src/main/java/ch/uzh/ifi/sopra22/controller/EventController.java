@@ -192,7 +192,7 @@ public class EventController {
     @GetMapping(value = "events/{eventId}/users")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<UserGetDTO> getAllUsers(@Parameter(description = "eventId") @PathVariable Long eventId
+    public List<EventUserGetDTO> getAllUsers(@Parameter(description = "eventId") @PathVariable Long eventId
             ,@RequestHeader(value = "Authorization", required = false) String token) {
         Event event = eventService.getEventByIDNum(eventId);
 
@@ -203,18 +203,19 @@ public class EventController {
         }
 
         List<EventUser> eventUsers = eventService.getEventUsers(event);
-        List<UserGetDTO> userGetDTOs = new ArrayList<>();
+        List<EventUserGetDTO> eventUserGetDTOS = new ArrayList<>();
 
         // convert each user to the API representation
         for (EventUser eventUser : eventUsers) {
-            UserGetDTO userGetDTO = UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(eventUser.getUser());
-            userGetDTO.setEventUserRole(eventUser.getRole());
-            userGetDTO.setEventUserStatus(eventUser.getStatus());
+            EventUserGetDTO eventUserGetDTO = UserDTOMapper.INSTANCE.convertEntityToEventUserGetDTO(eventUser.getUser());
+            eventUserGetDTO.setEventUserRole(eventUser.getRole());
+            eventUserGetDTO.setEventUserStatus(eventUser.getStatus());
+            eventUserGetDTO.setEventId(eventUser.getEvent().getId());
 
-            userGetDTOs.add(userGetDTO);
+            eventUserGetDTOS.add(eventUserGetDTO);
         }
 
-        return userGetDTOs;
+        return eventUserGetDTOS;
     }
 
     @Operation(summary = "Add a user to an event")
@@ -227,28 +228,29 @@ public class EventController {
     @PostMapping(value = "/events/{eventId}/users")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public UserGetDTO addUserToEvent(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token,
-                                     @RequestBody(required = false) UserPostDTO userPostDTO, HttpServletResponse response) {
+    public EventUserGetDTO addUserToEvent(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader(value = "Authorization", required = false) String token,
+                                     @RequestBody(required = false) EventUserPostDTO eventUserPostDTO, HttpServletResponse response) {
         // convert API user to internal representation
-        User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+        User userInput = UserDTOMapper.INSTANCE.convertEventUserPostDTOtoEntity(eventUserPostDTO);
 
         //get the event & user to be added
         Event event = eventService.getEventByIDNum(eventId);
         User addedUser = userService.getUserByPartialUser(userInput);
 
         // Check and get eventUser
-        EventUser newSignup = eventService.validEventUserPOST(userInput, event, userPostDTO, token);
+        EventUser newSignup = eventService.validEventUserPOST(userInput, event, eventUserPostDTO, token);
 
         // Link up all relationships & return addedUser
         eventService.linkEventUsertoEvent(event, newSignup);
         userService.linkEventUsertoUser(addedUser, newSignup);
 
         // Modify User with EventUser attributes
-        UserGetDTO userGetDTO = UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(addedUser);
-        userGetDTO.setEventUserRole(newSignup.getRole());
-        userGetDTO.setEventUserStatus(newSignup.getStatus());
+        EventUserGetDTO eventUserGetDTO = UserDTOMapper.INSTANCE.convertEntityToEventUserGetDTO(addedUser);
+        eventUserGetDTO.setEventUserRole(newSignup.getRole());
+        eventUserGetDTO.setEventUserStatus(newSignup.getStatus());
+        eventUserGetDTO.setEventId(eventId);
 
-        return userGetDTO;
+        return eventUserGetDTO;
     }
 
     @Operation(summary = "Add event Image with ID")

@@ -2,17 +2,21 @@ package ch.uzh.ifi.sopra22.rest.dto;
 
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
+import ch.uzh.ifi.sopra22.constants.UserStatus;
 
 import java.util.Date;
 
-public class UserPostDTO {
+public class EventUserGetDTO {
+
     private Long id;
     private String name;
     private String username;
-    private String password;
+    private UserStatus status;
     private Date birthday;
     private String biography;
-    private String email;
+    private EventUserRole eventUserRole;
+    private EventUserStatus eventUserStatus;
+    private Long eventId;
 
     public Long getId() {
         return id;
@@ -38,20 +42,20 @@ public class UserPostDTO {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public Date getBirthday() {
         return birthday;
     }
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public String getBiography() {
@@ -62,11 +66,27 @@ public class UserPostDTO {
         this.biography = biography;
     }
 
-    public String getEmail() {
-        return email;
+    public EventUserRole getEventUserRole() {
+        return eventUserRole;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEventUserRole(EventUserRole eventUserRole) {
+        this.eventUserRole = eventUserRole;
+    }
+
+    public EventUserStatus getEventUserStatus() {
+        return eventUserStatus;
+    }
+
+    public void setEventUserStatus(EventUserStatus eventUserStatus) {
+        this.eventUserStatus = eventUserStatus;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 }
