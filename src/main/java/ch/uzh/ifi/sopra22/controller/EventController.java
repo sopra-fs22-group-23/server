@@ -278,7 +278,6 @@ public class EventController {
 
     }
 
-
         @Operation(summary = "Add event Image with ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Event profile image was saved", content = @Content),
