@@ -253,7 +253,33 @@ public class EventController {
         return eventUserGetDTO;
     }
 
-    @Operation(summary = "Add event Image with ID")
+
+    @Operation(summary = "Update existing EventUser")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "EventUser was updated", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserGetDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Conflict, user not unique", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized User, could not be found by token", content = @Content)}
+    )
+    @PutMapping(value = "/events/{eventId}/users")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void editEventUser(@Parameter(description = "eventId") @PathVariable Long eventId,
+                              @RequestHeader(value = "Authorization", required = false) String token,
+                                          @RequestBody(required = false) EventUserPostDTO eventUserPostDTO, HttpServletResponse response) {
+        // convert API user to internal representation
+        User userInput = UserDTOMapper.INSTANCE.convertEventUserPostDTOtoEntity(eventUserPostDTO);
+
+        //get the event & user to be added
+        Event event = eventService.getEventByIDNum(eventId);
+
+        // Do manipulations if valid action
+        EventUser eventUser = eventService.validEventUserPUT(userInput, event, eventUserPostDTO, token);
+
+    }
+
+
+        @Operation(summary = "Add event Image with ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Event profile image was saved", content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),

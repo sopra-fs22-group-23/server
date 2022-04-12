@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -249,6 +250,70 @@ public class EventService {
             newInvite.setStatus(EventUserStatus.INVITED);
             return eventUserService.createEventUser(newInvite);
         }
+    }
+
+    private void checkSingleAdmin(EventUser eventUser) {
+        List<EventUser> eventUserList = eventUserRepository.findByEventId(eventUser.getEvent().getId());
+        boolean singleAdmin = true;
+        for (EventUser ev : eventUserList) {
+            if (ev.getRole() == EventUserRole.ADMIN && !ev.getEventUserId().equals(eventUser.getEventUserId())) {
+                singleAdmin = false;
+            }
+        }
+        if (singleAdmin) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Cannot cancel or change role if single admin");
+        }
+    }
+
+    public EventUser validEventUserPUT(User inputUser, Event event, EventUserPostDTO eventUserPostDTO, String token) {
+        User tokenUser = validateToken(token);
+        EventUserRole userRole = eventUserPostDTO.getEventUserRole();
+
+        // Check if eventUser exists
+        EventUser eventUser = eventUserService.ensureEventUserExists(event.getId(), inputUser.getId());
+
+        // Check singleAdmin
+        checkSingleAdmin(eventUser);
+
+        // Check if self-change
+        if (tokenUser.getId().equals(inputUser.getId())) {
+            boolean done = false;
+            if (eventUserPostDTO.getEventUserRole() != null) {
+                if (eventUser.getRole() == EventUserRole.ADMIN && eventUserPostDTO.getEventUserRole() == EventUserRole.COLLABORATOR) {
+                    eventUser.setRole(eventUserPostDTO.getEventUserRole());
+                    done = true;
+                }
+            }
+            if (eventUserPostDTO.getEventUserStatus() != null && eventUserPostDTO.getEventUserStatus() != EventUserStatus.INVITED) {
+                eventUser.setStatus(eventUserPostDTO.getEventUserStatus());
+                done = true;
+            }
+            if (!done) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this action");
+            }
+        } else {
+            // Check admin role
+            List<EventUser> eventUsers = event.getEventUsers();
+            boolean thrower = true;
+            for (EventUser ev2 : eventUsers) {
+                if (ev2.getUser().getId().equals(tokenUser.getId()) && ev2.getRole() == EventUserRole.ADMIN) {
+                    thrower = false;
+                    break;
+                }
+            }
+            if (thrower) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this action");
+            }
+            // Admin validated
+            if (eventUserPostDTO.getEventUserRole() != null) {
+                eventUser.setRole(eventUserPostDTO.getEventUserRole());
+            }
+            if (eventUserPostDTO.getEventUserStatus() != null) {
+                eventUser.setStatus(eventUserPostDTO.getEventUserStatus());
+            }
+        }
+        eventUserService.updateRepository(eventUser);
+        return eventUser;
     }
 
     public void linkEventUsertoEvent(Event createdEvent, EventUser admin) {

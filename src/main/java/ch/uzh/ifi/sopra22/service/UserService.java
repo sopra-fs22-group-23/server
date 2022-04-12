@@ -91,7 +91,6 @@ public class UserService {
                 //Check words of query (space = ' ', '_', '-', '+')
                 List<String> words = new ArrayList<>();
                 words = getWordsFromString(search);
-                System.out.println(words);
                 for (String word : words) {
                     try {
                         if (user.getUsername().toLowerCase().contains(word)) {score += usernameWeight;}
@@ -101,7 +100,6 @@ public class UserService {
                     } catch (Exception ignore) {;}
                 }
             } catch (Exception ignore) {;}
-            System.out.println(score);
             scores.add(score);
             sortedScores.add(score);
         }
@@ -109,7 +107,6 @@ public class UserService {
         // Sort events based on scores
         Collections.sort(sortedScores); // ascending
         Collections.reverse(sortedScores); // descending
-        System.out.println(sortedScores);
 
         for (int score : sortedScores) {
             /* no searchfilter but rather searchSort for /users
