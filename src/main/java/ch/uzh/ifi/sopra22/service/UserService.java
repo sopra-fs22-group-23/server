@@ -82,11 +82,12 @@ public class UserService {
             int score = 0;
             try {
                 // Contains check
-                if (user.getUsername().toLowerCase().contains(search)) {score += containsWholeFactor * usernameWeight;}
-                if (user.getName().toLowerCase().contains(search)) {score += containsWholeFactor * nameWeight;}
-                if (user.getEmail().toLowerCase().contains(search)) {score += containsWholeFactor * emailWeight;}
-                if (user.getBiography().toLowerCase().contains(search)) {score += containsWholeFactor * biographyWeight;}
-
+                try {
+                    if (user.getUsername().toLowerCase().contains(search)) {score += containsWholeFactor * usernameWeight;}
+                    if (user.getName().toLowerCase().contains(search)) {score += containsWholeFactor * nameWeight;}
+                    if (user.getEmail().toLowerCase().contains(search)) {score += containsWholeFactor * emailWeight;}
+                    if (user.getBiography().toLowerCase().contains(search)) {score += containsWholeFactor * biographyWeight;}
+                } catch (Exception ignore) {;}
                 //Check words of query (space = ' ', '_', '-', '+')
                 List<String> words = new ArrayList<>();
                 words = getWordsFromString(search);
@@ -100,6 +101,7 @@ public class UserService {
                     } catch (Exception ignore) {;}
                 }
             } catch (Exception ignore) {;}
+            System.out.println(score);
             scores.add(score);
             sortedScores.add(score);
         }
@@ -107,6 +109,7 @@ public class UserService {
         // Sort events based on scores
         Collections.sort(sortedScores); // ascending
         Collections.reverse(sortedScores); // descending
+        System.out.println(sortedScores);
 
         for (int score : sortedScores) {
             /* no searchfilter but rather searchSort for /users
@@ -116,7 +119,6 @@ public class UserService {
             sortedUsers.add(users.get(scores.indexOf(score)));
             scores.set(scores.indexOf(score), -1);
         }
-        System.out.println(sortedUsers.get(0).getUsername());
         return sortedUsers;
     }
 
