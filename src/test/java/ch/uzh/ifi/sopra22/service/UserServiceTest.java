@@ -256,4 +256,10 @@ class UserServiceTest {
         assertThrows(ResponseStatusException.class, () -> userService.editUser(createdUser));
 
     }
+    @Test
+    public void parseBearerToken_success(){
+        String testString = "Bearer 123";
+        String actual = userService.parseBearerToken(testString);
+        assertEquals(actual,"123");
+    }
 }

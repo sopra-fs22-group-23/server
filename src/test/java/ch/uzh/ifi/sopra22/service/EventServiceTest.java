@@ -4,7 +4,6 @@ import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
-import ch.uzh.ifi.sopra22.constants.UserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventLocation;
 import ch.uzh.ifi.sopra22.entity.EventUser;
@@ -228,5 +227,131 @@ class EventServiceTest {
 
         eventService.updateEvent(event,user,event);
     }
+    @Test
+    public void getEventByIDNum_success(){
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("We Events");
+        event.setType(EventType.PUBLIC);
+        event.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        event.setEventLocation(eventLocation);
 
+        Mockito.when(eventRepository.findById(Mockito.any())).thenReturn(Optional.of(event));
+
+        Event testEvent = eventService.getEventByIDNum(event.getId());
+
+        assertEquals(testEvent.getId(),event.getId());
+        assertEquals(testEvent.getEventLocation().getName(),event.getEventLocation().getName());
+        assertEquals(testEvent.getEventLocation().getLongitude(),event.getEventLocation().getLongitude());
+        assertEquals(testEvent.getEventLocation().getLatitude(),event.getEventLocation().getLatitude());
+        assertEquals(testEvent.getEventDate(),event.getEventDate());
+        assertEquals(testEvent.getTitle(),event.getTitle());
+        assertEquals(testEvent.getType(),event.getType());
+        assertEquals(testEvent.getStatus(),event.getStatus());
+        assertEquals(testEvent.getDescription(),event.getDescription());
+    }
+    @Test
+    public void test_getEventByIDNum_invalidInput(){
+        Mockito.when(eventRepository.findById(Mockito.any())).thenReturn(null);
+        assertThrows(ResponseStatusException.class, () -> eventService.getEventByIDNum(1L));
+    }
+    @Test
+    public void test_getWordsFromString_success(){
+        List<Event> events = new ArrayList<>();
+        List<Event> expectedEvents = new ArrayList<>();
+
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("We Events");
+        event.setType(EventType.PUBLIC);
+        event.setStatus(EventStatus.IN_PLANNING);
+        event.setDescription("Wevents");
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        event.setEventLocation(eventLocation);
+        events.add(event);
+        expectedEvents.add(event);
+
+        Event event2 = new Event();
+        event2.setId(1L);
+        event2.setTitle("We Events");
+        event2.setType(EventType.PUBLIC);
+        event2.setStatus(EventStatus.IN_PLANNING);
+        event2.setDescription("wevents");
+        EventLocation eventLocation2 = new EventLocation();
+        eventLocation2.setName("Frankfurt");
+        eventLocation2.setLatitude(1.02F);
+        eventLocation2.setLongitude(1.02F);
+        event2.setEventLocation(eventLocation2);
+        events.add(event2);
+
+        String searchTerm = "Zurich";
+
+        //test
+        List<Event> actual = eventService.sortEventsBySearch(events,searchTerm);
+
+        assertEquals(expectedEvents,actual);
+    }
+    @Test
+    public void test_validateToken_validInput(){
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setName("testName");
+        testUser.setUsername("testUsername");
+        testUser.setPassword("password");
+        testUser.setToken("1");
+
+        Mockito.when(userService.getUserByToken(Mockito.any())).thenReturn(testUser);
+
+        User actualUser = eventService.validateToken(testUser.getToken());
+
+        assertEquals(actualUser.getId(),testUser.getId());
+        assertEquals(actualUser.getToken(),testUser.getToken());
+        assertEquals(actualUser.getName(),testUser.getName());
+        assertEquals(actualUser.getUsername(), testUser.getUsername());
+    }
+    @Test
+    public void test_validateTokenForEventGET_validInput(){
+        User user = new User();
+        user.setName("Firstname Lastname");
+        user.setUsername("firstname@lastname");
+        user.setPassword("password");
+        user.setId(2L);
+        user.setToken("1");
+
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("We Events");
+        event.setType(EventType.PUBLIC);
+        event.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        event.setEventLocation(eventLocation);
+
+        EventUser eventUser = new EventUser();
+        eventUser.setEventUserId(3L);
+        eventUser.setEvent(event);
+        eventUser.setUser(user);
+        eventUser.setStatus(EventUserStatus.CONFIRMED);
+        eventUser.setRole(EventUserRole.ADMIN);
+        event.addEventUsers(eventUser);
+
+        Mockito.when(userService.getUserByToken(Mockito.any())).thenReturn(user);
+
+        EventUser actualEventUser = eventService.validateTokenForEventGET(event,user.getToken());
+
+        assertEquals(actualEventUser.getStatus(),eventUser.getStatus());
+        assertEquals(actualEventUser.getEventUserId(),eventUser.getEventUserId());
+        assertEquals(actualEventUser.getEvent().getId(),eventUser.getEvent().getId());
+        assertEquals(actualEventUser.getUser().getId(),eventUser.getUser().getId());
+        assertEquals(actualEventUser.getRole(),eventUser.getRole());
+    }
 }

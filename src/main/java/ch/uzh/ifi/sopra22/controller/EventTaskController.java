@@ -129,7 +129,7 @@ public class EventTaskController {
         List<EventTask> tasks = eventService.getTasksByEventID(eventID);//get all possible tasks for the event id
         List<EventTaskGetDTO> tasksDTOs = new ArrayList<>();
         for (EventTask oneTask : tasks) {
-            tasksDTOs.add(EventDTOMapper.INSTANCE.convertEventTaskToEventTakGetDTO(oneTask));
+            tasksDTOs.add(EventDTOMapper.INSTANCE.convertEventTaskToEventTaskGetDTO(oneTask));
         }
         return tasksDTOs;
     }

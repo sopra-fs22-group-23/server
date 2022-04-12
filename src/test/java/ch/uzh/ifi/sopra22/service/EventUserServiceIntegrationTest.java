@@ -60,9 +60,10 @@ public class EventUserServiceIntegrationTest {
 
     @BeforeEach
     public void setup() {
+        eventUserRepository.deleteAll();
         eventRepository.deleteAll();
         userRepository.deleteAll();
-        eventUserRepository.deleteAll();
+
 
 
         testEvent = new Event();
