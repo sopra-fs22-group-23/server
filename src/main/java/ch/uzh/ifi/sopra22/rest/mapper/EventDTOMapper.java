@@ -41,7 +41,7 @@ public interface EventDTOMapper {
     @Mapping(source = "user.id", target = "userID")
     @Mapping(source = "event.id", target = "eventID")
     @Mapping(source = "description", target = "description")
-    EventTaskGetDTO convertEventTaskToEventTakGetDTO(EventTask eventTask);
+    EventTaskGetDTO convertEventTaskToEventTaskGetDTO(EventTask eventTask);
 
 
     @Mapping(source = "description", target = "description")

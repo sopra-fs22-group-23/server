@@ -53,18 +53,18 @@ public class EventServiceIntegrationTest {
 
     @BeforeEach
     public void setup() {
+        eventUserRepository.deleteAll();
         eventRepository.deleteAll();
         userRepository.deleteAll();
-        eventUserRepository.deleteAll();
 
     }
-
+    /**
     @AfterEach
     public void cleanup() {
         eventRepository.deleteAll();
         userRepository.deleteAll();
         eventUserRepository.deleteAll();
-    }/***/
+    }*/
 
     @Test
     public void getEvents_validInput_success(){
@@ -120,7 +120,7 @@ public class EventServiceIntegrationTest {
         assertEquals(createdEvent.getType(), foundEvent.getType());
         assertEquals(createdEvent.getStatus(), foundEvent.getStatus());
     }
-/**
+
     @Test
     public void updateEvent_validInput_success() {
         Event testEvent = new Event();
@@ -166,7 +166,53 @@ public class EventServiceIntegrationTest {
         assertEquals(event.getEventLocation().getName(), updateEvent.getEventLocation().getName());
         assertEquals(event.getEventLocation().getLatitude(),updateEvent.getEventLocation().getLatitude());
         assertEquals(event.getEventLocation().getLongitude(), updateEvent.getEventLocation().getLongitude());
+    }/***/
+    @Test
+    public void test_createEventUser_validInput(){
+        Event testEvent = new Event();
+        testEvent.setTitle("We Events");
+        testEvent.setType(EventType.PUBLIC);
+        testEvent.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        testEvent.setEventLocation(eventLocation);
 
+        User testUser = new User();
+        testUser.setName("testName");
+        testUser.setUsername("testUsername");
+        testUser.setPassword("password");
 
-    }*/
+        User createdUser = userService.createUser(testUser);
+        Event createdEvent = eventService.createEvent(testEvent);
+
+        EventUser eventUser = eventService.createEventUser(createdUser,createdEvent,EventUserRole.ADMIN);
+
+        assertEquals(eventUser.getUser().getId(),testUser.getId());
+        assertEquals(eventUser.getEvent().getId(),testEvent.getId());
+        assertEquals("CONFIRMED",eventUser.getStatus().toString());
+        assertEquals("ADMIN",eventUser.getRole().toString());
+    }
+    @Test
+    public void test_createEvent_success(){
+        Event testEvent = new Event();
+        testEvent.setTitle("We Events");
+        testEvent.setType(EventType.PUBLIC);
+        testEvent.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        testEvent.setEventLocation(eventLocation);
+
+        Event actualEvent = eventService.createEvent(testEvent);
+
+        assertEquals(testEvent.getTitle(),actualEvent.getTitle());
+        assertEquals(testEvent.getEventDate(),actualEvent.getEventDate());
+        assertEquals(testEvent.getDescription(),actualEvent.getDescription());
+        assertEquals(testEvent.getStatus(),actualEvent.getStatus());
+        assertEquals(testEvent.getEventLocation(),actualEvent.getEventLocation());
+        assertEquals(testEvent.getType(),actualEvent.getType());
+    }
 }

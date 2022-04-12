@@ -1,7 +1,13 @@
 package ch.uzh.ifi.sopra22.service;
 
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.constants.UserStatus;
+import ch.uzh.ifi.sopra22.entity.Event;
+import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.repository.EventRepository;
+import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import ch.uzh.ifi.sopra22.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,9 +34,26 @@ public class UserServiceIntegrationTest {
     @Autowired
     private UserService userService;
 
+    @Qualifier("eventUserRepository")
+    @Autowired
+    private EventUserRepository eventUserRepository;
+
+    @Autowired
+    private EventUserService eventUserService;
+
+
+    @Qualifier("eventRepository")
+    @Autowired
+    private EventRepository eventRepository;
+
+    @Autowired
+    private EventService eventService;
+
     @BeforeEach
     public void setup() {
+        eventUserRepository.deleteAll();
         userRepository.deleteAll();
+        eventRepository.deleteAll();
     }
 
     @Test
@@ -207,5 +230,52 @@ public class UserServiceIntegrationTest {
         assertEquals(actualUser.getBirthday(), createdUser.getBirthday());
         assertEquals(actualUser.getBiography(), createdUser.getBiography());
         assertEquals(actualUser.getEmail(), createdUser.getEmail());
+    }
+
+    @Test
+    public void getUserByToken_validInput(){
+        assertNull(userRepository.findByToken("123"));
+
+        User user = new User();
+        user.setName("testName");
+        user.setUsername("testUsername");
+        user.setPassword("password");
+        User createdUser = userService.createUser(user);
+
+        User actualUser = userService.getUserByToken(createdUser.getToken());
+
+        assertEquals(actualUser.getId(), createdUser.getId());
+        assertEquals(actualUser.getUsername(), createdUser.getUsername());
+        assertEquals(actualUser.getToken(),createdUser.getToken());
+
+    }
+
+    @Test
+    public void linkeventUserToUser_validInput(){
+        assertNull(userRepository.findByUsername("testUsername"));
+
+        User user = new User();
+        user.setName("testName");
+        user.setUsername("testUsername");
+        user.setPassword("password");
+        User createdUser = userService.createUser(user);
+
+        Event event = new Event();
+        event.setTitle("testEvent");
+        Event createdEvent = eventService.createEvent(event);
+
+        EventUser eventUser = new EventUser();
+        eventUser.setUser(createdUser);
+        eventUser.setEvent(createdEvent);
+        eventUser.setStatus(EventUserStatus.CONFIRMED);
+        eventUser.setRole(EventUserRole.ADMIN);
+        EventUser createdEventUser = eventUserService.createEventUser(eventUser);
+
+        //testing for
+        userService.linkEventUsertoUser(createdUser,createdEventUser);
+
+        assertEquals(createdUser.getEventUsers().get(0).getEventUserId(), createdEventUser.getEventUserId());
+        assertEquals(createdUser.getEventUsers().get(0).getRole(), createdEventUser.getRole());
+        assertEquals(createdUser.getEventUsers().get(0).getStatus(), createdEventUser.getStatus());
     }
 }

@@ -4,8 +4,12 @@ import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventLocation;
+import ch.uzh.ifi.sopra22.entity.EventTask;
+import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.rest.dto.EventGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.EventPostDTO;
+import ch.uzh.ifi.sopra22.rest.dto.EventTaskGetDTO;
+import ch.uzh.ifi.sopra22.rest.dto.EventTaskPostDTO;
 import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
@@ -68,5 +72,38 @@ class EventDTOMapperTest {
         assertEquals(eventPostDTO.getLongitude(), event.getEventLocation().getLongitude());
         assertEquals(eventPostDTO.getStatus(), event.getStatus());
     }
+    @Test
+    public void testConvertEventTask_ToEventaskGetDTO_success(){
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("Event");
 
+        User user = new User();
+        user.setId(2L);
+        user.setUsername("testUser");
+        user.setToken("1");
+
+        EventTask eventTask = new EventTask();
+        eventTask.setEvent(event);
+        eventTask.setId(3L);
+        eventTask.setUser(user);
+        eventTask.setDescription("My description");
+
+        EventTaskGetDTO eventTaskGetDTO = EventDTOMapper.INSTANCE.convertEventTaskToEventTaskGetDTO(eventTask);
+
+        assertEquals(eventTaskGetDTO.getId(),eventTask.getId());
+        assertEquals(eventTaskGetDTO.getEventID(),eventTask.getEvent().getId());
+        assertEquals(eventTaskGetDTO.getUserID(),eventTask.getUser().getId());
+        assertEquals(eventTaskGetDTO.getDescription(),eventTask.getDescription());
+    }
+
+    @Test
+    public void testConvertEventTaskPostDTO_toEntity(){
+        EventTaskPostDTO eventTaskPostDTO = new EventTaskPostDTO();
+        eventTaskPostDTO.setDescription("This is my task");
+
+        EventTask eventTask = EventDTOMapper.INSTANCE.convertEventTaskPostDTOtoEntity(eventTaskPostDTO);
+
+        assertEquals(eventTask.getDescription(),eventTaskPostDTO.getDescription());
+    }
 }
