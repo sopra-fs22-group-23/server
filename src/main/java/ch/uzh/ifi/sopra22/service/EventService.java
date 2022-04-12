@@ -84,32 +84,12 @@ public class EventService {
         return event;
     }
 
-    private List<String> getWordsFromString(String text) {
-        List<String> words = new ArrayList<>();
-        int ref = 0;
-        for (int i=0; i < text.length(); i++) {
-            if (text.charAt(i) == ' ' || text.charAt(i) == '_' || text.charAt(i) == '+' || text.charAt(i) == '-') {
-                words.add(text.substring(ref, i));
-                ref = i + 1;
-            }
-        }
-        words.add(text.substring(ref));
-        return words;
-    }
-
-    private String parseString(String text) {
-        String parsedText = text.replace('+', ' ');
-        parsedText = parsedText.replace('-', ' ');
-        parsedText = parsedText.replace('_', ' ');
-        return parsedText;
-    }
-
     public List<Event> sortEventsBySearch(List<Event> availableEvents, String search) {
         if (search == null || search.equals("")) {
             return availableEvents;
         }
         // parse string to have spaces
-        search = parseString(search);
+        search = userService.parseString(search);
         search = search.toLowerCase();
 
         List<Integer> scores = new ArrayList<>();
@@ -126,7 +106,7 @@ public class EventService {
 
                 //Check words of query (space = ' ', '_', '-', '+')
                 List<String> words = new ArrayList<>();
-                words = getWordsFromString(search);
+                words = userService.getWordsFromString(search);
                 for (String word : words) {
                     try {
                         if (event.getTitle().toLowerCase().contains(word)) {score += titleWeight;}

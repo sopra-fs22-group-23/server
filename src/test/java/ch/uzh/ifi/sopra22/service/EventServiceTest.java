@@ -293,6 +293,8 @@ class EventServiceTest {
 
         String searchTerm = "Zurich";
 
+        Mockito.when(userService.parseString(Mockito.any())).thenReturn(searchTerm);
+
         //test
         List<Event> actual = eventService.sortEventsBySearch(events,searchTerm);
 

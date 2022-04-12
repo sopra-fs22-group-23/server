@@ -48,10 +48,13 @@ public class UserController {
     @GetMapping(value = "/users")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<UserGetDTO> getAllUsers(@RequestHeader("Authorization") String token) {
+    public List<UserGetDTO> getAllUsers(@RequestHeader("Authorization") String token,
+                                        @RequestParam(required = false, name = "search") String search) {
         userService.checkTokenExists(token);
 
         List<User> users = userService.getUsers();
+        // search function
+        users = userService.sortUsersBySearch(users, search);
         List<UserGetDTO> userGetDTOs = new ArrayList<>();
 
         // convert each user to the API representation
