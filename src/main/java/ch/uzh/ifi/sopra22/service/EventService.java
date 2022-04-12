@@ -273,7 +273,7 @@ public class EventService {
 
     public void linkEventUsertoEvent(Event createdEvent, EventUser admin) {
         createdEvent.addEventUsers(admin);
-        updateRepository(createdEvent);
+        Event event = updateRepository(createdEvent);
     }
 
     public Date stringToDate(String StringDate) {
