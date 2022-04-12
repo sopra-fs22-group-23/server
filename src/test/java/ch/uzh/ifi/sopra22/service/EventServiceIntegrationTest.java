@@ -58,13 +58,13 @@ public class EventServiceIntegrationTest {
         eventUserRepository.deleteAll();
 
     }
-/**
+
     @AfterEach
     public void cleanup() {
         eventRepository.deleteAll();
         userRepository.deleteAll();
         eventUserRepository.deleteAll();
-    }*/
+    }/***/
 
     @Test
     public void getEvents_validInput_success(){

@@ -8,7 +8,6 @@ import java.util.Date;
 public class EventPostDTO {
     private String title;
     private EventType type;
-    private String picture;
     private String description;
     private Date eventDate;
     private EventStatus status;
@@ -31,14 +30,6 @@ public class EventPostDTO {
 
     public void setType(EventType type) {
         this.type = type;
-    }
-
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
     }
 
     public String getDescription() {

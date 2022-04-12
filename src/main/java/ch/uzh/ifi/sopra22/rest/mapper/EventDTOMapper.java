@@ -19,7 +19,6 @@ public interface EventDTOMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "type", target = "type")
-    @Mapping(source = "picture", target = "picture")
     @Mapping(source = "description", target = "description")
     @Mapping(source = "eventDate", target = "eventDate")
     @Mapping(source = "eventLocation.name", target = "locationName")
@@ -30,7 +29,6 @@ public interface EventDTOMapper {
 
     @Mapping(source = "title", target = "title")
     @Mapping(source = "type", target = "type")
-    @Mapping(source = "picture", target = "picture")
     @Mapping(source = "description", target = "description")
     @Mapping(source = "eventDate", target = "eventDate")
     @Mapping(source = "locationName", target = "eventLocation.name")
