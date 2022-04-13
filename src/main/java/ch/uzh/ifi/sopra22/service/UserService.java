@@ -293,7 +293,7 @@ public class UserService {
     }
 
     public User validateUser(Long id, String token) {
-        User user = getUserByToken(token);
+        User user = getUserByToken(parseBearerToken(token));
 
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is invalid");

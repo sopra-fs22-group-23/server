@@ -347,7 +347,6 @@ public class EventController {
     public List<UserEventGetDTO> getAllUserEvents(@Parameter(description = "userId") @PathVariable Long userId,
                                                   @RequestHeader("Authorization") String token) {
         // Validate user by token
-        userService.checkTokenExists(token);
         User user = userService.validateUser(userId, token);
 
         // Get enhanced events list

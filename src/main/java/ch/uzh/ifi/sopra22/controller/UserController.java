@@ -157,7 +157,7 @@ public class UserController {
                                @RequestBody UserPostDTO userPostDTO) {
 
         userService.checkTokenExists(token);
-        User userRepo = userService.validateUser(userId, userService.parseBearerToken(token));
+        User userRepo = userService.validateUser(userId, token);
         userPostDTO.setId(userId);
 
         User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
@@ -179,7 +179,7 @@ public class UserController {
                                                                     @RequestParam("file") MultipartFile file){
 
         userService.checkTokenExists(token);
-        User userRepo = userService.validateUser(userId, userService.parseBearerToken(token));
+        User userRepo = userService.validateUser(userId, token);
         System.out.println("Get's in here");
         String createRandomName = fileService.createRandomName(file.getOriginalFilename());
         //String randomString = RandomStringUtils.random(20,true,true);
