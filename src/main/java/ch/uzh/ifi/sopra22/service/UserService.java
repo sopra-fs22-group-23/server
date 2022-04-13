@@ -1,6 +1,7 @@
 package ch.uzh.ifi.sopra22.service;
 
 import ch.uzh.ifi.sopra22.constants.UserStatus;
+import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.UserRepository;
@@ -16,9 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -28,6 +27,13 @@ public class UserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
+
+    // Search constants
+    private final int containsWholeFactor = 3;
+    private final int usernameWeight = 3;
+    private final int nameWeight = 3;
+    private final int biographyWeight = 1;
+    private final int emailWeight = 3;
 
     @Autowired
     public UserService(@Qualifier("userRepository") UserRepository userRepository) {
@@ -39,6 +45,78 @@ public class UserService {
         updateRepository(user);
     }
 
+    public List<String> getWordsFromString(String text) {
+        List<String> words = new ArrayList<>();
+        int ref = 0;
+        for (int i=0; i < text.length(); i++) {
+            if (text.charAt(i) == ' ' || text.charAt(i) == '_' || text.charAt(i) == '+' || text.charAt(i) == '-') {
+                words.add(text.substring(ref, i));
+                ref = i + 1;
+            }
+        }
+        words.add(text.substring(ref));
+        return words;
+    }
+
+    public String parseString(String text) {
+        String parsedText = text.replace('+', ' ');
+        parsedText = parsedText.replace('-', ' ');
+        parsedText = parsedText.replace('_', ' ');
+        return parsedText.toLowerCase();
+    }
+
+    public List<User> sortUsersBySearch(List<User> users, String search) {
+        if (search == null || search.equals("")) {
+            return users;
+        }
+        // parse string to have spaces
+        search = parseString(search);
+
+        List<Integer> scores = new ArrayList<>();
+        List<Integer> sortedScores = new ArrayList<>();
+        List<User> sortedUsers = new ArrayList<>();
+
+        // Assign scores to events
+        for (User user : users) {
+            int score = 0;
+            try {
+                // Contains check
+                try {
+                    if (user.getUsername().toLowerCase().contains(search)) {score += containsWholeFactor * usernameWeight;}
+                    if (user.getName().toLowerCase().contains(search)) {score += containsWholeFactor * nameWeight;}
+                    if (user.getEmail().toLowerCase().contains(search)) {score += containsWholeFactor * emailWeight;}
+                    if (user.getBiography().toLowerCase().contains(search)) {score += containsWholeFactor * biographyWeight;}
+                } catch (Exception ignore) {;}
+                //Check words of query (space = ' ', '_', '-', '+')
+                List<String> words = new ArrayList<>();
+                words = getWordsFromString(search);
+                for (String word : words) {
+                    try {
+                        if (user.getUsername().toLowerCase().contains(word)) {score += usernameWeight;}
+                        if (user.getName().toLowerCase().contains(word)) {score += nameWeight;}
+                        if (user.getEmail().toLowerCase().contains(word)) {score += emailWeight;}
+                        if (user.getBiography().toLowerCase().contains(word)) {score += biographyWeight;}
+                    } catch (Exception ignore) {;}
+                }
+            } catch (Exception ignore) {;}
+            scores.add(score);
+            sortedScores.add(score);
+        }
+
+        // Sort events based on scores
+        Collections.sort(sortedScores); // ascending
+        Collections.reverse(sortedScores); // descending
+
+        for (int score : sortedScores) {
+            /* no searchfilter but rather searchSort for /users
+            if (score <= 0) {
+                break;
+            }*/
+            sortedUsers.add(users.get(scores.indexOf(score)));
+            scores.set(scores.indexOf(score), -1);
+        }
+        return sortedUsers;
+    }
 
     public List<User> getUsers() {
         return this.userRepository.findAll();

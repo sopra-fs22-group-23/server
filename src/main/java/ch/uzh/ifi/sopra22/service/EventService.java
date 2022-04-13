@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -84,33 +85,12 @@ public class EventService {
         return event;
     }
 
-    private List<String> getWordsFromString(String text) {
-        List<String> words = new ArrayList<>();
-        int ref = 0;
-        for (int i=0; i < text.length(); i++) {
-            if (text.charAt(i) == ' ' || text.charAt(i) == '_' || text.charAt(i) == '+' || text.charAt(i) == '-') {
-                words.add(text.substring(ref, i));
-                ref = i + 1;
-            }
-        }
-        words.add(text.substring(ref));
-        return words;
-    }
-
-    private String parseString(String text) {
-        String parsedText = text.replace('+', ' ');
-        parsedText = parsedText.replace('-', ' ');
-        parsedText = parsedText.replace('_', ' ');
-        return parsedText;
-    }
-
     public List<Event> sortEventsBySearch(List<Event> availableEvents, String search) {
         if (search == null || search.equals("")) {
             return availableEvents;
         }
         // parse string to have spaces
-        search = parseString(search);
-        search = search.toLowerCase();
+        search = userService.parseString(search);
 
         List<Integer> scores = new ArrayList<>();
         List<Integer> sortedScores = new ArrayList<>();
@@ -126,7 +106,7 @@ public class EventService {
 
                 //Check words of query (space = ' ', '_', '-', '+')
                 List<String> words = new ArrayList<>();
-                words = getWordsFromString(search);
+                words = userService.getWordsFromString(search);
                 for (String word : words) {
                     try {
                         if (event.getTitle().toLowerCase().contains(word)) {score += titleWeight;}
@@ -269,6 +249,70 @@ public class EventService {
             newInvite.setStatus(EventUserStatus.INVITED);
             return eventUserService.createEventUser(newInvite);
         }
+    }
+
+    private void checkSingleAdmin(EventUser eventUser) {
+        List<EventUser> eventUserList = eventUser.getEvent().getEventUsers();
+        boolean singleAdmin = true;
+        for (EventUser ev : eventUserList) {
+            if (ev.getRole() == EventUserRole.ADMIN && !ev.getEventUserId().equals(eventUser.getEventUserId())) {
+                singleAdmin = false;
+            }
+        }
+        if (singleAdmin) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Cannot cancel or change role if single admin");
+        }
+    }
+
+    public EventUser validEventUserPUT(User inputUser, Event event, EventUserPostDTO eventUserPostDTO, String token) {
+        User tokenUser = validateToken(token);
+        EventUserRole userRole = eventUserPostDTO.getEventUserRole();
+
+        // Check if eventUser exists
+        EventUser eventUser = eventUserService.ensureEventUserExists(event.getId(), inputUser.getId());
+
+        // Check singleAdmin
+        checkSingleAdmin(eventUser);
+
+        // Check if self-change
+        if (tokenUser.getId().equals(inputUser.getId())) {
+            boolean done = false;
+            if (eventUserPostDTO.getEventUserRole() != null) {
+                if (eventUser.getRole() == EventUserRole.ADMIN && eventUserPostDTO.getEventUserRole() == EventUserRole.COLLABORATOR) {
+                    eventUser.setRole(eventUserPostDTO.getEventUserRole());
+                    done = true;
+                }
+            }
+            if (eventUserPostDTO.getEventUserStatus() != null && eventUserPostDTO.getEventUserStatus() != EventUserStatus.INVITED) {
+                eventUser.setStatus(eventUserPostDTO.getEventUserStatus());
+                done = true;
+            }
+            if (!done) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this action");
+            }
+        } else {
+            // Check admin role
+            List<EventUser> eventUsers = event.getEventUsers();
+            boolean thrower = true;
+            for (EventUser ev2 : eventUsers) {
+                if (ev2.getUser().getId().equals(tokenUser.getId()) && ev2.getRole() == EventUserRole.ADMIN) {
+                    thrower = false;
+                    break;
+                }
+            }
+            if (thrower) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this action");
+            }
+            // Admin validated
+            if (eventUserPostDTO.getEventUserRole() != null) {
+                eventUser.setRole(eventUserPostDTO.getEventUserRole());
+            }
+            if (eventUserPostDTO.getEventUserStatus() != null) {
+                eventUser.setStatus(eventUserPostDTO.getEventUserStatus());
+            }
+        }
+        eventUserService.updateRepository(eventUser);
+        return eventUser;
     }
 
     public void linkEventUsertoEvent(Event createdEvent, EventUser admin) {

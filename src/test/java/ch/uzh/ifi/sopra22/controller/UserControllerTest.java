@@ -30,12 +30,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * UserControllerTest
- * This is a WebMvcTest which allows to test the UserController i.e. GET/POST
- * request without actually sending them over the network.
- * This tests if the UserController works.
- */
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
 
@@ -63,6 +57,7 @@ public class UserControllerTest {
         // this mocks the UserService -> we define above what the userService should
         // return when getUsers() is called
         given(userService.getUsers()).willReturn(allUsers);
+        given(userService.sortUsersBySearch(Mockito.any(), Mockito.any())).willReturn(allUsers);
 
         // when
         MockHttpServletRequestBuilder getRequest = get("/users")

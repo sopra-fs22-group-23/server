@@ -39,7 +39,7 @@ public class EventUserService {
         return this.eventUserRepository.findAll();
     }
 
-    private EventUser updateRepository(EventUser eventUser) {
+    public EventUser updateRepository(EventUser eventUser) {
         EventUser savedEventUser = eventUserRepository.save(eventUser);
         eventUserRepository.flush();
         return savedEventUser;
@@ -57,6 +57,24 @@ public class EventUserService {
         if (eventUsersEventIds.contains(eventUserToBe.getEvent().getId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, baseErrorMessage);
         }
+    }
+
+    public EventUser ensureEventUserExists(Long eventId, Long userId) {
+        List<EventUser> eventUsersByUserId = eventUserRepository.findByUserId(userId);
+
+        EventUser eventUser = null;
+        for (EventUser ev : eventUsersByUserId) {
+            if (ev.getEvent().getId().equals(eventId)) {
+                eventUser = ev;
+                break;
+            }
+        }
+
+        // Check existence
+        if (eventUser == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This signup does not exist and hence cannot be manipulated");
+        }
+        return eventUser;
     }
 
     public EventUser createEventUser(EventUser newEventUser) {
