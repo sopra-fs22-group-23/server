@@ -336,5 +336,23 @@ public class EventController {
         //      .body(null);
     }
 
+    @Operation(summary = "Get a list of all events of user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "events were found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content) })
+    @GetMapping(value = "/users/{userId}/events")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<UserEventGetDTO> getAllUserEvents(@Parameter(description = "userId") @PathVariable Long userId,
+                                                  @RequestHeader("Authorization") String token) {
+        // Validate user by token
+        userService.checkTokenExists(token);
+        User user = userService.validateUser(userId, token);
+
+        // Get enhanced events list
+        return eventService.generateUserEvents(user);
+    }
+
 
 }

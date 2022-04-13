@@ -12,7 +12,9 @@ import ch.uzh.ifi.sopra22.repository.EventRepository;
 import ch.uzh.ifi.sopra22.repository.EventTaskRepository;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import ch.uzh.ifi.sopra22.rest.dto.EventUserPostDTO;
+import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
+import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +71,18 @@ public class EventService {
 
     private List<Event> getEvents() {
         return this.eventRepository.findAll();
+    }
+
+    public List<UserEventGetDTO> generateUserEvents(User user) {
+        List<EventUser> eventUsers = eventUserService.getEventUsers(user);
+        List<UserEventGetDTO> userEvents = new ArrayList<>();
+        for (EventUser eventUser : eventUsers) {
+            UserEventGetDTO userEventGetDTO = EventDTOMapper.INSTANCE.convertEntityToUserEventGetDTO(eventUser.getEvent());
+            userEventGetDTO.setEventUserStatus(eventUser.getStatus());
+            userEventGetDTO.setEventUserRole(eventUser.getRole());
+            userEvents.add(userEventGetDTO);
+        }
+        return userEvents;
     }
 
     public Event getEventByIDNum(Long eventId) {

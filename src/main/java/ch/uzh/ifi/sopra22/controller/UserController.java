@@ -1,10 +1,13 @@
 package ch.uzh.ifi.sopra22.controller;
 
+import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.model.UploadResponseMessage;
+import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
+import ch.uzh.ifi.sopra22.service.EventUserService;
 import ch.uzh.ifi.sopra22.service.FileService;
 import ch.uzh.ifi.sopra22.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +68,7 @@ public class UserController {
     }
 
 
-    @Operation(summary = "Create new user")
+        @Operation(summary = "Create new user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User was created", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = UserGetDTO.class))}),
