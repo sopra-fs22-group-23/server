@@ -10,6 +10,8 @@ import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
 import java.util.Optional;
+
+import ch.uzh.ifi.sopra22.rest.dto.EventUserPostDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -379,5 +381,71 @@ class EventServiceTest {
         assertEquals(actualEventUser.getEvent().getId(),eventUser.getEvent().getId());
         assertEquals(actualEventUser.getUser().getId(),eventUser.getUser().getId());
         assertEquals(actualEventUser.getRole(),eventUser.getRole());
+    }
+    @Test
+    public void addUserToEventPOST_validInput() {
+        //when
+        EventUserPostDTO eventUserPostDTO = new EventUserPostDTO();
+        eventUserPostDTO.setId(testUser.getId());
+        eventUserPostDTO.setEventUserRole(EventUserRole.GUEST);
+        eventUserPostDTO.setEventUserStatus(EventUserStatus.CONFIRMED);
+
+        EventUser createdEventUser = new EventUser();
+        createdEventUser.setEventUserId(8L);
+        createdEventUser.setEvent(testEvent);
+        createdEventUser.setUser(testUser);
+        createdEventUser.setRole(EventUserRole.GUEST);
+        createdEventUser.setStatus(EventUserStatus.CONFIRMED);
+
+        //given
+        Mockito.when(userService.getUserByToken(Mockito.any())).thenReturn(testUser);
+        Mockito.when(eventUserService.createEventUser(Mockito.any())).thenReturn(createdEventUser);
+
+        EventUser eventUser = eventService.validEventUserPOST(testUser, testEvent, eventUserPostDTO, testUser.getToken());
+
+        //then
+        assertEquals(eventUser.getStatus(), EventUserStatus.CONFIRMED);
+        assertEquals(eventUser.getEvent().getId(), testEvent.getId());
+        assertEquals(eventUser.getUser().getId(), testUser.getId());
+        assertEquals(eventUser.getRole(), EventUserRole.GUEST);
+
+    }
+    @Test
+    public void addUserToEventPUT_validInput() {
+        //when
+        EventUserPostDTO eventUserPostDTO = new EventUserPostDTO();
+        eventUserPostDTO.setId(testUser.getId());
+        eventUserPostDTO.setEventUserRole(EventUserRole.GUEST);
+        eventUserPostDTO.setEventUserStatus(EventUserStatus.CANCELLED);
+
+        EventUser createdEventUser = new EventUser();
+        createdEventUser.setEventUserId(8L);
+        createdEventUser.setEvent(testEvent);
+        createdEventUser.setUser(testUser);
+        createdEventUser.setRole(EventUserRole.GUEST);
+        createdEventUser.setStatus(EventUserStatus.CONFIRMED);
+
+        EventUser admin = new EventUser();
+        admin.setEvent(testEvent);
+        admin.setUser(testUser);
+        admin.setEventUserId(7L);
+        admin.setRole(EventUserRole.ADMIN);
+        createdEventUser.setStatus(EventUserStatus.CONFIRMED);
+
+        testEvent.addEventUsers(admin);
+        testEvent.addEventUsers(createdEventUser);
+
+        //given
+        Mockito.when(userService.getUserByToken(Mockito.any())).thenReturn(testUser);
+        Mockito.when(eventUserService.ensureEventUserExists(Mockito.any(), Mockito.any())).thenReturn(createdEventUser);
+
+        EventUser eventUser = eventService.validEventUserPUT(testUser, testEvent, eventUserPostDTO, testUser.getToken());
+
+        //then
+        assertEquals(eventUser.getStatus(), EventUserStatus.CANCELLED);
+        assertEquals(eventUser.getEvent().getId(), testEvent.getId());
+        assertEquals(eventUser.getUser().getId(), testUser.getId());
+        assertEquals(eventUser.getRole(), EventUserRole.GUEST);
+
     }
 }

@@ -252,7 +252,7 @@ public class EventService {
     }
 
     private void checkSingleAdmin(EventUser eventUser) {
-        List<EventUser> eventUserList = eventUserRepository.findByEventId(eventUser.getEvent().getId());
+        List<EventUser> eventUserList = eventUser.getEvent().getEventUsers();
         boolean singleAdmin = true;
         for (EventUser ev : eventUserList) {
             if (ev.getRole() == EventUserRole.ADMIN && !ev.getEventUserId().equals(eventUser.getEventUserId())) {
