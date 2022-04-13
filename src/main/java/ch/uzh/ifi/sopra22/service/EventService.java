@@ -302,7 +302,7 @@ public class EventService {
                 done = true;
             }
             if (!done) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this action");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not authorized for this action");
             }
         } else {
             // Check admin role
@@ -317,7 +317,7 @@ public class EventService {
             if (thrower) {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is not authorized for this action");
             }
-            // Admin validated
+            // Admin validated...
             if (eventUserPostDTO.getEventUserRole() != null) {
                 eventUser.setRole(eventUserPostDTO.getEventUserRole());
             }
