@@ -108,6 +108,30 @@ class EventServiceTest {
     }
 
     @Test
+    public void getAvailableEventsBySearch_validUser() {
+        Event createdEvent = eventService.createEvent(testEvent);
+
+        List<Event> eventList = new ArrayList<>();
+        eventList.add(createdEvent);
+        String search = "We+Even";
+
+        //given
+        Mockito.when(userService.parseString(Mockito.any())).thenReturn("we even");
+        List<String> words = new ArrayList<>();
+        words.add("we");
+        words.add("even");
+        Mockito.when(userService.getWordsFromString(Mockito.any())).thenReturn(words);
+
+        List<Event> testEventList = eventService.sortEventsBySearch(eventList, search);
+
+        assertEquals(1, testEventList.size());
+        assertEquals(testEvent.getId(), testEventList.get(0).getId());
+        assertEquals(testEvent.getTitle(), testEventList.get(0).getTitle());
+        assertEquals(testEvent.getStatus(), testEventList.get(0).getStatus());
+        assertEquals(testEvent.getType(), testEventList.get(0).getType());
+    }
+
+    @Test
     public void createEventUser_validInput(){
         User user = new User();
         user.setId(2L);
@@ -293,7 +317,7 @@ class EventServiceTest {
 
         String searchTerm = "Zurich";
 
-        Mockito.when(userService.parseString(Mockito.any())).thenReturn(searchTerm);
+        Mockito.when(userService.parseString(Mockito.any())).thenReturn("zurich");
 
         //test
         List<Event> actual = eventService.sortEventsBySearch(events,searchTerm);

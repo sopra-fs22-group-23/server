@@ -62,7 +62,7 @@ public class UserService {
         String parsedText = text.replace('+', ' ');
         parsedText = parsedText.replace('-', ' ');
         parsedText = parsedText.replace('_', ' ');
-        return parsedText;
+        return parsedText.toLowerCase();
     }
 
     public List<User> sortUsersBySearch(List<User> users, String search) {
@@ -71,7 +71,6 @@ public class UserService {
         }
         // parse string to have spaces
         search = parseString(search);
-        search = search.toLowerCase();
 
         List<Integer> scores = new ArrayList<>();
         List<Integer> sortedScores = new ArrayList<>();

@@ -91,7 +91,6 @@ public class EventService {
         }
         // parse string to have spaces
         search = userService.parseString(search);
-        search = search.toLowerCase();
 
         List<Integer> scores = new ArrayList<>();
         List<Integer> sortedScores = new ArrayList<>();
