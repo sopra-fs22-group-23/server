@@ -5,6 +5,8 @@ import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
+import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
+import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +117,14 @@ public class EventUserService {
         return getEventIDNums(userId);
     }
 
+    public List<EventUser> getEventUsers(User user) {
+        List<EventUser> eventUsers = eventUserRepository.findByUserId(user.getId());
+        if (eventUsers == null) {
+            eventUsers = new ArrayList<>();
+            return eventUsers;
+        }
+        return eventUsers;
+    }
 
     // Test
     public boolean canUserAccessEvent(User user, Long eventID, EventUserRole role){

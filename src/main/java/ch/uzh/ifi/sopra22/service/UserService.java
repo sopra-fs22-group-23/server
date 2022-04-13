@@ -4,7 +4,11 @@ import ch.uzh.ifi.sopra22.constants.UserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import ch.uzh.ifi.sopra22.repository.UserRepository;
+import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
+import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
+import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -289,7 +293,7 @@ public class UserService {
     }
 
     public User validateUser(Long id, String token) {
-        User user = getUserByToken(token);
+        User user = getUserByToken(parseBearerToken(token));
 
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is invalid");

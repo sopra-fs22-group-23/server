@@ -83,7 +83,7 @@ class UserServiceTest {
         //given
         Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
 
-        User validUser = userService.validateUser(testUser.getId(), testUser.getToken());
+        User validUser = userService.validateUser(testUser.getId(), "Bearer " + testUser.getToken());
 
         assertEquals(validUser.getUsername(), testUser.getUsername());
         assertEquals(validUser.getPassword(), testUser.getPassword());
@@ -95,7 +95,7 @@ class UserServiceTest {
         //given
         Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(testUser);
 
-        assertThrows(ResponseStatusException.class, () -> userService.validateUser(15L, testUser.getToken()));
+        assertThrows(ResponseStatusException.class, () -> userService.validateUser(15L, "Bearer " + testUser.getToken()));
     }
 
     @Test
