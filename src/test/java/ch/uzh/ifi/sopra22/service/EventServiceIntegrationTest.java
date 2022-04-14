@@ -123,6 +123,7 @@ public class EventServiceIntegrationTest {
 
     @Test
     public void updateEvent_validInput_success() {
+        //Setup
         Event testEvent = new Event();
         testEvent.setTitle("We Events");
         testEvent.setType(EventType.PUBLIC);
@@ -145,28 +146,25 @@ public class EventServiceIntegrationTest {
         eventService.linkEventUsertoEvent(createdEvent,eventUser);
         userService.linkEventUsertoUser(createdUser,eventUser);
 
-
-
         Event updateEvent = new Event();
-        updateEvent.setTitle("We Events");
-        //updateEvent.setType(EventType.PUBLIC);
-        //updateEvent.setStatus(EventStatus.IN_PLANNING);
+        updateEvent.setTitle("Test Events");
         EventLocation ueventLocation = new EventLocation();
-        ueventLocation.setName("Zurich");
-        ueventLocation.setLatitude(1.02F);
-        ueventLocation.setLongitude(1.02F);
+        ueventLocation.setName("Frankfurt");
+        ueventLocation.setLatitude(1F);
+        ueventLocation.setLongitude(1F);
         updateEvent.setEventLocation(ueventLocation);
 
         //when
         eventService.updateEvent(createdEvent,createdUser,updateEvent);
 
+        //then
         Event event = eventService.getEventByIDNum(testEvent.getId());
 
         assertEquals(event.getTitle(),updateEvent.getTitle());
         assertEquals(event.getEventLocation().getName(), updateEvent.getEventLocation().getName());
         assertEquals(event.getEventLocation().getLatitude(),updateEvent.getEventLocation().getLatitude());
         assertEquals(event.getEventLocation().getLongitude(), updateEvent.getEventLocation().getLongitude());
-    }/***/
+    }
     @Test
     public void test_createEventUser_validInput(){
         Event testEvent = new Event();
