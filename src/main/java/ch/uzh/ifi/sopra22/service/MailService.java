@@ -1,5 +1,7 @@
 package ch.uzh.ifi.sopra22.service;
 
+import ch.uzh.ifi.sopra22.entity.EventUser;
+import ch.uzh.ifi.sopra22.mail.EmailParameters;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,19 +24,28 @@ public class MailService {
         this.mailSender = mailSender;
     }
 
-    public void sendMail(String from, String subject, String toAddresses, String ccAddresses, String bccAddresses, String body) {
+    public void sendMail(EmailParameters emailParameters) {
         MimeMessagePreparator preparator = mimeMessage -> {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
-            message.setTo(toAddresses.split("[,;]"));
-            message.setFrom(from, "Wevent");
-            message.setSubject(subject);
-            if (StringUtils.isNotBlank(ccAddresses))
-                message.setCc(ccAddresses.split("[;,]"));
-            if (StringUtils.isNotBlank(bccAddresses))
-                message.setBcc(bccAddresses.split("[;,]"));
-            message.setText(body, false);
+            message.setTo(emailParameters.getToAddresses().split("[,;]"));
+            message.setFrom(emailParameters.getFrom(), "Wevent");
+            message.setSubject(emailParameters.getSubject());
+            if (StringUtils.isNotBlank(emailParameters.getCcAddresses()))
+                message.setCc(emailParameters.getCcAddresses().split("[;,]"));
+            if (StringUtils.isNotBlank(emailParameters.getBccAddresses()))
+                message.setBcc(emailParameters.getBccAddresses().split("[;,]"));
+            message.setText(emailParameters.getBody(), false);
         };
         mailSender.send(preparator);
         //logger.info("Email sent successfully To " + toAddresses +", " + ccAddresses +" with Subject " + subject);
+    }
+
+    public void sendInvitationMail(EventUser newSignup) {
+        EmailParameters emailParameters = new EmailParameters();
+        emailParameters.setFrom("wevent21@gmail.com");
+        emailParameters.setSubject("You got invited to an new event!!!");
+        emailParameters.setToAddresses(newSignup.getUser().getEmail());
+        emailParameters.setBody("Welcome to the new Event " + newSignup.getEvent().getTitle() + ",\n The link is the folowing ………" + newSignup.getEvent().getId());
+        sendMail(emailParameters);
     }
 }

@@ -5,6 +5,7 @@ import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.mail.EmailParameters;
 import ch.uzh.ifi.sopra22.model.UploadResponseMessage;
 import ch.uzh.ifi.sopra22.rest.dto.*;
 import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
@@ -247,6 +248,11 @@ public class EventController {
         eventService.linkEventUsertoEvent(event, newSignup);
         userService.linkEventUsertoUser(addedUser, newSignup);
 
+        //Add mailService
+        if (newSignup.getUser().getEmail() != null){
+            mailService.sendInvitationMail(newSignup);
+        }
+
         // Modify User with EventUser attributes
         EventUserGetDTO eventUserGetDTO = UserDTOMapper.INSTANCE.convertEntityToEventUserGetDTO(addedUser);
         eventUserGetDTO.setEventUserRole(newSignup.getRole());
@@ -368,7 +374,12 @@ public class EventController {
     @ResponseBody
     public void sendMailMessage(@RequestHeader(value = "Authorization", required = false) String token,
                               @RequestBody(required = false) EventUserPostDTO eventUserPostDTO) {
-        mailService.sendMail("wevent@gmail.com","Welcome to Wevent","adam.bauer@uzh.ch;mark.duering@uzh.ch;wesley.mueri@uzh.ch;paolo.tyyko@uzh.ch;kai.zinnhardt@uzh.ch ","","kai.zinnhardt@gmail.com","Welecome to the new mail service of wevent/n your Wevent Support Team");
+        EmailParameters em = new EmailParameters();
+        em.setFrom("wevent21@gmail.com");
+        em.setSubject("Welcome to Wevent");
+        em.setToAddresses("kai.zinnhardt@gmail.com");
+        em.setBody("Welecome to the new mail service of wevent \n your Wevent Support Team");
+        mailService.sendMail(em);
 
     }
 
