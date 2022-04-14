@@ -11,6 +11,7 @@ import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
 import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.sopra22.service.EventService;
 import ch.uzh.ifi.sopra22.service.FileService;
+import ch.uzh.ifi.sopra22.service.MailService;
 import ch.uzh.ifi.sopra22.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,11 +38,13 @@ public class EventController {
     private final EventService eventService;
     private final UserService userService;
     private final FileService fileService;
+    private final MailService mailService;
 
-    public EventController(EventService eventService, UserService userService, FileService fileService) {
+    public EventController(EventService eventService, UserService userService, FileService fileService, MailService mailService) {
         this.eventService = eventService;
         this.userService = userService;
         this.fileService = fileService;
+        this.mailService = mailService;
     }
 
     @Operation(summary = "Get a list of all public events and private events where authorized")
@@ -351,6 +354,22 @@ public class EventController {
 
         // Get enhanced events list
         return eventService.generateUserEvents(user);
+    }
+
+    @Operation(summary = "Test send mail")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "EventUser was updated", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserGetDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "Conflict, user not unique", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized User, could not be found by token", content = @Content)}
+    )
+    @PutMapping(value = "/email")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void sendMailMessage(@RequestHeader(value = "Authorization", required = false) String token,
+                              @RequestBody(required = false) EventUserPostDTO eventUserPostDTO) {
+        mailService.sendMail("wevent@gmail.com","Welcome to Wevent","adam.bauer@uzh.ch;mark.duering@uzh.ch;wesley.mueri@uzh.ch;paolo.tyyko@uzh.ch;kai.zinnhardt@uzh.ch ","","kai.zinnhardt@gmail.com","Welecome to the new mail service of wevent/n your Wevent Support Team");
+
     }
 
 

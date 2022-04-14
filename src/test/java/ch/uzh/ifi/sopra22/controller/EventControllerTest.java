@@ -11,6 +11,7 @@ import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.rest.dto.EventPostDTO;
 import ch.uzh.ifi.sopra22.service.EventService;
 import ch.uzh.ifi.sopra22.service.FileService;
+import ch.uzh.ifi.sopra22.service.MailService;
 import ch.uzh.ifi.sopra22.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,6 +54,9 @@ class EventControllerTest {
 
     @MockBean
     private FileService fileService;
+
+    @MockBean
+    private MailService mailService;
 
     @Test
     void givenEvent_getAvailableEvents() throws Exception {
