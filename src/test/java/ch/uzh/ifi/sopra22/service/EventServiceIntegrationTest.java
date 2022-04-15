@@ -47,6 +47,9 @@ public class EventServiceIntegrationTest {
     @Autowired
     private EventUserService eventUserService;
 
+    @Autowired
+    private MailService mailService;
+
     /**private User testUser;
 
     private Event testEvent;**/
