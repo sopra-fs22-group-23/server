@@ -220,7 +220,7 @@ public class UserServiceIntegrationTest {
 
         createdUser.setBiography("Its me");
         createdUser.setBirthday(Calendar.getInstance().getTime());
-        createdUser.setEmail("2@gmail.com");
+        createdUser.setEmail("kai@gmail.com");
 
         User actualUser = userService.editUser(createdUser);
 

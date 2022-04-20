@@ -22,6 +22,7 @@ import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -261,7 +262,12 @@ public class UserService {
     }
 
     private void checkEmail(String email){
-        if (!email.contains("@")){
+        // OWASP validation regex
+        String regexPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Boolean validPattern = Pattern.compile(regexPattern)
+                .matcher(email)
+                .matches();
+        if (validPattern == Boolean.FALSE){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email address");
         }
     }

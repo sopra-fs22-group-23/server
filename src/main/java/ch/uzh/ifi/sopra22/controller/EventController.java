@@ -2,6 +2,7 @@ package ch.uzh.ifi.sopra22.controller;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
@@ -184,6 +185,14 @@ public class EventController {
 
         eventService.updateEvent(event,user,eventInput);
 
+        // Inform Users about the Update
+        for (EventUser eventUser: event.getEventUsers()){
+            if (!eventUser.getUser().getId().equals(user.getId()) && !eventUser.getStatus().equals(EventUserStatus.CANCELLED)
+                    && eventUser.getUser().getEmail() != null){
+                mailService.sendUpdateEventMail(eventUser,user);
+            }
+        }
+
 
         //return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event);
     }
@@ -311,6 +320,13 @@ public class EventController {
             fileService.save(file,createRandomName);
             eventService.linkImageToEvent(event,createRandomName);
 
+            //Send an Email to inform the other users
+            for (EventUser eventUser: event.getEventUsers()){
+                if (!eventUser.getUser().getId().equals(user.getId()) && !eventUser.getStatus().equals(EventUserStatus.CANCELLED)
+                && eventUser.getUser().getEmail() != null){
+                    mailService.sendUpdateEventMail(eventUser,user);
+                }
+            }
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new UploadResponseMessage("Uploaded the file successfully: " + createRandomName));
         } catch (Exception e) {
