@@ -230,7 +230,7 @@ class UserServiceTest {
 
         createdUser.setBiography("Its me");
         createdUser.setBirthday(Calendar.getInstance().getTime());
-        createdUser.setEmail("1@gmail.com");
+        createdUser.setEmail("kai.zinnhardt@gmail.com");
 
         User actualUser = userService.editUser(createdUser);
 

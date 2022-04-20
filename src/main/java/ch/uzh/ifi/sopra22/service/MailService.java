@@ -1,6 +1,7 @@
 package ch.uzh.ifi.sopra22.service;
 
 import ch.uzh.ifi.sopra22.entity.EventUser;
+import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.mail.EmailParameters;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,19 @@ public class MailService {
         emailParameters.setFrom("wevent21@gmail.com");
         emailParameters.setSubject("You got invited to an new event!!!");
         emailParameters.setToAddresses(newSignup.getUser().getEmail());
-        emailParameters.setBody("Welcome to the new Event " + newSignup.getEvent().getTitle() + ",\n The link is the folowing ………" + newSignup.getEvent().getId());
+        emailParameters.setBody("Hi "+ newSignup.getUser().getName() + ",\n \n" +
+                "Welcome to the new event: " + newSignup.getEvent().getTitle() + "!!\n \n The link to this event is the folowing ……… e.g. http://localhost:8080/events/" + newSignup.getEvent().getId());
+        sendMail(emailParameters);
+    }
+
+    public void sendUpdateEventMail(EventUser eventUser, User userUpdate) {
+        EmailParameters emailParameters = new EmailParameters();
+        emailParameters.setFrom("wevent21@gmail.com");
+        emailParameters.setSubject("The event '" + eventUser.getEvent().getTitle() + "' received an updated");
+        emailParameters.setToAddresses(eventUser.getUser().getEmail());
+        emailParameters.setBody("Hi "+ eventUser.getUser().getName() + ",\n \n" +
+                "The event '" + eventUser.getEvent().getTitle() + "' recently received an update to its parameters. This update was conducted by "+ userUpdate.getName()+
+                ".\n \n The link to the updated event is the folowing ……… e.g. http://localhost:8080/events/" + eventUser.getEvent().getId());
         sendMail(emailParameters);
     }
 }
