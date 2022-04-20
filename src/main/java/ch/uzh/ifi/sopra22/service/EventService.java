@@ -11,6 +11,7 @@ import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
 import ch.uzh.ifi.sopra22.repository.EventTaskRepository;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
+import ch.uzh.ifi.sopra22.rest.dto.EventTaskPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.EventUserPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
@@ -384,11 +385,16 @@ public class EventService {
         eventTaskRepository.save(task);
     }
 
-    public void updateTask(Long taskID, EventTask newTaskData){
+    public void updateTask(Long taskID, EventTaskPostDTO newTaskData){
         EventTask task = eventTaskRepository.getOne(taskID);
 
-        if(newTaskData.getUser() != null){
-            task.setUser(userService.getUserByIDNum(newTaskData.getUser().getId()));
+        if(newTaskData.getUserID() != null){
+            task.setUser(userService.getUserByIDNum(newTaskData.getUserID()));
+        }
+
+        //the case when we unassign it, 0 is the dummy value
+        if(newTaskData.getUserID() == 0){
+            task.setUser(null);
         }
 
         if(newTaskData.getDescription() != null){
