@@ -9,6 +9,7 @@ import ch.uzh.ifi.sopra22.entity.EventLocation;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.rest.dto.EventPostDTO;
+import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import ch.uzh.ifi.sopra22.service.EventService;
 import ch.uzh.ifi.sopra22.service.FileService;
 import ch.uzh.ifi.sopra22.service.MailService;
@@ -433,6 +434,31 @@ class EventControllerTest {
 
         mockMvc.perform(getRequest)
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void emailNotificationTest() throws Exception {
+        Event event = new Event();
+        event.setId(2L);
+        event.setTitle("Test Event");
+        event.setType(EventType.PUBLIC);
+        event.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        event.setEventLocation(eventLocation);
+
+        given(eventService.getEventByIDNum(Mockito.any())).willReturn(event);
+        UserPostDTO userPostDTO = new UserPostDTO();
+        userPostDTO.setEmail("test@gmail.com");
+
+        MockHttpServletRequestBuilder postRequest = post("/emailNotification/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userPostDTO));
+
+        mockMvc.perform(postRequest)
+                .andExpect(status().isCreated());
     }
 
     /**

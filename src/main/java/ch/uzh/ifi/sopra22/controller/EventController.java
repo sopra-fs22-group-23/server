@@ -337,9 +337,9 @@ public class EventController {
 
     @Operation(summary = "Get event picture with ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User profile image was saved", content = @Content),
+            @ApiResponse(responseCode = "201", description = "Event profile image was saved", content = @Content),
             //@ApiResponse(responseCode = "400", description = "No file found for this User", content = @Content),
-            @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
+            @ApiResponse(responseCode = "404", description = "Event was not found", content = @Content) })
     @GetMapping(value = "/events/{eventId}/image")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -380,23 +380,17 @@ public class EventController {
 
     @Operation(summary = "Test send mail")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "EventUser was updated", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserGetDTO.class))}),
-            @ApiResponse(responseCode = "404", description = "Conflict, user not unique", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized User, could not be found by token", content = @Content)}
+            @ApiResponse(responseCode = "204", description = "Unregisted User got Informed", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Event was not found", content = @Content)}
     )
-    @PutMapping(value = "/email")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping(value = "/emailNotification/{eventId}")
+    @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public void sendMailMessage(@RequestHeader(value = "Authorization", required = false) String token,
-                              @RequestBody(required = false) EventUserPostDTO eventUserPostDTO) {
-        EmailParameters em = new EmailParameters();
-        em.setFrom("wevent21@gmail.com");
-        em.setSubject("Welcome to Wevent");
-        em.setToAddresses("kai.zinnhardt@gmail.com");
-        em.setBody("Welecome to the new mail service of wevent \n your Wevent Support Team");
-        mailService.sendMail(em);
-
+    public void sendMailMessage(@Parameter(description = "eventId") @PathVariable Long eventId,
+                              @RequestBody(required = false) UserPostDTO userPostDTO) {
+        User unregisteredUser = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+        Event event = eventService.getEventByIDNum(eventId);
+        mailService.sendUnregisterdUserNotification(unregisteredUser, event);
     }
 
 
