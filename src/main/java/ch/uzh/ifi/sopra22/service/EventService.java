@@ -388,13 +388,12 @@ public class EventService {
     public void updateTask(Long taskID, EventTaskPostDTO newTaskData){
         EventTask task = eventTaskRepository.getOne(taskID);
 
-        if(newTaskData.getUserID() != null){
-            task.setUser(userService.getUserByIDNum(newTaskData.getUserID()));
-        }
 
-        //the case when we unassign it, 0 is the dummy value
-        if(newTaskData.getUserID() == 0){
+        if(newTaskData.getUserID() == 0){ //the case when we unassign it, 0 is the dummy value
             task.setUser(null);
+        }
+        else if(newTaskData.getUserID() != null){
+            task.setUser(userService.getUserByIDNum(newTaskData.getUserID()));
         }
 
         if(newTaskData.getDescription() != null){
