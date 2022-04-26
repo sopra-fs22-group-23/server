@@ -262,4 +262,10 @@ class UserServiceTest {
         String actual = userService.parseBearerToken(testString);
         assertEquals(actual,"123");
     }
+    @Test
+    public void validateToken_invalidToken(){
+        String token = "Bearer: 1sde";
+        Mockito.when(userRepository.findByToken(Mockito.any())).thenReturn(null);
+        assertThrows(ResponseStatusException.class, () -> userService.validateToken(token));
+    }
 }
