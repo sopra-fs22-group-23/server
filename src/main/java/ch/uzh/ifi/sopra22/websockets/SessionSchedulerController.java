@@ -25,6 +25,7 @@ public class SessionSchedulerController {
     @SendTo("/topic/sessionScheduler/{eventHash}")
     public TaskMessage send(@DestinationVariable("eventHash") String eventHash, final TaskMessage message){
         System.out.println(message.toString());
-        return new TaskMessage(message.getTaskID(), message.getUser().concat("With hash:").concat(eventHash), message.getAction());
+        return new TaskMessage(message.getTaskID(), message.getUserID(), message.getColumnID(), message.getAction());
+//        .concat("With hash:").concat(eventHash)
     }
 }

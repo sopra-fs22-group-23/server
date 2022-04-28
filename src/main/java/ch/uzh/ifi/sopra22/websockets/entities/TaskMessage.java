@@ -4,12 +4,14 @@ import ch.uzh.ifi.sopra22.websockets.entities.enums.TaskAction;
 
 public class TaskMessage {
     private Long taskID;
-    private String user;
+    private Long userID;
+    private Long columnID;
     private TaskAction action;
 
-    public TaskMessage(Long taskID, String user, TaskAction action) {
+    public TaskMessage(Long taskID, Long userID, Long columnID, TaskAction action) {
         this.taskID = taskID;
-        this.user = user;
+        this.userID = userID;
+        this.columnID = columnID;
         this.action = action;
     }
 
@@ -21,12 +23,20 @@ public class TaskMessage {
         this.taskID = taskID;
     }
 
-    public String getUser() {
-        return user;
+    public Long getUserID() {
+        return userID;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setUserID(Long userID) {
+        this.userID = userID;
+    }
+
+    public Long getColumnID() {
+        return columnID;
+    }
+
+    public void setColumnID(Long columnID) {
+        this.columnID = columnID;
     }
 
     public TaskAction getAction() {
@@ -35,14 +45,5 @@ public class TaskMessage {
 
     public void setAction(TaskAction action) {
         this.action = action;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskMessage{" +
-                "taskID=" + taskID +
-                ", user='" + user + '\'' +
-                ", action=" + action +
-                '}';
     }
 }
