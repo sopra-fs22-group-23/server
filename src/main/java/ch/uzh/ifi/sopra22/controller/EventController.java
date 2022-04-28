@@ -378,7 +378,7 @@ public class EventController {
         return eventService.generateUserEvents(user);
     }
 
-    @Operation(summary = "Test send mail")
+    @Operation(summary = "Send mail for unregistered Users (Can only be done for Public events)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Unregisted User got Informed", content = @Content),
             @ApiResponse(responseCode = "404", description = "Event was not found", content = @Content)}
@@ -390,7 +390,9 @@ public class EventController {
                               @RequestBody(required = false) UserPostDTO userPostDTO) {
         User unregisteredUser = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
         Event event = eventService.getEventByIDNum(eventId);
-        mailService.sendUnregisterdUserNotification(unregisteredUser, event);
+        if(event.getType() == EventType.PUBLIC) {
+            mailService.sendUnregisterdUserNotification(unregisteredUser, event);
+        }
     }
 
 
