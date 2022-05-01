@@ -40,7 +40,7 @@ public class Event implements Serializable {
     private EventStatus status;
 
     @Column()
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date eventDate;
 
     @Column()
