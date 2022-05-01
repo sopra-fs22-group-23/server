@@ -15,17 +15,18 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
-class EventUserRepositoryTest {
+class EventUserRepositoryIntegrationTest {
 
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
     private EventUserRepository eventUserRepository;
-    /**
+/**
     @Autowired
     private EventRepository eventRepository;
 
@@ -40,8 +41,8 @@ class EventUserRepositoryTest {
         user.setPassword("password");
         user.setId(2L);
         user.setToken("1");
-        entityManager.persist(user);
-        entityManager.flush();
+        //entityManager.persist(user);
+        //entityManager.flush();
 
         Event event = new Event();
         event.setId(1L);
@@ -53,13 +54,13 @@ class EventUserRepositoryTest {
         eventLocation.setLatitude(1.02F);
         eventLocation.setLongitude(1.02F);
         event.setEventLocation(eventLocation);
-        entityManager.persist(event);
-        entityManager.flush();
+        //entityManager.persist(event);
+        //entityManager.flush();
 
         EventUser eventUser = new EventUser();
         eventUser.setEventUserId(3L);
-        eventUser.setEvent(event);
-        eventUser.setUser(user);
+        //eventUser.setEvent(event);
+        //eventUser.setUser(user);
         eventUser.setStatus(EventUserStatus.CONFIRMED);
         eventUser.setRole(EventUserRole.ADMIN);
         entityManager.persist(eventUser);
