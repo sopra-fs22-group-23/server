@@ -39,7 +39,6 @@ class UserServiceTest {
         testUser.setName("testName");
         testUser.setUsername("testUsername");
         testUser.setPassword("password");
-        testUser.setEmail("test@test.com");
         testUser.setToken("12345");
 
         // when -> any object is being save in the userRepository -> return the dummy
