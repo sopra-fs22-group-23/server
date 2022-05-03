@@ -381,7 +381,8 @@ public class EventController {
     @Operation(summary = "Send mail for unregistered Users (Can only be done for Public events)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Unregisted User got Informed", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Event was not found", content = @Content)}
+            @ApiResponse(responseCode = "404", description = "Event was not found", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Cannot send this email for a private event", content = @Content)}
     )
     @PostMapping(value = "/emailNotification/{eventId}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -392,6 +393,9 @@ public class EventController {
         Event event = eventService.getEventByIDNum(eventId);
         if(event.getType() == EventType.PUBLIC) {
             mailService.sendUnregisterdUserNotification(unregisteredUser, event);
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Unauthorized to send the request");
         }
     }
 
