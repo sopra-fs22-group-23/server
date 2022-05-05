@@ -59,7 +59,7 @@ public class MailConfig {
 
         Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(environment.getProperty("spring.mail.username"), environment.getProperty("spring.mail.password"));
+                return new PasswordAuthentication(environment.getProperty("SPRING_MAIL_USERNAME"), environment.getProperty("SPRING_MAIL_PASSWORD"));
             }
         });
 
