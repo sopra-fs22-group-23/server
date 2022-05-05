@@ -186,12 +186,13 @@ public class EventController {
         eventService.updateEvent(event,user,eventInput);
 
         // Inform Users about the Update
+        /** Disabled for testing purpose
         for (EventUser eventUser: event.getEventUsers()){
             if (!eventUser.getUser().getId().equals(user.getId()) && !eventUser.getStatus().equals(EventUserStatus.CANCELLED)
                     && eventUser.getUser().getEmail() != null){
                 mailService.sendUpdateEventMail(eventUser,user);
             }
-        }
+        }*/
 
 
         //return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event);
@@ -258,9 +259,10 @@ public class EventController {
         userService.linkEventUsertoUser(addedUser, newSignup);
 
         //Add mailService
+        /** Disabled for testing purpose
         if (newSignup.getUser().getEmail() != null){
             mailService.sendInvitationMail(newSignup);
-        }
+        }*/
 
         // Modify User with EventUser attributes
         EventUserGetDTO eventUserGetDTO = UserDTOMapper.INSTANCE.convertEntityToEventUserGetDTO(addedUser);
