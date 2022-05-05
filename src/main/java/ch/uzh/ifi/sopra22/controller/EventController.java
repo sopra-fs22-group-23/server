@@ -186,7 +186,7 @@ public class EventController {
         eventService.updateEvent(event,user,eventInput);
 
         // Inform Users about the Update
-        /** Disabled for testing purpose
+        /** Disabled for testing purposes
         for (EventUser eventUser: event.getEventUsers()){
             if (!eventUser.getUser().getId().equals(user.getId()) && !eventUser.getStatus().equals(EventUserStatus.CANCELLED)
                     && eventUser.getUser().getEmail() != null){
@@ -259,7 +259,7 @@ public class EventController {
         userService.linkEventUsertoUser(addedUser, newSignup);
 
         //Add mailService
-        /** Disabled for testing purpose
+        /** Disabeld for testing purposes
         if (newSignup.getUser().getEmail() != null){
             mailService.sendInvitationMail(newSignup);
         }*/
