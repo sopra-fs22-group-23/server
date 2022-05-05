@@ -8,10 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.mail.*;
 import javax.mail.internet.AddressException;
@@ -60,10 +62,9 @@ public class MailService {
             //System.out.println("sending...");
             Transport.send(message);
             //System.out.println("Sent message successfully....");
-        } catch (AddressException e) {
-            e.printStackTrace();
-        } catch (MessagingException mex) {
-            mex.printStackTrace();
+        } catch (MessagingException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Wrong email or credentials");
+            //e.printStackTrace();
         }
     }
 
