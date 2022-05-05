@@ -51,3 +51,6 @@ jobs:
 
     - name: deploy project to heroku
       run: git push heroku HEAD:refs/heads/master
+      env:
+          SPRING_MAIL_USERNAME: ${{ secrets.SPRING_MAIL_USERNAME}}
+          SPRING_MAIL_PASSWORD: ${{ secrets.SPRING_MAIL_PASSWORD}}
