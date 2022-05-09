@@ -4,10 +4,7 @@ import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
-import ch.uzh.ifi.sopra22.entity.Event;
-import ch.uzh.ifi.sopra22.entity.EventLocation;
-import ch.uzh.ifi.sopra22.entity.EventUser;
-import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.entity.*;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -114,6 +111,31 @@ class EventUserServiceTest {
 
         //then
         assertEquals(eventIds.get(0), testEvent.getId());
+    }
+
+    @Test
+    public void getUserTasks_validInput(){
+        List<EventTask> taskList = new ArrayList<>();
+        EventTask task1 = new EventTask();
+        task1.setDescription("Test Task");
+        task1.setUser(testUser);
+        task1.setEvent(testEvent);
+        task1.setId(5L);
+        taskList.add(task1);
+
+        EventTask task2 = new EventTask();
+        task2.setDescription("Task 2");
+        task2.setEvent(testEvent);
+        task2.setId(6L);
+        taskList.add(task2);
+
+        List<EventTask> actualTaskList = eventUserService.getUserTasks(taskList,2L);
+
+        assertEquals(1,actualTaskList.size());
+        assertEquals(task1.getId(),actualTaskList.get(0).getId());
+        assertEquals(task1.getUser().getId(),actualTaskList.get(0).getUser().getId());
+        assertEquals(task1.getEvent().getId(),actualTaskList.get(0).getEvent().getId());
+        assertEquals(task1.getDescription(),actualTaskList.get(0).getDescription());
     }
 
 }

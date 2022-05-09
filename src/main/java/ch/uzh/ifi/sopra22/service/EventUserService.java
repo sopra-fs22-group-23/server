@@ -136,7 +136,7 @@ public class EventUserService {
     public List<EventTask> getUserTasks(List<EventTask> tasks, Long userID) {
         List<EventTask> userTask = new ArrayList<>();
         for ( EventTask task : tasks){
-            if (task.getUser().getId() == userID){
+            if (task.getUser() != null && task.getUser().getId().equals(userID)){
                 userTask.add(task);
             }
         }
