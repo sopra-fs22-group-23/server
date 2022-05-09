@@ -15,6 +15,8 @@ jobs:
       HEROKU_KEY: ${{ secrets.HEROKU_API_KEY }}
       HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
       HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+      SPRING_MAIL_USERNAME: ${{ secrets.SPRING_MAIL_USERNAME }}
+      SPRING_MAIL_PASSWORD: ${{ secrets.SPRING_MAIL_PASSWORD }}
 
     steps:
     - name: checkout repository code
@@ -48,4 +50,7 @@ jobs:
       run: heroku git:remote -a $HEROKU_APP_NAME
 
     - name: deploy project to heroku
+      env:
+          SPRING_MAIL_USERNAME: ${{ secrets.SPRING_MAIL_USERNAME }}
+          SPRING_MAIL_PASSWORD: ${{ secrets.SPRING_MAIL_PASSWORD }}
       run: git push heroku HEAD:refs/heads/master
