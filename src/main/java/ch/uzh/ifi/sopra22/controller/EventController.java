@@ -343,7 +343,6 @@ public class EventController {
     @GetMapping(value = "/events/{eventId}/image")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    //public ResponseEntity<UploadResponseMessage> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
     public ResponseEntity<Resource> getFile(@Parameter(description = "eventId") @PathVariable Long eventId) {
         Event event = eventService.getEventByIDNum(eventId);
 
