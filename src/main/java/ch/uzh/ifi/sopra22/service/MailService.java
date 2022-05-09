@@ -6,6 +6,7 @@ import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.mail.EmailParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.web.PagedResourcesAssemblerArgumentResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -17,8 +18,6 @@ import javax.mail.*;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
-import java.util.logging.Logger;
 
 @Service
 public class MailService {
@@ -60,7 +59,8 @@ public class MailService {
             Transport.send(message);
         } catch (MessagingException e) {
             //throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Wrong email or credentials");
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("Wrong email or credentials used");
         }
     }
 
