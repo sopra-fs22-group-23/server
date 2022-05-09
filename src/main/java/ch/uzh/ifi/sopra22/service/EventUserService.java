@@ -129,6 +129,7 @@ public class EventUserService {
     // Test
     public boolean canUserAccessEvent(User user, Long eventID, EventUserRole role){
         //TODO check if event exists
-        return eventUserRepository.existsByUserAndEvent_idAndRole(user, eventID, role);
+        EventUser eventUser = ensureEventUserExists(eventID, user.getId());
+        return eventUser != null;
     }
 }
