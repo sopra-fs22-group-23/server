@@ -16,25 +16,15 @@ public class MailConfig {
     @Autowired
     private Environment environment;
 
-    /**
-    @Value("${mail.support.username}")
-    private String userName;
-    @Value("${mail.support.password}")
-    private String password;*/
     @Bean("gmail")
     public JavaMailSender gmailMailSender(){
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
-        //mailSender.setHost("smtp.mail.yahoo.com");
         mailSender.setPort(587);
 
-        /**mailSender.setUsername("wevent21@gmail.com");
-        mailSender.setPassword("Wevent$Group$23");*/
         //takes credentials locally from my config file application.properties, have to change between GMAIL and YAHOO credentials
         mailSender.setUsername(environment.getProperty("spring.mail.username"));
-        System.out.println("Username: "+environment.getProperty("spring.mail.username"));
         mailSender.setPassword(environment.getProperty("spring.mail.password"));
-        System.out.println("Password: "+environment.getProperty("spring.mail.password"));
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
@@ -46,9 +36,6 @@ public class MailConfig {
     }
     @Bean("yahoo")
     public Session yahooMailSender(){
-        final String to = "kai.zinnhardt@gmail.com";
-        final String from = "wevent23@yahoo.com";
-
         String host = "smtp.mail.yahoo.com";
         Properties properties = System.getProperties();
 
