@@ -131,6 +131,11 @@ public class UserService {
         newUser.setToken(UUID.randomUUID().toString());
         newUser.setStatus(UserStatus.ONLINE);
 
+        if (newUser.getBirthday() != null){
+            checkBirthdayBeforeToday(newUser.getBirthday());
+        }
+
+
         if (newUser.getName() == null){
             newUser.setName(newUser.getUsername());
         }
@@ -144,6 +149,14 @@ public class UserService {
 
         updateRepository(newUser);
         return newUser;
+    }
+
+    private void checkBirthdayBeforeToday(Date birthday) {
+        Date nowDate = new Date();
+        System.out.println(nowDate);
+        if (nowDate.before(birthday)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"The Birthday you want to use is in the furture");
+        }
     }
 
     public User editUser(User updatedUser) {
@@ -162,6 +175,7 @@ public class UserService {
             user.setName(updatedUser.getName());
         }
         if (updatedUser.getBirthday() != null) {
+            checkBirthdayBeforeToday(updatedUser.getBirthday());
             user.setBirthday(updatedUser.getBirthday());
         }
         if (updatedUser.getBiography() != null){
