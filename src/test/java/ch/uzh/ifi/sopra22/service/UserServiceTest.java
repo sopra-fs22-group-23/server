@@ -48,6 +48,53 @@ class UserServiceTest {
     }
 
     @Test
+    public void getUserByPartialUser_success() {
+        // given
+        Optional<User> optionalUser = Optional.ofNullable(testUser);
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(optionalUser);
+
+        // then
+        User result = userService.getUserByPartialUser(testUser);
+        assertEquals(testUser.getId(), result.getId());
+        assertEquals(testUser.getUsername(), result.getUsername());
+        assertEquals(testUser.getName(), result.getName());
+    }
+
+    @Test
+    public void getWordsFromString_success() {
+        // given
+        String text = "my sample text";
+        List<String> words = userService.getWordsFromString(text);
+
+        // then
+        assertEquals(3, words.size());
+        assertEquals("sample", words.get(1));
+    }
+
+    @Test
+    public void parseString_success() {
+        // given
+        String text = "my+sample-text";
+        String parsed = userService.parseString(text);
+
+        // then
+        assertEquals("my sample text", parsed);
+    }
+
+    @Test
+    public void sortUsersBySearch_success() {
+        // given
+        List<User> users = new ArrayList<>();
+        users.add(testUser);
+
+        // then
+        List<User> results = userService.sortUsersBySearch(users, "testName");
+        assertEquals(testUser.getId(), results.get(0).getId());
+        assertEquals(testUser.getUsername(), results.get(0).getUsername());
+        assertEquals(testUser.getName(), results.get(0).getName());
+    }
+
+    @Test
     public void getUsersList_validInputs_success(){
         User createdUser = userService.createUser(testUser);
 
