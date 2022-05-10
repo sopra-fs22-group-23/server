@@ -2,6 +2,7 @@ package ch.uzh.ifi.sopra22.service;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
+import ch.uzh.ifi.sopra22.constants.Event.GameMode;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventLocation;
@@ -136,6 +137,7 @@ public class EventServiceIntegrationTest {
         eventLocation.setLatitude(1.02F);
         eventLocation.setLongitude(1.02F);
         testEvent.setEventLocation(eventLocation);
+        testEvent.setGameMode(GameMode.OFF);
 
         User testUser = new User();
         testUser.setName("testName");
@@ -156,6 +158,7 @@ public class EventServiceIntegrationTest {
         ueventLocation.setLatitude(1F);
         ueventLocation.setLongitude(1F);
         updateEvent.setEventLocation(ueventLocation);
+        updateEvent.setGameMode(GameMode.ON);
 
         //when
         eventService.updateEvent(createdEvent,createdUser,updateEvent);
@@ -167,6 +170,7 @@ public class EventServiceIntegrationTest {
         assertEquals(event.getEventLocation().getName(), updateEvent.getEventLocation().getName());
         assertEquals(event.getEventLocation().getLatitude(),updateEvent.getEventLocation().getLatitude());
         assertEquals(event.getEventLocation().getLongitude(), updateEvent.getEventLocation().getLongitude());
+        assertEquals(event.getGameMode(),updateEvent.getGameMode());
     }
     @Test
     public void test_createEventUser_validInput(){
