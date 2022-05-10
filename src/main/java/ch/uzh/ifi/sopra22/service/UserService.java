@@ -270,8 +270,6 @@ public class UserService {
                     String.format(baseErrorMessage, "username and the name", "are"));
         } else if (userByUsername != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
-        } else if (userByName != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "name", "is"));
         }
     }
 
