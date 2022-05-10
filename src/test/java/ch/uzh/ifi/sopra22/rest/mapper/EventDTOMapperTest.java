@@ -2,14 +2,13 @@ package ch.uzh.ifi.sopra22.rest.mapper;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
+import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventLocation;
 import ch.uzh.ifi.sopra22.entity.EventTask;
 import ch.uzh.ifi.sopra22.entity.User;
-import ch.uzh.ifi.sopra22.rest.dto.EventGetDTO;
-import ch.uzh.ifi.sopra22.rest.dto.EventPostDTO;
-import ch.uzh.ifi.sopra22.rest.dto.EventTaskGetDTO;
-import ch.uzh.ifi.sopra22.rest.dto.EventTaskPostDTO;
+import ch.uzh.ifi.sopra22.rest.dto.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
@@ -45,6 +44,40 @@ class EventDTOMapperTest {
         assertEquals(event.getEventLocation().getLatitude(), eventGetDTO.getLatitude());
         assertEquals(event.getEventLocation().getLongitude(), eventGetDTO.getLongitude());
         assertEquals(event.getStatus(), eventGetDTO.getStatus());
+    }
+
+    @Test
+    public void convertFromEntity_toUserEventGetDTO_success(){
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("Event");
+        event.setType(EventType.PUBLIC);
+        event.setDescription("This is an event");
+        event.setEventDate(Calendar.getInstance().getTime());
+        event.setStatus(EventStatus.READY);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setLongitude(1F);
+        eventLocation.setLongitude(1F);
+        eventLocation.setName("Zurich");
+        event.setEventLocation(eventLocation);
+
+        //Map
+        UserEventGetDTO userEventGetDTO = EventDTOMapper.INSTANCE.convertEntityToUserEventGetDTO(event);
+        userEventGetDTO.setEventUserStatus(EventUserStatus.CONFIRMED);
+        userEventGetDTO.setEventUserRole(EventUserRole.ADMIN);
+
+        //check
+        assertEquals(event.getId().intValue(),userEventGetDTO.getId().intValue());
+        assertEquals(event.getTitle(),userEventGetDTO.getTitle());
+        assertEquals(event.getType(),userEventGetDTO.getType());
+        assertEquals(event.getDescription(),userEventGetDTO.getDescription());
+        assertEquals(event.getEventDate(),userEventGetDTO.getEventDate());
+        assertEquals(event.getStatus(),userEventGetDTO.getStatus());
+        assertEquals(event.getEventLocation().getName(),userEventGetDTO.getLocationName());
+        assertEquals(event.getEventLocation().getLongitude(), userEventGetDTO.getLongitude());
+        assertEquals(event.getEventLocation().getLatitude(),userEventGetDTO.getLatitude());
+        assertEquals(EventUserStatus.CONFIRMED,userEventGetDTO.getEventUserStatus());
+        assertEquals(EventUserRole.ADMIN,userEventGetDTO.getEventUserRole());
     }
 
     @Test
