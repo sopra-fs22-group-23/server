@@ -164,6 +164,24 @@ class EventTaskControllerTest {
                 .andExpect(jsonPath("$[0].eventID", is(testTasks.get(0).getEvent().getId().intValue())))
                 .andExpect(jsonPath("$[0].description", is(testTasks.get(0).getDescription())));
     }
+    @Test
+    public void getAllTasksForAnEventFromAUser_validAccess() throws Exception {
+        given(eventService.validateToken(Mockito.any())).willReturn(testUser);
+        given(eventService.getTasksByEventID(Mockito.any())).willReturn(testTasks);
+        given(eventUserService.getUserTasks(Mockito.any(),Mockito.any())).willReturn(testTasks);
+
+        // when
+        MockHttpServletRequestBuilder getRequest = get("/events/1/users/2/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",testUser.getToken());
+
+        mockMvc.perform(getRequest).andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is(testTasks.get(0).getId().intValue())))
+                .andExpect(jsonPath("$[0].userID", is(testUser.getId().intValue())))
+                .andExpect(jsonPath("$[0].eventID", is(testEvent.getId().intValue())))
+                .andExpect(jsonPath("$[0].description", is(testTasks.get(0).getDescription())));
+    }
 
     /**
      * Helper Method to convert userPostDTO into a JSON string such that the input
