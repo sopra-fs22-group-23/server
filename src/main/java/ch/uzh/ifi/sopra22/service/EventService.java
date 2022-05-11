@@ -424,7 +424,11 @@ public class EventService {
             event.setTitle(eventInput.getTitle());
         }/**else if (eventInput.getType() != null){ //Type should not be able to be changed, or should it?
             event.setType(eventInput.getType());
-        }*/if (eventInput.getDescription() != null){
+        }*/
+        if (eventInput.getStatus() != null ){
+            event.setStatus(eventInput.getStatus());
+        }
+        if (eventInput.getDescription() != null){
             event.setDescription(eventInput.getDescription());
         } if (eventInput.getEventDate() != null){
             checkIfDateIsBeforeToday(eventInput.getEventDate());
