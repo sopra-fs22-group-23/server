@@ -171,9 +171,9 @@ public class EventController {
             @ApiResponse(responseCode = "401", description = "Unauthorized for this request", content = @Content),
             @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
     @PutMapping(value = "/events/{eventId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public void updateEventByEventId(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token,
+    public EventGetDTO updateEventByEventId(@Parameter(description = "eventId") @PathVariable Long eventId, @RequestHeader("Authorization") String token,
                                      @RequestBody EventPostDTO eventPostDTO) {
         userService.checkTokenExists(token);
         User user = eventService.validateToken(token);
@@ -193,8 +193,9 @@ public class EventController {
             }
         }
 
+        Event updatedEvent = eventService.getEventByIDNum(eventId);
 
-        //return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event);
+        return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(updatedEvent);
     }
 
     @Operation(summary = "Get a list of all users from an Event")

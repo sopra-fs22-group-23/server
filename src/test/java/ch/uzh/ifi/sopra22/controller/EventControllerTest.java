@@ -235,7 +235,12 @@ class EventControllerTest {
                 .header("Authorization",user.getToken());
 
         mockMvc.perform(putRequest)
-                .andExpect(status().isNoContent());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(event.getId().intValue())))
+                .andExpect(jsonPath("$.title", is(event.getTitle())))
+                .andExpect(jsonPath("$.type", is(event.getType().toString())))
+                .andExpect(jsonPath("$.status", is(event.getStatus().toString())))
+                .andExpect(jsonPath("$.locationName", is(event.getEventLocation().getName())));
     }
 
     @Test
