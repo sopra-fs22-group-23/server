@@ -71,7 +71,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].id", is(user.getId().intValue())))
                 .andExpect(jsonPath("$[0].name", is(user.getName())))
                 .andExpect(jsonPath("$[0].username", is(user.getUsername())))
-                .andExpect(jsonPath("[0].birthday", is(user.getBirthday())));
+                .andExpect(jsonPath("$[0].birthday", is(user.getBirthday())));
     }
     @Test
     public void createUser_validInput_userCreated() throws Exception {

@@ -11,10 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,6 +35,7 @@ class UserServiceTest {
         testUser.setId(1L);
         testUser.setName("testName");
         testUser.setUsername("testUsername");
+        testUser.setBirthday(new Date(new Date().getTime() - (1000*60*60*24)));
         testUser.setPassword("password");
         testUser.setEmail("test@test.com");
         testUser.setToken("12345");
@@ -289,6 +287,26 @@ class UserServiceTest {
         assertEquals(actualUser.getBiography(), createdUser.getBiography());
         assertEquals(actualUser.getEmail(), createdUser.getEmail());
     }
+
+    @Test
+    public void editUser_invalidDate(){
+        User createdUser = userService.createUser(testUser);
+
+        User editUser = new User();
+        editUser.setBirthday(new Date(new Date().getTime() +(1000*60*60*24)));
+        editUser.setUsername("testUsername");
+        editUser.setName("testName");
+
+        Mockito.verify(userRepository).save(Mockito.any());
+
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(testUser));
+
+        editUser.setBiography("Its me");
+        editUser.setEmail("kai.zinnhardt@gmail.com");
+
+        assertThrows(ResponseStatusException.class, () -> userService.editUser(editUser));
+    }
+
     @Test
     public void editUser_invalidEmail(){
         User createdUser = userService.createUser(testUser);

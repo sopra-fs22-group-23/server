@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class EventTaskController {
@@ -119,6 +120,36 @@ public class EventTaskController {
         eventService.updateTask(taskID, eventTaskPostDTO);
 
         return getEventTaskGetDTOS(eventID);
+    }
+
+    @Operation(summary = "Get all tasks of one event for one user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns the tasks", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))}),
+            @ApiResponse(responseCode = "404", description = "No such event exists", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Only collaborators and Admins can view event tasks", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Token not received, Authorization has failed", content = @Content)
+    })
+    @GetMapping(value = "/events/{eventID}/users/{userID}/tasks")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<EventTaskGetDTO> getEventTasksFromUser(@RequestHeader("Authorization") String token,
+                                               @PathVariable Long eventID, @PathVariable Long userID) {
+        User user = eventService.validateToken(token);//verify that user has rights to access the api
+        //can only access own events and tasks
+        if (!user.getId().equals(userID)){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Can only access your own event tasks");
+        }
+
+        List<EventTask> tasks = eventService.getTasksByEventID(eventID);
+
+        List<EventTask> userTasks = eventUserService.getUserTasks(tasks,userID);
+
+        List<EventTaskGetDTO> tasksDTOs = new ArrayList<>();
+        for (EventTask oneTask : userTasks) {
+            tasksDTOs.add(EventDTOMapper.INSTANCE.convertEventTaskToEventTaskGetDTO(oneTask));
+        }
+        return tasksDTOs;
     }
 
 

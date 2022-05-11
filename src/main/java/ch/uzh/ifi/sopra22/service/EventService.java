@@ -14,7 +14,6 @@ import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import ch.uzh.ifi.sopra22.rest.dto.EventTaskPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.EventUserPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
-import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -179,6 +177,9 @@ public class EventService {
         }
         if (newEvent.getDescription() == null){
             newEvent.setDescription("Please edit your event description here...");
+        }
+        if(newEvent.getEventDate() != null){
+            checkIfDateIsBeforeToday(newEvent.getEventDate());
         }
 
         newEvent.setStatus(EventStatus.IN_PLANNING);
@@ -426,6 +427,7 @@ public class EventService {
         }*/if (eventInput.getDescription() != null){
             event.setDescription(eventInput.getDescription());
         } if (eventInput.getEventDate() != null){
+            checkIfDateIsBeforeToday(eventInput.getEventDate());
             event.setEventDate(eventInput.getEventDate());
         } if (eventInput.getEventLocation() != null){
             event.setEventLocation(eventInput.getEventLocation());
@@ -447,5 +449,13 @@ public class EventService {
     public void linkImageToEvent(Event event, String createRandomName) {
         event.setPicture(createRandomName);
         updateRepository(event);
+    }
+    private void checkIfDateIsBeforeToday(Date eventDate) {
+        Date nowDate = new Date();
+        System.out.println(nowDate);
+        if (nowDate.after(eventDate)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"The event you want to create is in the past");
+        }
+
     }
 }
