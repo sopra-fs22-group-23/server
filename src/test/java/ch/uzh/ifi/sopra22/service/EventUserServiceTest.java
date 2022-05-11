@@ -20,8 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class EventUserServiceTest {
     @Mock
@@ -81,6 +80,54 @@ class EventUserServiceTest {
         Mockito.when(eventUserRepository.save(Mockito.any())).thenReturn(testEventUser);
     }
 
+    @Test
+    public void canUserAccessEvent_success() {
+        // given
+        List<EventUser> eventUsers = new ArrayList<>();
+        eventUsers.add(testEventUser);
+
+        // when
+        Mockito.when(eventUserRepository.findByUserId(Mockito.any())).thenReturn(eventUsers);
+
+        // then
+        assertTrue(eventUserService.canUserAccessEvent(testUser, testEvent.getId(), testEventUser.getRole()));
+    }
+
+    @Test
+    public void getEventUsers_success() {
+        // given
+        List<EventUser> eventUsers = new ArrayList<>();
+        eventUsers.add(testEventUser);
+
+        // when
+        Mockito.when(eventUserRepository.findByUserId(Mockito.any())).thenReturn(eventUsers);
+
+        // then
+        List<EventUser> results = eventUserService.getEventUsers(testUser);
+        assertEquals(testEventUser.getEventUserId(), results.get(0).getEventUserId());
+        assertEquals(testEventUser.getUser().getId(), results.get(0).getUser().getId());
+        assertEquals(testEventUser.getEvent().getId(), results.get(0).getEvent().getId());
+        assertEquals(testEventUser.getStatus(), results.get(0).getStatus());
+        assertEquals(testEventUser.getRole(), results.get(0).getRole());
+    }
+
+    @Test
+    public void ensureEventUserExists_success() {
+        // given
+        List<EventUser> eventUsers = new ArrayList<>();
+        eventUsers.add(testEventUser);
+
+        // when
+        Mockito.when(eventUserRepository.findByUserId(Mockito.any())).thenReturn(eventUsers);
+
+        // then
+        EventUser result = eventUserService.ensureEventUserExists(testEvent.getId(), testUser.getId());
+        assertEquals(testEventUser.getEventUserId(), result.getEventUserId());
+        assertEquals(testEventUser.getUser().getId(), result.getUser().getId());
+        assertEquals(testEventUser.getEvent().getId(), result.getEvent().getId());
+        assertEquals(testEventUser.getStatus(), result.getStatus());
+        assertEquals(testEventUser.getRole(), result.getRole());
+    }
 
     @Test
     public void createEventUser_validInput_success() {

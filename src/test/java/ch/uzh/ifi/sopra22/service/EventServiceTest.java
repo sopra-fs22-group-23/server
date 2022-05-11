@@ -4,14 +4,16 @@ import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
-import ch.uzh.ifi.sopra22.entity.Event;
-import ch.uzh.ifi.sopra22.entity.EventLocation;
-import ch.uzh.ifi.sopra22.entity.EventUser;
-import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.entity.*;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
 import java.util.Optional;
 
+import ch.uzh.ifi.sopra22.repository.EventTaskRepository;
+import ch.uzh.ifi.sopra22.rest.dto.EventTaskPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.EventUserPostDTO;
+import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
+import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
+import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,10 +28,14 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doNothing;
 
 class EventServiceTest {
     @Mock
     private EventRepository eventRepository;
+
+    @Mock
+    private EventTaskRepository eventTaskRepository;
 
     @Mock
     private UserService userService;
@@ -74,6 +80,153 @@ class EventServiceTest {
 
 
         Mockito.when(eventRepository.save(Mockito.any())).thenReturn(testEvent);
+    }
+
+    @Test
+    public void linkImageToEvent_success() {
+        // given
+
+        // when
+        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(testEvent);
+        doNothing().when(eventRepository).flush();
+
+        // then
+        eventService.linkImageToEvent(testEvent, "randomName");
+    }
+
+    @Test
+    public void isUserAloudToUpdate_success() {
+        // given
+        EventUser eventUser = new EventUser();
+        eventUser.setEvent(testEvent);
+        eventUser.setUser(testUser);
+        eventUser.setEventUserId(5L);
+        eventUser.setStatus(EventUserStatus.CONFIRMED);
+        eventUser.setRole(EventUserRole.ADMIN);
+
+        List<EventUser> eventUserList = new ArrayList<>();
+        eventUserList.add(eventUser);
+
+        // when
+        testEvent.setEventUsers(eventUserList);
+
+        // then
+        eventService.isUserAloudToUpdate(testEvent, testUser);
+    }
+
+    @Test
+    public void getEventUsers_success() {
+        // given
+        EventUser eventUser = new EventUser();
+        eventUser.setEvent(testEvent);
+        eventUser.setUser(testUser);
+        eventUser.setEventUserId(5L);
+        eventUser.setStatus(EventUserStatus.CONFIRMED);
+        eventUser.setRole(EventUserRole.ADMIN);
+
+        List<EventUser> eventUserList = new ArrayList<>();
+        eventUserList.add(eventUser);
+
+        // when
+        testEvent.setEventUsers(eventUserList);
+
+        // then
+        List<EventUser> results = eventService.getEventUsers(testEvent);
+        assertEquals(eventUser.getRole(), results.get(0).getRole());
+        assertEquals(eventUser.getStatus(), results.get(0).getStatus());
+        assertEquals(eventUser.getEvent().getId(), results.get(0).getEvent().getId());
+        assertEquals(eventUser.getUser().getId(), results.get(0).getUser().getId());
+        assertEquals(eventUser.getEventUserId(), results.get(0).getEventUserId());
+    }
+
+    @Test
+    public void generateUserEvents_success() {
+        // given
+        UserEventGetDTO userEventGetDTO = EventDTOMapper.INSTANCE.convertEntityToUserEventGetDTO(testEvent);
+        userEventGetDTO.setEventUserRole(EventUserRole.GUEST);
+        userEventGetDTO.setEventUserStatus(EventUserStatus.CONFIRMED);
+
+        EventUser eventUser = new EventUser();
+        eventUser.setEventUserId(5L);
+        eventUser.setEvent(testEvent);
+        eventUser.setUser(testUser);
+        eventUser.setRole(EventUserRole.GUEST);
+        eventUser.setStatus(EventUserStatus.CONFIRMED);
+        List<EventUser> eventUsers = new ArrayList<>();
+        eventUsers.add(eventUser);
+
+        // when
+        Mockito.when(eventUserService.getEventUsers(Mockito.any())).thenReturn(eventUsers);
+
+        // then
+        List<UserEventGetDTO> results = eventService.generateUserEvents(testUser);
+        assertEquals(userEventGetDTO.getEventUserRole(), results.get(0).getEventUserRole());
+        assertEquals(userEventGetDTO.getEventUserStatus(), results.get(0).getEventUserStatus());
+        assertEquals(userEventGetDTO.getTitle(), results.get(0).getTitle());
+        assertEquals(userEventGetDTO.getType(), results.get(0).getType());
+    }
+
+    @Test
+    public void getTasksByEventID_success() {
+        // given
+        EventTask task = new EventTask();
+        task.setEvent(testEvent);
+        task.setUser(testUser);
+        task.setDescription("task1");
+        List<EventTask> taskList = new ArrayList<>();
+        taskList.add(task);
+
+        // when
+        Mockito.when(eventTaskRepository.findAllByEvent_id(Mockito.any())).thenReturn(taskList);
+
+        // then
+        List<EventTask> results = eventService.getTasksByEventID(testEvent.getId());
+        assertEquals(task.getEvent().getId(), results.get(0).getEvent().getId());
+        assertEquals(task.getUser().getId(), results.get(0).getUser().getId());
+        assertEquals(task.getDescription(), results.get(0).getDescription());
+    }
+
+    @Test
+    public void addTask_success() {
+        // given
+        EventTask task = new EventTask();
+        task.setEvent(testEvent);
+        task.setUser(testUser);
+        task.setDescription("task1");
+        List<EventTask> taskList = new ArrayList<>();
+        taskList.add(task);
+
+        // when
+        Mockito.when(eventRepository.existsById(Mockito.any())).thenReturn(true);
+        Optional<Event> optionalEvent = Optional.ofNullable(testEvent);
+        Mockito.when(eventRepository.findById(Mockito.any())).thenReturn(optionalEvent);
+        Mockito.when(eventTaskRepository.save(Mockito.any())).thenReturn(task);
+
+        // then
+        eventService.addTask(testEvent.getId(), task);
+    }
+
+    @Test
+    public void updateTask_success() {
+        // given
+        EventTask task = new EventTask();
+        task.setId(5L);
+        task.setEvent(testEvent);
+        task.setUser(testUser);
+        task.setDescription("task1");
+        List<EventTask> taskList = new ArrayList<>();
+        taskList.add(task);
+
+        EventTaskPostDTO eventTaskPostDTO = new EventTaskPostDTO();
+        eventTaskPostDTO.setUserID(testUser.getId());
+        eventTaskPostDTO.setDescription(task.getDescription());
+
+        // when
+        Mockito.when(eventTaskRepository.getOne(task.getId())).thenReturn(task);
+        Mockito.when(userService.getUserByIDNum(Mockito.any())).thenReturn(testUser);
+
+        // then
+        eventService.updateTask(task.getId(), eventTaskPostDTO);
     }
 
     @Test
