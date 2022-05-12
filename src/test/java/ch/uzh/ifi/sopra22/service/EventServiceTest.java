@@ -13,7 +13,6 @@ import ch.uzh.ifi.sopra22.rest.dto.EventTaskPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.EventUserPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
 import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
-import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -248,15 +247,33 @@ class EventServiceTest {
     public void getAvailableEvents_validUser() {
         Event createdEvent = eventService.createEvent(testEvent);
 
+        Event secondEvent = new Event();
+        secondEvent.setId(2L);
+        secondEvent.setTitle("We Events");
+        secondEvent.setType(EventType.PRIVATE);
+        secondEvent.setStatus(EventStatus.IN_PLANNING);
+        secondEvent.setEventDate(new Date(new Date().getTime() +(1000*60*60*24)));
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        secondEvent.setEventLocation(eventLocation);
+
         List<Event> eventList = new ArrayList<>();
         eventList.add(createdEvent);
+        eventList.add(secondEvent);
+        List<Long> eventIds = new ArrayList<>();
+        eventIds.add(createdEvent.getId());
+        eventIds.add(secondEvent.getId());
 
         //given
         Mockito.when(eventRepository.findByType(EventType.PUBLIC)).thenReturn(eventList);
+        Mockito.when(eventUserService.getEventIdsFromToken(Mockito.any())).thenReturn(eventIds);
+        //Mockito.when(eventRepository.findById(Mockito.any())).thenReturn(Optional.of(secondEvent));
 
         List<Event> testEventList = eventService.getAvailableEvents(testUser.getToken());
 
-        assertEquals(1, testEventList.size());
+        assertEquals(2, testEventList.size());
         assertEquals(testEvent.getId(), testEventList.get(0).getId());
         assertEquals(testEvent.getTitle(), testEventList.get(0).getTitle());
         assertEquals(testEvent.getStatus(), testEventList.get(0).getStatus());
@@ -600,6 +617,52 @@ class EventServiceTest {
         assertEquals(eventUser.getRole(), EventUserRole.GUEST);
 
     }
+
+    @Test
+    public void addUserToEventPOSTDifferentUser_validInput() {
+        //when
+        EventUserPostDTO eventUserPostDTO = new EventUserPostDTO();
+        eventUserPostDTO.setId(testUser.getId());
+        eventUserPostDTO.setEventUserStatus(EventUserStatus.CONFIRMED);
+
+        EventUser createdEventUser = new EventUser();
+        createdEventUser.setEventUserId(8L);
+        createdEventUser.setEvent(testEvent);
+        createdEventUser.setUser(testUser);
+        createdEventUser.setRole(EventUserRole.GUEST);
+        createdEventUser.setStatus(EventUserStatus.CONFIRMED);
+
+        User adminUser = new User();
+        adminUser.setId(3L);
+        adminUser.setUsername("admin");
+        adminUser.setPassword("password");
+        adminUser.setName("admin");
+        adminUser.setToken("123345");
+
+        EventUser admin = new EventUser();
+        admin.setEvent(testEvent);
+        admin.setUser(adminUser);
+        admin.setEventUserId(7L);
+        admin.setRole(EventUserRole.ADMIN);
+        admin.setStatus(EventUserStatus.CONFIRMED);
+
+        testEvent.addEventUsers(createdEventUser);
+        testEvent.addEventUsers(admin);
+
+        //given
+        Mockito.when(userService.getUserByToken(Mockito.any())).thenReturn(adminUser);
+        Mockito.when(userService.getUserByIDNum(Mockito.any())).thenReturn(testUser);
+        Mockito.when(eventUserService.createEventUser(Mockito.any())).thenReturn(createdEventUser);
+
+        EventUser eventUser = eventService.validEventUserPOST(testUser, testEvent, eventUserPostDTO, adminUser.getToken());
+
+        //then
+        assertEquals(eventUser.getStatus(), EventUserStatus.CONFIRMED);
+        assertEquals(eventUser.getEvent().getId(), testEvent.getId());
+        assertEquals(eventUser.getUser().getId(), testUser.getId());
+        assertEquals(eventUser.getRole(), EventUserRole.GUEST);
+
+    }
     @Test
     public void addUserToEventPUT_validInput() {
         //when
@@ -635,6 +698,51 @@ class EventServiceTest {
         assertEquals(eventUser.getStatus(), EventUserStatus.CANCELLED);
         assertEquals(eventUser.getEvent().getId(), testEvent.getId());
         assertEquals(eventUser.getUser().getId(), testUser.getId());
+        assertEquals(eventUser.getRole(), EventUserRole.GUEST);
+
+    }
+    @Test
+    public void addUserToEventPUTNotSelfChange_validInput() {
+        //when
+        User adminUser = new User();
+        adminUser.setId(3L);
+        adminUser.setUsername("admin");
+        adminUser.setPassword("password");
+        adminUser.setName("admin");
+        adminUser.setToken("123345");
+
+        EventUserPostDTO eventUserPostDTO = new EventUserPostDTO();
+        eventUserPostDTO.setId(testUser.getId());
+        eventUserPostDTO.setEventUserRole(EventUserRole.GUEST);
+        eventUserPostDTO.setEventUserStatus(EventUserStatus.CANCELLED);
+
+        EventUser createdEventUser = new EventUser();
+        createdEventUser.setEventUserId(8L);
+        createdEventUser.setEvent(testEvent);
+        createdEventUser.setUser(testUser);
+        createdEventUser.setRole(EventUserRole.ADMIN);
+        createdEventUser.setStatus(EventUserStatus.CONFIRMED);
+
+        EventUser admin = new EventUser();
+        admin.setEvent(testEvent);
+        admin.setUser(adminUser);
+        admin.setEventUserId(7L);
+        admin.setRole(EventUserRole.ADMIN);
+        createdEventUser.setStatus(EventUserStatus.CONFIRMED);
+
+        testEvent.addEventUsers(admin);
+        testEvent.addEventUsers(createdEventUser);
+
+        //given
+        Mockito.when(userService.getUserByToken(Mockito.any())).thenReturn(adminUser);
+        Mockito.when(eventUserService.ensureEventUserExists(Mockito.any(), Mockito.any())).thenReturn(admin);
+
+        EventUser eventUser = eventService.validEventUserPUT(testUser, testEvent, eventUserPostDTO, testUser.getToken());
+
+        //then
+        assertEquals(eventUser.getStatus(), EventUserStatus.CANCELLED);
+        assertEquals(eventUser.getEvent().getId(), testEvent.getId());
+        assertEquals(eventUser.getUser().getId(), adminUser.getId());
         assertEquals(eventUser.getRole(), EventUserRole.GUEST);
 
     }
