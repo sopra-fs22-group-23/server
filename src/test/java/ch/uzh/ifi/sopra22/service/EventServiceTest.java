@@ -9,11 +9,11 @@ import ch.uzh.ifi.sopra22.repository.EventRepository;
 import java.util.Optional;
 
 import ch.uzh.ifi.sopra22.repository.EventTaskRepository;
+import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import ch.uzh.ifi.sopra22.rest.dto.EventTaskPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.EventUserPostDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
 import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
-import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -36,6 +36,9 @@ class EventServiceTest {
 
     @Mock
     private EventTaskRepository eventTaskRepository;
+
+    @Mock
+    private EventUserRepository eventUserRepository;
 
     @Mock
     private UserService userService;
@@ -637,5 +640,114 @@ class EventServiceTest {
         assertEquals(eventUser.getUser().getId(), testUser.getId());
         assertEquals(eventUser.getRole(), EventUserRole.GUEST);
 
+    }
+
+    @Test
+    public void validEventUserDelete_validInput(){
+        EventUser testEventUser = new EventUser();
+        testEventUser.setEventUserId(3L);
+        testEventUser.setEvent(testEvent);
+        testEventUser.setUser(testUser);
+        testEventUser.setRole(EventUserRole.ADMIN);
+        testEventUser.setStatus(EventUserStatus.CONFIRMED);
+        testEvent.addEventUsers(testEventUser);
+        testUser.addEventUsers(testEventUser);
+
+        User guestUser = new User();
+        guestUser.setId(4L);
+        guestUser.setUsername("guest");
+        guestUser.setPassword("guestPassword");
+        guestUser.setName("guest");
+        guestUser.setToken("123458");
+
+        EventUser guestEventUser = new EventUser();
+        guestEventUser.setEventUserId(5L);
+        guestEventUser.setEvent(testEvent);
+        guestEventUser.setUser(guestUser);
+        guestEventUser.setRole(EventUserRole.GUEST);
+        guestEventUser.setStatus(EventUserStatus.CONFIRMED);
+        testEvent.addEventUsers(guestEventUser);
+        guestUser.addEventUsers(guestEventUser);
+
+        //given
+        Mockito.when(userService.getUserByToken(Mockito.any())).thenReturn(testUser);
+        Mockito.when(userService.getUserByIDNum(Mockito.any())).thenReturn(guestUser);
+
+        //when
+        eventService.validEventUserDELETE(testEvent,guestUser.getId(),testUser.getToken());
+
+        assertEquals(testEvent.getEventUsers().size(),1);
+        assertEquals(testUser.getEventUsers().size(),1);
+        assertEquals(guestUser.getEventUsers().size(),0);
+        assertEquals(testEvent.getEventUsers().get(0).getEventUserId(),testEventUser.getEventUserId());
+    }
+    @Test
+    public void validEventUserDelete_failNotDeleteGuestUser(){
+        EventUser testEventUser = new EventUser();
+        testEventUser.setEventUserId(3L);
+        testEventUser.setEvent(testEvent);
+        testEventUser.setUser(testUser);
+        testEventUser.setRole(EventUserRole.ADMIN);
+        testEventUser.setStatus(EventUserStatus.CONFIRMED);
+        testEvent.addEventUsers(testEventUser);
+        testUser.addEventUsers(testEventUser);
+
+        User guestUser = new User();
+        guestUser.setId(4L);
+        guestUser.setUsername("guest");
+        guestUser.setPassword("guestPassword");
+        guestUser.setName("guest");
+        guestUser.setToken("123458");
+
+        EventUser guestEventUser = new EventUser();
+        guestEventUser.setEventUserId(5L);
+        guestEventUser.setEvent(testEvent);
+        guestEventUser.setUser(guestUser);
+        guestEventUser.setRole(EventUserRole.ADMIN);
+        guestEventUser.setStatus(EventUserStatus.CONFIRMED);
+        testEvent.addEventUsers(guestEventUser);
+        guestUser.addEventUsers(guestEventUser);
+
+        //given
+        Mockito.when(userService.getUserByToken(Mockito.any())).thenReturn(testUser);
+        Mockito.when(userService.getUserByIDNum(Mockito.any())).thenReturn(guestUser);
+
+        //when
+        assertThrows(ResponseStatusException.class, () -> eventService.validEventUserDELETE(testEvent,guestUser.getId(),testUser.getToken()));
+    }
+
+    @Test
+    public void validEventUserDelete_failDeleteOperationByGuestUser(){
+        EventUser testEventUser = new EventUser();
+        testEventUser.setEventUserId(3L);
+        testEventUser.setEvent(testEvent);
+        testEventUser.setUser(testUser);
+        testEventUser.setRole(EventUserRole.GUEST);
+        testEventUser.setStatus(EventUserStatus.CONFIRMED);
+        testEvent.addEventUsers(testEventUser);
+        testUser.addEventUsers(testEventUser);
+
+        User guestUser = new User();
+        guestUser.setId(4L);
+        guestUser.setUsername("guest");
+        guestUser.setPassword("guestPassword");
+        guestUser.setName("guest");
+        guestUser.setToken("123458");
+
+        EventUser guestEventUser = new EventUser();
+        guestEventUser.setEventUserId(5L);
+        guestEventUser.setEvent(testEvent);
+        guestEventUser.setUser(guestUser);
+        guestEventUser.setRole(EventUserRole.GUEST);
+        guestEventUser.setStatus(EventUserStatus.CONFIRMED);
+        testEvent.addEventUsers(guestEventUser);
+        guestUser.addEventUsers(guestEventUser);
+
+        //given
+        Mockito.when(userService.getUserByToken(Mockito.any())).thenReturn(testUser);
+        Mockito.when(userService.getUserByIDNum(Mockito.any())).thenReturn(guestUser);
+
+        //when
+        assertThrows(ResponseStatusException.class, () -> eventService.validEventUserDELETE(testEvent,guestUser.getId(),testUser.getToken()));
     }
 }

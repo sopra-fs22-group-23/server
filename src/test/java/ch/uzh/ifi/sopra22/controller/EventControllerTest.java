@@ -374,6 +374,41 @@ class EventControllerTest {
     }
 
     @Test
+    public void deleteGuestEventUser_validInput() throws Exception {
+        User user = new User();
+        user.setName("Firstname Lastname");
+        user.setUsername("firstname@lastname");
+        user.setPassword("password");
+        user.setId(2L);
+        user.setToken("1");
+
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("We Events");
+        event.setType(EventType.PUBLIC);
+        event.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        event.setEventLocation(eventLocation);
+
+        EventUser eventUser = new EventUser();
+        eventUser.setEventUserId(3L);
+        eventUser.setEvent(event);
+        eventUser.setUser(user);
+        eventUser.setRole(EventUserRole.GUEST);
+
+        given(eventService.getEventByIDNum(Mockito.any())).willReturn(event);
+
+        MockHttpServletRequestBuilder deleteRequest = delete("/events/1/users/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization",user.getToken());
+
+        mockMvc.perform(deleteRequest).andExpect(status().isOk());
+    }
+
+    @Test
     public void uploadfile_validInput() throws Exception {
         User user = new User();
         user.setId(1L);

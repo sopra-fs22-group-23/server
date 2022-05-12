@@ -10,6 +10,7 @@ import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
 import ch.uzh.ifi.sopra22.repository.UserRepository;
+import ch.uzh.ifi.sopra22.rest.dto.EventUserPostDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -215,5 +217,51 @@ public class EventServiceIntegrationTest {
         assertEquals(testEvent.getStatus(),actualEvent.getStatus());
         assertEquals(testEvent.getEventLocation(),actualEvent.getEventLocation());
         assertEquals(testEvent.getType(),actualEvent.getType());
+    }
+    @Test
+    public void test_EventUserDelete_success(){
+        //Setup
+        Event testEvent = new Event();
+        testEvent.setTitle("We Events");
+        testEvent.setType(EventType.PUBLIC);
+        testEvent.setStatus(EventStatus.IN_PLANNING);
+        EventLocation eventLocation = new EventLocation();
+        eventLocation.setName("Zurich");
+        eventLocation.setLatitude(1.02F);
+        eventLocation.setLongitude(1.02F);
+        testEvent.setEventLocation(eventLocation);
+
+        User testUser = new User();
+        testUser.setName("testName");
+        testUser.setUsername("testUsername");
+        testUser.setPassword("password");
+
+        User createdUser = userService.createUser(testUser);
+        Event createdEvent = eventService.createEvent(testEvent);
+
+        EventUser eventUser = eventService.createEventUser(createdUser,createdEvent,EventUserRole.ADMIN);
+        eventService.linkEventUsertoEvent(createdEvent,eventUser);
+        userService.linkEventUsertoUser(createdUser,eventUser);
+
+        //create second user
+        User guestUser = new User();
+        guestUser.setName("guestName");
+        guestUser.setUsername("guestUsername");
+        guestUser.setPassword("password10");
+        User createguestUser = userService.createUser(guestUser);
+
+        EventUser guestEventUser = eventService.validEventUserPOST(createguestUser,createdEvent,new EventUserPostDTO(),"Bearer "+ createguestUser.getToken());
+        eventService.linkEventUsertoEvent(createdEvent,guestEventUser);
+        userService.linkEventUsertoUser(createguestUser,guestEventUser);
+
+        //when
+        eventService.validEventUserDELETE(createdEvent,createguestUser.getId(),"Bearer "+ createdUser.getToken());
+
+        //then
+        assertEquals(createdEvent.getEventUsers().size(),1);
+        assertEquals(createdUser.getEventUsers().size(),1);
+        assertEquals(createdEvent.getEventUsers().get(0).getEventUserId(),eventUser.getEventUserId());
+
+        //assertThrows(ResponseStatusException.class, () -> eventService.validEventUserDELETE(createdEvent,createdUser.getId(), "Bearer "+createdUser.getToken()));
     }
 }

@@ -331,6 +331,51 @@ public class EventService {
         return eventUser;
     }
 
+    public void validEventUserDELETE(Event event, Long userId, String token) {
+        User userOperatingDelete = validateToken(token);
+
+        //Validate userOperating Delete
+        for (EventUser eventUser:event.getEventUsers()){
+            if (eventUser.getUser().getId().equals(userOperatingDelete.getId())){
+                if (eventUser.getRole().equals(EventUserRole.GUEST) && !eventUser.getUser().getId().equals(userId)){
+                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "As a guest you are not allowed to delete others");
+                }
+            }
+            if (eventUser.getUser().getId().equals(userId)){
+                if (!eventUser.getRole().equals(EventUserRole.GUEST)){
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can only delete guests");
+                }
+            }
+        }
+
+        //performing Delete
+        List<EventUser> eventUserListAfterDeleteEvent = new ArrayList<>();
+        List<EventUser> eventUserListAfterDeleteUser = new ArrayList<>();
+        User userEventUserDelete = userService.getUserByIDNum(userId);
+        //Boolean userFound = false;
+        for (EventUser eventUser:event.getEventUsers()){
+            if (!eventUser.getUser().getId().equals(userEventUserDelete.getId())){
+                eventUserListAfterDeleteEvent.add(eventUser);
+            }
+        }
+        for (EventUser eventUser:userEventUserDelete.getEventUsers()){
+            if (!eventUser.getEvent().getId().equals(event.getId())){
+                eventUserListAfterDeleteUser.add(eventUser);
+            }
+            else {
+                eventUserRepository.delete(eventUser);
+            }
+        }
+        event.setEventUsers(eventUserListAfterDeleteEvent);
+        updateRepository(event);
+        userEventUserDelete.setEventUsers(eventUserListAfterDeleteUser);
+        userService.updateRepository(userEventUserDelete);
+        /**if (userFound){ //Do I need this?
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "EventUser not found in the event");
+        }*/
+
+    }
+
     public void linkEventUsertoEvent(Event createdEvent, EventUser admin) {
         createdEvent.addEventUsers(admin);
         Event event = updateRepository(createdEvent);

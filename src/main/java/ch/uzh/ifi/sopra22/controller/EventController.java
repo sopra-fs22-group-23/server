@@ -297,6 +297,23 @@ public class EventController {
 
     }
 
+    @Operation(summary = "Deleting a Guest from an event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "EventUser was deleted and removed from Event and User", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Conflict, user not unique", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized User, could not be found by token", content = @Content)}
+    )
+    @DeleteMapping(value = "events/{eventId}/users/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void deleteGuestEventUser(@Parameter(description = "eventId") @PathVariable Long eventId,
+                                     @Parameter(description = "userId")@PathVariable Long userId,
+                                     @RequestHeader(value = "Authorization") String token){
+        Event event = eventService.getEventByIDNum(eventId);
+
+        eventService.validEventUserDELETE(event,userId,token);
+    }
+
         @Operation(summary = "Add event Image with ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Event profile image was saved", content = @Content),
