@@ -70,7 +70,8 @@ public class MailService {
         emailParameters.setSubject("You got invited to an new event!!!");
         emailParameters.setToAddresses(newSignup.getUser().getEmail());
         emailParameters.setBody("Hi "+ newSignup.getUser().getName() + ",\n \n" +
-                "Welcome to the new event: " + newSignup.getEvent().getTitle() + "!!\n \n The link to this event is the folowing https://sopra-fs22-group23-client.herokuapp.com/event/" +newSignup.getEvent().getId());
+                "Welcome to the new event: " + newSignup.getEvent().getTitle() + "!!\n \n The link to this event is the folowing https://sopra-fs22-group23-client.herokuapp.com/event/" +newSignup.getEvent().getId()
+                + "\n \n Kind Regards, \n \n Wevent Support team");
         yahooSendMail(emailParameters);
     }
 
@@ -81,7 +82,8 @@ public class MailService {
         emailParameters.setToAddresses(eventUser.getUser().getEmail());
         emailParameters.setBody("Hi "+ eventUser.getUser().getName() + ",\n \n" +
                 "The event '" + eventUser.getEvent().getTitle() + "' recently received an update to its parameters. This update was conducted by "+ userUpdate.getName()+
-                ".\n \n The link to the updated event is the folowing https://sopra-fs22-group23-client.herokuapp.com/event/" + eventUser.getEvent().getId());
+                ".\n \n The link to the updated event is the folowing https://sopra-fs22-group23-client.herokuapp.com/event/" + eventUser.getEvent().getId()
+        + "\n \n Kind Regards, \n \n Wevent Support team");
         yahooSendMail(emailParameters);
     }
 
@@ -91,7 +93,8 @@ public class MailService {
         emailParameters.setSubject("The event '" + event.getTitle() + "' received your interest");
         emailParameters.setToAddresses(unregisteredUser.getEmail());
         emailParameters.setBody("Hi Wevent Site visitor" + ",\n \n" +
-                "You expressed intrest in the event '" + event.getTitle() + "'. The link to the event is the folowing https://sopra-fs22-group23-client.herokuapp.com/event/" + event.getId());
+                "You expressed intrest in the event '" + event.getTitle() + "'. The link to the event is the folowing https://sopra-fs22-group23-client.herokuapp.com/event/" + event.getId()
+                + "\n \n Kind Regards, \n \n Wevent Support team");
         yahooSendMail(emailParameters);
     }
 }
