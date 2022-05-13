@@ -2,6 +2,7 @@ package ch.uzh.ifi.sopra22.rest.mapper;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
+import ch.uzh.ifi.sopra22.constants.Event.GameMode;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
@@ -30,6 +31,7 @@ class EventDTOMapperTest {
         eventLocation.setLongitude(1F);
         eventLocation.setName("Zurich");
         event.setEventLocation(eventLocation);
+        event.setGameMode(GameMode.OFF);
 
         //Map
         EventGetDTO eventGetDTO = EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(event);
@@ -44,6 +46,7 @@ class EventDTOMapperTest {
         assertEquals(event.getEventLocation().getLatitude(), eventGetDTO.getLatitude());
         assertEquals(event.getEventLocation().getLongitude(), eventGetDTO.getLongitude());
         assertEquals(event.getStatus(), eventGetDTO.getStatus());
+        assertEquals(event.getGameMode(),eventGetDTO.getGameMode());
     }
 
     @Test
@@ -91,6 +94,7 @@ class EventDTOMapperTest {
         eventPostDTO.setLocationName("Zurich");
         eventPostDTO.setLatitude(2F);
         eventPostDTO.setLongitude(2F);
+        eventPostDTO.setGameMode(GameMode.OFF);
 
         //Map
         Event event = EventDTOMapper.INSTANCE.convertEventPostDTOtoEntity(eventPostDTO);
@@ -104,6 +108,7 @@ class EventDTOMapperTest {
         assertEquals(eventPostDTO.getLatitude(), event.getEventLocation().getLatitude());
         assertEquals(eventPostDTO.getLongitude(), event.getEventLocation().getLongitude());
         assertEquals(eventPostDTO.getStatus(), event.getStatus());
+        assertEquals(eventPostDTO.getGameMode(), event.getGameMode());
     }
     @Test
     public void testConvertEventTask_ToEventaskGetDTO_success(){

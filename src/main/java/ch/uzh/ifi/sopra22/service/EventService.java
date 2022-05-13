@@ -2,6 +2,7 @@ package ch.uzh.ifi.sopra22.service;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
+import ch.uzh.ifi.sopra22.constants.Event.GameMode;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
@@ -180,6 +181,9 @@ public class EventService {
         }
         if(newEvent.getEventDate() != null){
             checkIfDateIsBeforeToday(newEvent.getEventDate());
+        }
+        if (newEvent.getGameMode() == null){
+            newEvent.setGameMode(GameMode.OFF);
         }
 
         newEvent.setStatus(EventStatus.IN_PLANNING);
@@ -435,6 +439,8 @@ public class EventService {
             event.setEventDate(eventInput.getEventDate());
         } if (eventInput.getEventLocation() != null){
             event.setEventLocation(eventInput.getEventLocation());
+        } if (eventInput.getGameMode() != null){
+            event.setGameMode(eventInput.getGameMode());
         }
         Event updatedEvent = updateRepository(event);
     }

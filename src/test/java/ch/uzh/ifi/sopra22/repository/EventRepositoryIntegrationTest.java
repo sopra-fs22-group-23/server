@@ -1,6 +1,7 @@
 package ch.uzh.ifi.sopra22.repository;
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
+import ch.uzh.ifi.sopra22.constants.Event.GameMode;
 import ch.uzh.ifi.sopra22.constants.UserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventLocation;
@@ -36,6 +37,7 @@ public class EventRepositoryIntegrationTest {
         event.setTitle("We Events");
         event.setType(EventType.PUBLIC);
         event.setStatus(EventStatus.IN_PLANNING);
+        event.setGameMode(GameMode.OFF);
         EventLocation eventLocation = new EventLocation();
         eventLocation.setName("Zurich");
         eventLocation.setLatitude(1.02F);
@@ -57,7 +59,7 @@ public class EventRepositoryIntegrationTest {
         assertEquals(found.getEventDate(), event.getEventDate());
         assertEquals(found.getStatus(), event.getStatus());
         assertEquals(found.getEventLocation(), event.getEventLocation());
-
+        assertEquals(found.getGameMode(),event.getGameMode());
     }
 
 }

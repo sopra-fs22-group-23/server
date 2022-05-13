@@ -3,6 +3,7 @@ package ch.uzh.ifi.sopra22.entity;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
+import ch.uzh.ifi.sopra22.constants.Event.GameMode;
 import org.w3c.dom.stylesheets.LinkStyle;
 
 import javax.persistence.*;
@@ -38,6 +39,9 @@ public class Event implements Serializable {
 
     @Column(nullable = false)
     private EventStatus status;
+
+    @Column(nullable = false)
+    private GameMode gameMode;
 
     @Column()
     @Temporal(TemporalType.TIMESTAMP)
@@ -120,4 +124,12 @@ public class Event implements Serializable {
     public void setEventUsers(List<EventUser> eventUsers) { this.eventUsers = eventUsers; }
 
     public void addEventUsers(EventUser eventUser) { this.eventUsers.add(eventUser); }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
+    }
 }

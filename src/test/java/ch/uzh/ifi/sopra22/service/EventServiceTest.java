@@ -2,6 +2,7 @@ package ch.uzh.ifi.sopra22.service;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
+import ch.uzh.ifi.sopra22.constants.Event.GameMode;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.entity.*;
@@ -65,6 +66,7 @@ class EventServiceTest {
         eventLocation.setLatitude(1.02F);
         eventLocation.setLongitude(1.02F);
         testEvent.setEventLocation(eventLocation);
+        testEvent.setGameMode(GameMode.OFF);
 
         // when -> any object is being save in the userRepository -> return the dummy
 
@@ -241,6 +243,11 @@ class EventServiceTest {
         assertEquals(createdEvent.getDescription(), testEvent.getDescription());
         assertEquals(createdEvent.getType(), testEvent.getType());
         assertEquals(createdEvent.getStatus(), testEvent.getStatus());
+        assertEquals(createdEvent.getEventLocation().getName(),testEvent.getEventLocation().getName());
+        assertEquals(createdEvent.getEventLocation().getLatitude(),testEvent.getEventLocation().getLatitude());
+        assertEquals(createdEvent.getEventLocation().getLongitude(),testEvent.getEventLocation().getLongitude());
+        assertEquals(createdEvent.getEventDate(),testEvent.getEventDate());
+        assertEquals(createdEvent.getGameMode(),testEvent.getGameMode());
     }
 
     @Test
@@ -278,6 +285,11 @@ class EventServiceTest {
         assertEquals(testEvent.getTitle(), testEventList.get(0).getTitle());
         assertEquals(testEvent.getStatus(), testEventList.get(0).getStatus());
         assertEquals(testEvent.getType(), testEventList.get(0).getType());
+        assertEquals(testEvent.getEventDate(),testEventList.get(0).getEventDate());
+        assertEquals(testEvent.getEventLocation().getName(),testEventList.get(0).getEventLocation().getName());
+        assertEquals(testEvent.getEventLocation().getLongitude(), testEventList.get(0).getEventLocation().getLongitude());
+        assertEquals(testEvent.getEventLocation().getLatitude(),testEventList.get(0).getEventLocation().getLatitude());
+        assertEquals(testEvent.getGameMode(),testEventList.get(0).getGameMode());
     }
 
     @Test
@@ -326,6 +338,7 @@ class EventServiceTest {
         assertEquals(actualEventUser.getEvent(), eventUser.getEvent());
         assertEquals(actualEventUser.getUser(), eventUser.getUser());
         assertEquals(actualEventUser.getRole(), eventUser.getRole());
+        assertEquals(actualEventUser.getStatus(),eventUser.getStatus());
     }
 
     @Test

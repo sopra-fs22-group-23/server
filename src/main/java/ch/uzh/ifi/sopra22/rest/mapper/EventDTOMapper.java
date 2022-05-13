@@ -22,6 +22,7 @@ public interface EventDTOMapper {
     @Mapping(source = "eventLocation.longitude", target = "longitude")
     @Mapping(source = "eventLocation.latitude", target = "latitude")
     @Mapping(source = "status", target = "status")
+    @Mapping(source = "gameMode", target = "gameMode")
     EventGetDTO convertEntityToEventGetDTO(Event event);
 
     @Mapping(source = "id", target = "id")
@@ -43,6 +44,7 @@ public interface EventDTOMapper {
     @Mapping(source = "latitude", target = "eventLocation.latitude")
     @Mapping(source = "longitude", target = "eventLocation.longitude")
     @Mapping(source = "status", target = "status")
+    @Mapping(source = "gameMode", target = "gameMode")
     Event convertEventPostDTOtoEntity(EventPostDTO eventPostDTO);
 
     @Mapping(source = "id", target = "id")

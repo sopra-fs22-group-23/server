@@ -2,6 +2,7 @@ package ch.uzh.ifi.sopra22.rest.dto;
 
 import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.EventType;
+import ch.uzh.ifi.sopra22.constants.Event.GameMode;
 
 import java.util.Date;
 
@@ -15,6 +16,7 @@ public class EventGetDTO {
     private String locationName;
     private float longitude;
     private float latitude;
+    private GameMode gameMode;
 
     public Long getId() {
         return id;
@@ -86,5 +88,13 @@ public class EventGetDTO {
 
     public void setLatitude(float latitude) {
         this.latitude = latitude;
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
     }
 }
