@@ -5,10 +5,8 @@ import ch.uzh.ifi.sopra22.constants.Event.EventStatus;
 import ch.uzh.ifi.sopra22.constants.Event.GameMode;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
-import ch.uzh.ifi.sopra22.entity.Event;
-import ch.uzh.ifi.sopra22.entity.EventTask;
-import ch.uzh.ifi.sopra22.entity.EventUser;
-import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.entity.*;
+import ch.uzh.ifi.sopra22.repository.EventChatMessageRepository;
 import ch.uzh.ifi.sopra22.repository.EventRepository;
 import ch.uzh.ifi.sopra22.repository.EventTaskRepository;
 import ch.uzh.ifi.sopra22.repository.EventUserRepository;
@@ -38,6 +36,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventUserRepository eventUserRepository;
     private final EventTaskRepository eventTaskRepository;
+    private final EventChatMessageRepository eventChatMessageRepository;
 
     private final EventUserService eventUserService;
     private final UserService userService;
@@ -53,12 +52,14 @@ public class EventService {
     public EventService(@Qualifier("eventRepository") EventRepository eventRepository,
                         @Qualifier("eventUserRepository") EventUserRepository eventUserRepository,
                         @Qualifier("eventTaskRepository") EventTaskRepository eventTaskRepository,
-                        @Qualifier("userService") UserService userService,
+                        @Qualifier("eventChatMessageRepository") EventChatMessageRepository eventChatMessageRepositoryRepository,
+                        EventChatMessageRepository eventChatMessageRepository, @Qualifier("userService") UserService userService,
                         @Qualifier("eventUserService") EventUserService eventUserService
     ) {
         this.eventRepository = eventRepository;
         this.eventUserRepository =eventUserRepository;
         this.eventTaskRepository =eventTaskRepository;
+        this.eventChatMessageRepository = eventChatMessageRepository;
         this.userService = userService;
         this.eventUserService = eventUserService;
     }
@@ -405,6 +406,26 @@ public class EventService {
             task.setDescription(newTaskData.getDescription());
         }
 
+    }
+
+    /**
+     * get all messages according to event ID
+     */
+    public List<EventChatMessage> getMessagesByEventID(Long eventID){
+        return eventChatMessageRepository.findAllByEvent_id(eventID);
+    }
+
+    /**
+     * add task to event, checks also if event exists
+     */
+    public void addMessage(Long eventID, EventChatMessage message){
+        if(!eventRepository.existsById(eventID)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event with this ID does not exists");
+        }
+        Event e = eventRepository.findById(eventID).orElse(null);
+        message.setEvent(e);
+        message.setDatetime(new Date());
+        eventChatMessageRepository.save(message);
     }
 
 
