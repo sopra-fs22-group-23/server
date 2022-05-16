@@ -1,7 +1,7 @@
 # SOPRA group 23
 
 ### Introduction:
-**Wevent** is an interactive Event planning tool.  Thereby, Wevent enables its customers to engage in live Event planning sessions. In these sessions invited Users can decide what task each individual has to perform. Additionally, what makes Wevent special is that it has the dimension of public and private events. For Private Events only invited Users can take part in the event planning session. However, for Public events, every registered user can take part in the event planning session and unregistered Users can see the event details. Other special features that were added is a Google Maps interface of all the location of public events as well as your specific private event and an Email Notification system.
+**Wevent** is an interactive Event planning tool.  Thereby, Wevent enables its customers to create and engage in live Event planning sessions with their friends or colleagues. In these sessions invited Users can decide what task each individual has to perform. Additionally, what makes Wevent special is that it has the dimension of public and private events. For Private Events only invited Users can take part in the event planning session. However, for Public events, every registered user can take part in the event planning session and unregistered Users can see the event details. Other special features that we added is a Google Maps interface of all the location of public events as well as your specific private event and an Email Notification system.
 
 ### Technologies:
 For the backend we used Java, Spring Boot and Gradle. For the testing we used Mokito and JUnit. Additionally, we used postman to test the endpoints manually.
@@ -62,11 +62,15 @@ The authors of this Application are the UZH SoPra Group 23:
 - Paolo Tykko
 - Kai Zinnhardt
 
+Further aknowledgements go to:
+- Samuel Brügger (TA)
+- Tomas Fritz, Prof. Dr.
+
 ### License
 
 MIT License
 
-Copyright (c) 2022 Wevent
+Copyright (c) 2022 Wevent&copy;
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
