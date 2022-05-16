@@ -4,7 +4,7 @@
 **Wevent** is an interactive Event planning tool.  Thereby, Wevent enables its customers to create and engage in live Event planning sessions with their friends or colleagues. In these sessions invited Users can decide what task each individual has to perform. Additionally, what makes Wevent special is that it has the dimension of public and private events. For Private Events only invited Users can take part in the event planning session. However, for Public events, every registered user can take part in the event planning session and unregistered Users can see the event details. Other special features that we added is a Google Maps interface of all the location of public events as well as your specific private event and an Email Notification system.
 
 ### Technologies:
-For the backend we used Java, Spring Boot and Gradle. For the testing we used Mokito and JUnit. Additionally, we used postman to test the endpoints manually.
+For the backend we used Java, Spring Boot and Gradle. For the testing we used Mokito and JUnit. Additionally, we used postman to test the endpoints manually. Additionally, to generate the E-Mails, we used a yahoo account and its corresponding API.
 
 #### Important links
 -  View the API documentation of the application: https://sopra-fs22-group-23-server.herokuapp.com//swagger-ui/index.html#
