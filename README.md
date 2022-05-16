@@ -1,8 +1,93 @@
 # SOPRA group 23
 
-## Important links
--  API documentation: https://sopra-fs22-group-23-server.herokuapp.com//swagger-ui/index.html#
+### Introduction:
+**Wevent** is an interactive Event planning tool.  Thereby, Wevent enables its customers to engage in live Event planning sessions. In these sessions invited Users can decide what task each individual has to perform. Additionally, what makes Wevent special is that it has the dimension of public and private events. For Private Events only invited Users can take part in the event planning session. However, for Public events, every registered user can take part in the event planning session and unregistered Users can see the event details. Other special features that were added is a Google Maps interface of all the location of public events as well as your specific private event and an Email Notification system.
 
+### Technologies:
+For the backend we used Java, Spring Boot and Gradle. For the testing we used Mokito and JUnit. Additionally, we used postman to test the endpoints manually.
+
+#### Important links
+-  View the API documentation of the application: https://sopra-fs22-group-23-server.herokuapp.com//swagger-ui/index.html#
+
+### High-level Components:
+We have identified four main components in our system. 
+- The first is the [User entity](https://github.com/sopra-fs22-group-23/server/tree/master/src/main/java/ch/uzh/ifi/sopra22/entity/User.java). The User entity is used to store a User. As the user is one of the main parts, and the client also wants to gather different information about the user, we had to implement a [User Service](https://github.com/sopra-fs22-group-23/server/blob/master/src/main/java/ch/uzh/ifi/sopra22/service/UserService.java) and a [User Controller](https://github.com/sopra-fs22-group-23/server/blob/master/src/main/java/ch/uzh/ifi/sopra22/controller/UserController.java). Thereby, the User Service updates and interprets the User request. The User Controller is the access point that receives this request and sends the respective requests to the User Service.
+- The Second important high-level Component is the Event. Thereby, we also have the same three dimensions as explained by the User ([Entity](https://github.com/sopra-fs22-group-23/server/blob/master/src/main/java/ch/uzh/ifi/sopra22/entity/Event.java), [Service](https://github.com/sopra-fs22-group-23/server/blob/master/src/main/java/ch/uzh/ifi/sopra22/service/EventService.java), and [Controller](https://github.com/sopra-fs22-group-23/server/blob/master/src/main/java/ch/uzh/ifi/sopra22/controller/EventController.java)). This store, modify and interpret, and receive the request from the client, in respective order. Therefore the event Entity has all the information to describe an Event. Furthermore, the main dimension of the Event is that it has the Dimension of a public or private event. Thereby, the main logic is also implemented around this attribute. Additionally, to add a User to the Event, we create an [EventUser](https://github.com/sopra-fs22-group-23/server/blob/master/src/main/java/ch/uzh/ifi/sopra22/entity/EventUser.java). This Event User represents a specific user, that is then mapped to an Event. The Event User has the Special Categories of Role and Status. 
+- The third main component is the [Event Task](https://github.com/sopra-fs22-group-23/server/blob/master/src/main/java/ch/uzh/ifi/sopra22/entity/EventTask.java). The Event Task enables us to add tasks to an event. Those tasks can then be added to a specific user. To do this, one has to have special [endpoints](https://github.com/sopra-fs22-group-23/server/blob/master/src/main/java/ch/uzh/ifi/sopra22/controller/EventTaskController.java) to modify the specific task entities.
+- The final important high-level component is the [WebSockets](https://github.com/sopra-fs22-group-23/server/tree/master/src/main/java/ch/uzh/ifi/sopra22/websockets) to enable a live and collaborative feature. Thereby, we need to use Websockets for this functionality, as we want to change from a pull to push endpoint implementation. This is important so that users can move the tasks in real-time for a specific event.
+
+### Launch and Deployment:
+
+This repository can be downloaded and run via Gradle. Thereby, Gradle will install all needed dependencies and automatically run tests if the project is being built. The implementation of new features will trigger the JUnit tests automatically when the project is rebuild.
+
+#### Build
+```
+./gradlew build
+```
+#### Run
+```
+./gradlew bootRun
+```
+#### Test
+```
+./gradlew test
+```
+#### Development Mode
+You can start the backend in development mode, this will automatically trigger a new build and reload the application
+once the content of a file has been changed and you save the file.
+
+Start two terminal windows and run:
+
+`./gradlew build --continuous`
+
+and in the other one:
+
+`./gradlew bootRun`
+
+If you want to avoid running all tests with every change, use the following command instead:
+
+`./gradlew build --continuous -xtest`
+
+### Roadmap:
+The three main features that could be implemented in the backend are the following:
+1. Save guests. We want to save unregistered users, this gives us the opportunity to send update statuses as well as reminders.
+2. Save the Pictures in an external API. At the moment we save the pictures on the server, however, this is a suboptimal solution. Therefore it should be refactored to save the pictures on an external Database.
+3. Use a persistent Database. At the moment we use a non-persistent Database, therefore from time to time the Data is deleted. However, to ramp this up, a persistent database should be used.
+
+### Authors and acknowledgment
+The authors of this Application are the UZH SoPra Group 23:
+- Adam Bauer
+- Mark Düring
+- Wesley Müri
+- Paolo Tykko
+- Kai Zinnhardt
+
+### License
+
+MIT License
+
+Copyright (c) 2022 Wevent
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+# Old README, to be Deleted!!!
 ### Build
 
 ```bash
