@@ -1,9 +1,7 @@
 package ch.uzh.ifi.sopra22.websockets;
 
-import ch.uzh.ifi.sopra22.websockets.entities.NotificationMessage;
-import ch.uzh.ifi.sopra22.websockets.entities.OutputMessage;
+
 import ch.uzh.ifi.sopra22.websockets.entities.TaskMessage;
-import ch.uzh.ifi.sopra22.websockets.entities.enums.WebsocketType;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -24,8 +22,15 @@ public class SessionSchedulerController {
     @MessageMapping("/sessionScheduler/{eventHash}")
     @SendTo("/topic/sessionScheduler/{eventHash}")
     public TaskMessage send(@DestinationVariable("eventHash") String eventHash, final TaskMessage message){
-        System.out.println(message.toString());
         return new TaskMessage(message.getTaskID(), message.getUserID(), message.getColumnID(), message.getAction());
 //        .concat("With hash:").concat(eventHash)
     }
+
+
+    @MessageMapping("/sessionScheduler/{eventHash}/chat")
+    @SendTo("/topic/sessionScheduler/{eventHash}/chat")
+    public String send(@DestinationVariable("eventHash") String eventHash, final String message){
+        return message;
+    }
+    //it is only resending the message back to the client, so one can send json whit whatever structure one wants
 }

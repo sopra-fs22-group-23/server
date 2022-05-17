@@ -1,6 +1,7 @@
 package ch.uzh.ifi.sopra22.rest.mapper;
 
 import ch.uzh.ifi.sopra22.entity.Event;
+import ch.uzh.ifi.sopra22.entity.EventChatMessage;
 import ch.uzh.ifi.sopra22.entity.EventTask;
 import ch.uzh.ifi.sopra22.rest.dto.*;
 import org.mapstruct.Mapper;
@@ -56,5 +57,17 @@ public interface EventDTOMapper {
 
     @Mapping(source = "description", target = "description")
     EventTask convertEventTaskPostDTOtoEntity(EventTaskPostDTO eventTaskPostDTO);
+
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "user.id", target = "userID")
+    @Mapping(source = "user.username", target = "username")
+    @Mapping(source = "event.id", target = "eventID")
+    @Mapping(source = "text", target = "text")
+    @Mapping(source = "datetime", target = "datetime")
+    EventChatMessageGetDTO convertMessageToDTO(EventChatMessage message);
+
+    @Mapping(source = "text", target = "text")
+    EventChatMessage convertDTOtoMessageEntity(EventChatMessagePostDTO messagePostDTO);
 
 }

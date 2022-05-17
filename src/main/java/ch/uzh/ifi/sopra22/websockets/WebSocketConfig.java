@@ -47,7 +47,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
 
-
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new UserInterceptor());//to hande the login of user to websocket and be able to sent it both ways also to certain user
