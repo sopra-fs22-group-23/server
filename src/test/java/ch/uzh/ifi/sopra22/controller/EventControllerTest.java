@@ -17,7 +17,6 @@ import ch.uzh.ifi.sopra22.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -255,7 +254,7 @@ class EventControllerTest {
         Event event = new Event();
         event.setId(1L);
         event.setTitle("We Events");
-        event.setType(EventType.PUBLIC);
+        event.setType(EventType.PRIVATE);
         event.setStatus(EventStatus.IN_PLANNING);
         EventLocation eventLocation = new EventLocation();
         eventLocation.setName("Zurich");
@@ -278,7 +277,7 @@ class EventControllerTest {
         given(eventService.getEventUsers(Mockito.any())).willReturn(allEventUsers);
 
         // when
-        MockHttpServletRequestBuilder getRequest = get("/events/1/users")
+        MockHttpServletRequestBuilder getRequest = get("/events/1/users?eventUserStatus=CONFIRMED")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization",user.getToken());
 
@@ -336,7 +335,7 @@ class EventControllerTest {
     }
 
     @Test
-    public void updadeEventUser_validInput_success() throws Exception {
+    public void updateEventUser_validInput_success() throws Exception {
         User user = new User();
         user.setName("Firstname Lastname");
         user.setUsername("firstname@lastname");
