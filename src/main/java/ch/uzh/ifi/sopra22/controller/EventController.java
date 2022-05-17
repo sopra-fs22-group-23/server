@@ -206,8 +206,9 @@ public class EventController {
     @GetMapping(value = "events/{eventId}/users")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<EventUserGetDTO> getAllUsers(@Parameter(description = "eventId") @PathVariable Long eventId
-            ,@RequestHeader(value = "Authorization", required = false) String token) {
+    public List<EventUserGetDTO> getAllUsers(@Parameter(description = "eventId") @PathVariable Long eventId,
+                                             @RequestHeader(value = "Authorization", required = false) String token,
+                                             @RequestParam(required = false, name = "eventUserStatus") EventUserStatus eventUserStatus) {
         Event event = eventService.getEventByIDNum(eventId);
 
         // Check authorization
@@ -221,12 +222,14 @@ public class EventController {
 
         // convert each user to the API representation
         for (EventUser eventUser : eventUsers) {
-            EventUserGetDTO eventUserGetDTO = UserDTOMapper.INSTANCE.convertEntityToEventUserGetDTO(eventUser.getUser());
-            eventUserGetDTO.setEventUserRole(eventUser.getRole());
-            eventUserGetDTO.setEventUserStatus(eventUser.getStatus());
-            eventUserGetDTO.setEventId(eventUser.getEvent().getId());
+            if (eventUser.getStatus() == eventUserStatus || eventUserStatus==null) {
+                EventUserGetDTO eventUserGetDTO = UserDTOMapper.INSTANCE.convertEntityToEventUserGetDTO(eventUser.getUser());
+                eventUserGetDTO.setEventUserRole(eventUser.getRole());
+                eventUserGetDTO.setEventUserStatus(eventUser.getStatus());
+                eventUserGetDTO.setEventId(eventUser.getEvent().getId());
 
-            eventUserGetDTOS.add(eventUserGetDTO);
+                eventUserGetDTOS.add(eventUserGetDTO);
+            }
         }
 
         return eventUserGetDTOS;
