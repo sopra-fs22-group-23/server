@@ -1,9 +1,7 @@
 package ch.uzh.ifi.sopra22.websockets;
 
-import ch.uzh.ifi.sopra22.websockets.entities.NotificationMessage;
-import ch.uzh.ifi.sopra22.websockets.entities.OutputMessage;
+
 import ch.uzh.ifi.sopra22.websockets.entities.TaskMessage;
-import ch.uzh.ifi.sopra22.websockets.entities.enums.WebsocketType;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
