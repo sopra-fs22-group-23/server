@@ -4,19 +4,16 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
-import ch.uzh.ifi.sopra22.entity.User;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -64,9 +61,12 @@ public class FileService {
         }
     }
 
-    public String createRandomName(String originalFilename) {
-        String randomString = RandomStringUtils.random(20,true,true);
+    public String createNameWithTimestampAndID(String originalFilename,Long id) {
+        //String randomString = RandomStringUtils.random(20,true,true);
         String endtype = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-        return randomString + "." + endtype;
+        String eventIdString = id.toString();
+        String DateString= new java.util.Date().toString();
+        String DateStringSpaceless = DateString.replaceAll("\\s", "");
+        return DateStringSpaceless + "_" + eventIdString + "." + endtype;
     }
 }

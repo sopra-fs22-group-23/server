@@ -6,7 +6,6 @@ import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
 import ch.uzh.ifi.sopra22.entity.Event;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
-import ch.uzh.ifi.sopra22.mail.EmailParameters;
 import ch.uzh.ifi.sopra22.model.UploadResponseMessage;
 import ch.uzh.ifi.sopra22.rest.dto.*;
 import ch.uzh.ifi.sopra22.rest.mapper.EventDTOMapper;
@@ -316,7 +315,7 @@ public class EventController {
         User user = eventService.validateToken(token);
         Event event = eventService.getEventByIDNum(eventId);
         eventService.isUserAloudToUpdate(event,user);
-        String createRandomName = fileService.createRandomName(file.getOriginalFilename());
+        String createRandomName = fileService.createNameWithTimestampAndID(file.getOriginalFilename(),eventId);
         //String randomString = RandomStringUtils.random(20,true,true);
         System.out.println(createRandomName);
         //file.setOrginalFilename(randomString);

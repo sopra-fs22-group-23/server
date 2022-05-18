@@ -1,13 +1,10 @@
 package ch.uzh.ifi.sopra22.controller;
 
-import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.model.UploadResponseMessage;
-import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import ch.uzh.ifi.sopra22.rest.mapper.UserDTOMapper;
-import ch.uzh.ifi.sopra22.service.EventUserService;
 import ch.uzh.ifi.sopra22.service.FileService;
 import ch.uzh.ifi.sopra22.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -27,8 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -181,7 +175,7 @@ public class UserController {
         userService.checkTokenExists(token);
         User userRepo = userService.validateUser(userId, token);
         System.out.println("Get's in here");
-        String createRandomName = fileService.createRandomName(file.getOriginalFilename());
+        String createRandomName = fileService.createNameWithTimestampAndID(file.getOriginalFilename(),userId);
         //String randomString = RandomStringUtils.random(20,true,true);
         System.out.println(createRandomName);
         //file.setOrginalFilename(randomString);

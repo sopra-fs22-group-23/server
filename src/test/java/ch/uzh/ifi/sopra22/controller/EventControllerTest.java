@@ -395,9 +395,9 @@ class EventControllerTest {
 
         given(eventService.validateToken(Mockito.any())).willReturn(user);
         given(eventService.getEventByIDNum(Mockito.any())).willReturn(event);
-        given(fileService.createRandomName(Mockito.any())).willReturn("test.json");
+        given(fileService.createNameWithTimestampAndID(Mockito.any(),Mockito.any())).willReturn("test_1.json");
         //Mock Request
-        MockMultipartFile jsonFile = new MockMultipartFile("test.json", "test", "application/json", "{\"key1\": \"value1\"}".getBytes());
+        MockMultipartFile jsonFile = new MockMultipartFile("test_1.json", "test", "application/json", "{\"key1\": \"value1\"}".getBytes());
 
         MockHttpServletRequestBuilder postRequest = MockMvcRequestBuilders.multipart("/events/2/image")
                 .file("file",jsonFile.getBytes())
