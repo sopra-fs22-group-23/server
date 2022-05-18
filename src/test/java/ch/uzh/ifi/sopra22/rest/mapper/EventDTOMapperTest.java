@@ -5,10 +5,7 @@ import ch.uzh.ifi.sopra22.constants.Event.EventType;
 import ch.uzh.ifi.sopra22.constants.Event.GameMode;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserRole;
 import ch.uzh.ifi.sopra22.constants.EventUser.EventUserStatus;
-import ch.uzh.ifi.sopra22.entity.Event;
-import ch.uzh.ifi.sopra22.entity.EventLocation;
-import ch.uzh.ifi.sopra22.entity.EventTask;
-import ch.uzh.ifi.sopra22.entity.User;
+import ch.uzh.ifi.sopra22.entity.*;
 import ch.uzh.ifi.sopra22.rest.dto.*;
 import org.junit.jupiter.api.Test;
 
@@ -110,6 +107,7 @@ class EventDTOMapperTest {
         assertEquals(eventPostDTO.getStatus(), event.getStatus());
         assertEquals(eventPostDTO.getGameMode(), event.getGameMode());
     }
+
     @Test
     public void testConvertEventTask_ToEventaskGetDTO_success(){
         Event event = new Event();
@@ -143,5 +141,41 @@ class EventDTOMapperTest {
         EventTask eventTask = EventDTOMapper.INSTANCE.convertEventTaskPostDTOtoEntity(eventTaskPostDTO);
 
         assertEquals(eventTask.getDescription(),eventTaskPostDTO.getDescription());
+    }
+
+    @Test
+    public void testConvertMessage_ToMessageGETDTO_success(){
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("Event");
+
+        User user = new User();
+        user.setId(2L);
+        user.setUsername("testUser");
+        user.setToken("1");
+
+        EventChatMessage testMessage = new EventChatMessage();
+        testMessage.setEvent(event);
+        testMessage.setId(3L);
+        testMessage.setUser(user);
+        testMessage.setText("My description");
+
+        EventChatMessageGetDTO messageGetDTO = EventDTOMapper.INSTANCE.convertMessageToDTO(testMessage);
+
+        assertEquals(messageGetDTO.getId(),testMessage.getId());
+        assertEquals(messageGetDTO.getEventID(),testMessage.getEvent().getId());
+        assertEquals(messageGetDTO.getUserID(),testMessage.getUser().getId());
+        assertEquals(messageGetDTO.getText(),testMessage.getText());
+    }
+
+    @Test
+    public void testConvertMessagePostDTO_toEntity(){
+        EventChatMessagePostDTO messagePostDTO = new EventChatMessagePostDTO();
+        messagePostDTO.setText("Hi");
+
+
+        EventChatMessage message  = EventDTOMapper.INSTANCE.convertDTOtoMessageEntity(messagePostDTO);
+
+        assertEquals(message.getText(),messagePostDTO.getText());
     }
 }
