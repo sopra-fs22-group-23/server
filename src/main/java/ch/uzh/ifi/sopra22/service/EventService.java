@@ -458,7 +458,7 @@ public class EventService {
         } if (eventInput.getEventDate() != null){
             checkIfDateIsBeforeToday(eventInput.getEventDate());
             event.setEventDate(eventInput.getEventDate());
-        } if (eventInput.getEventLocation() != null){
+        } if (eventInput.getEventLocation().getName() != null){
             event.setEventLocation(eventInput.getEventLocation());
         } if (eventInput.getGameMode() != null){
             event.setGameMode(eventInput.getGameMode());
