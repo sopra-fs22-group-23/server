@@ -373,11 +373,24 @@ public class EventController {
     @ResponseBody
     public List<UserEventGetDTO> getAllUserEvents(@Parameter(description = "userId") @PathVariable Long userId,
                                                   @RequestHeader("Authorization") String token) {
-        // Validate user by token
-        User user = userService.validateUser(userId, token);
+        // Get users
+        User tokenUser = eventService.validateToken(token);
+        User userById = userService.getUserByIDNum(userId);
 
-        // Get enhanced events list
-        return eventService.generateUserEvents(user);
+        // Get all userEvents
+        List<UserEventGetDTO> userEventGetDTOS = eventService.generateUserEvents(userById);
+
+        if (tokenUser.getId().equals(userById.getId())) {
+            return userEventGetDTOS;
+        } else {
+            List<UserEventGetDTO> publicEvents = new ArrayList<>();
+            for (UserEventGetDTO userEventGetDTO : userEventGetDTOS) {
+                if (userEventGetDTO.getType() == EventType.PUBLIC) {
+                    publicEvents.add(userEventGetDTO);
+                }
+            }
+            return publicEvents;
+        }
     }
 
     @Operation(summary = "Send mail for unregistered Users (Can only be done for Public events)")
