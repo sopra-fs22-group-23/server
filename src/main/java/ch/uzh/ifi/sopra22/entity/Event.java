@@ -52,7 +52,7 @@ public class Event implements Serializable {
 
 
     @OneToMany(mappedBy = "event")
-    private List<EventUser> eventUsers = new ArrayList<>(); //Set<EventUser> eventUsers = new HashSet<>();
+    private List<EventUser> eventUsers = new ArrayList<>();
 
     public Long getId() {
         return id;
