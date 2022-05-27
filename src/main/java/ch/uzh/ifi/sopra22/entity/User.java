@@ -48,7 +48,7 @@ public class User implements Serializable {
     private String imageFile;
 
     @OneToMany(mappedBy = "user")
-    private List<EventUser> eventUsers = new ArrayList<>(); //private Set<EventUser> eventUsers = new HashSet<>();
+    private List<EventUser> eventUsers = new ArrayList<>();
 
     public Long getId() {
         return id;

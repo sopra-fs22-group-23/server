@@ -187,12 +187,9 @@ public class UserController {
         User userRepo = userService.validateUser(userId, token);
         System.out.println("Get's in here");
         String createRandomName = fileService.createNameWithTimestampAndID(file.getOriginalFilename(),userId);
-        //String randomString = RandomStringUtils.random(20,true,true);
         System.out.println(createRandomName);
-        //file.setOrginalFilename(randomString);
         try {
             fileService.save(file,createRandomName);
-            //userService.linkImageToUser(userRepo, file.getOriginalFilename());
             userService.linkImageToUser(userRepo,createRandomName);
 
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -206,12 +203,11 @@ public class UserController {
     @Operation(summary = "Get user picture with ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User profile image was saved", content = @Content),
-            //@ApiResponse(responseCode = "400", description = "No file found for this User", content = @Content),
+            @ApiResponse(responseCode = "400", description = "No Image found for this User", content = @Content),
             @ApiResponse(responseCode = "404", description = "User was not found", content = @Content) })
     @GetMapping(value = "/users/{userId}/image")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    //public ResponseEntity<UploadResponseMessage> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
     public ResponseEntity<Resource> getFile(@Parameter(description = "userId") @PathVariable Long userId) {
         User user = userService.getUserByIDNum(userId);
 
@@ -223,10 +219,6 @@ public class UserController {
         }catch (NullPointerException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "there is no image");
         }
-        //System.out.println("Filename: "+ file.getFilename() + ". File length: " + file.getDescription());
-
-        //return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; NO FILE EXISTENT!!!")
-          //      .body(null);
     }
 
 

@@ -75,19 +75,6 @@ public class EventController {
         Date fromDate = eventService.stringToDate(fromStringDate);
         Date toDate = eventService.stringToDate(toStringDate);
 
-        //Go through all the Parameters
-        /**
-         List<Event> eventsByEventType = eventService.getEventsByEventType(availableEvents, eventType);
-         List<Event> eventsByUserRole = eventService.getEventsByEventUserRole(eventsByEventType, userRole, token);
-         List<Event> eventsByFromDate = eventService.getEventsByFromDate(eventsByUserRole, fromDate);
-         List<Event> eventByToDate = eventService.getEventsByToDate(eventsByFromDate, toDate);
-         List<Event> eventByLocation = eventService.getEventsByLocation(eventByToDate, location);*/
-
-        /**List<Event> eventsByUserRole;
-         if(userRole != null){
-         eventsByUserRole = eventService.getEventfromUserRole(userRole);
-         }*/
-
         // change Sorting based on search score
         availableEvents = eventService.sortEventsBySearch(availableEvents, search);
 
@@ -132,11 +119,6 @@ public class EventController {
         //to generate the bidirectional relation
         eventService.linkEventUsertoEvent(createdEvent, admin);
         userService.linkEventUsertoUser(user, admin);
-/**
-        List<EventUser> eventUsers = createdEvent.getEventUsers();
-        for (EventUser eventUser: eventUsers){
-            System.out.println(eventUser.getRole());
-        }*/
 
         return EventDTOMapper.INSTANCE.convertEntityToEventGetDTO(createdEvent);
     }
@@ -316,9 +298,7 @@ public class EventController {
         Event event = eventService.getEventByIDNum(eventId);
         eventService.isUserAloudToUpdate(event,user);
         String createRandomName = fileService.createNameWithTimestampAndID(file.getOriginalFilename(),eventId);
-        //String randomString = RandomStringUtils.random(20,true,true);
         System.out.println(createRandomName);
-        //file.setOrginalFilename(randomString);
         try {
             fileService.save(file,createRandomName);
             eventService.linkImageToEvent(event,createRandomName);
@@ -341,7 +321,7 @@ public class EventController {
     @Operation(summary = "Get event picture with ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Event profile image was saved", content = @Content),
-            //@ApiResponse(responseCode = "400", description = "No file found for this User", content = @Content),
+            @ApiResponse(responseCode = "400", description = "No Image found for this Event", content = @Content),
             @ApiResponse(responseCode = "404", description = "Event was not found", content = @Content) })
     @GetMapping(value = "/events/{eventId}/image")
     @ResponseStatus(HttpStatus.OK)
@@ -357,10 +337,6 @@ public class EventController {
         }catch (NullPointerException e){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "there is no image");
         }
-        //System.out.println("Filename: "+ file.getFilename() + ". File length: " + file.getDescription());
-
-        //return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; NO FILE EXISTENT!!!")
-        //      .body(null);
     }
 
     @Operation(summary = "Get a list of all events of user")

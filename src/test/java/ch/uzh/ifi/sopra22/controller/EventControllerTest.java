@@ -9,6 +9,7 @@ import ch.uzh.ifi.sopra22.entity.EventLocation;
 import ch.uzh.ifi.sopra22.entity.EventUser;
 import ch.uzh.ifi.sopra22.entity.User;
 import ch.uzh.ifi.sopra22.rest.dto.EventPostDTO;
+import ch.uzh.ifi.sopra22.rest.dto.UserEventGetDTO;
 import ch.uzh.ifi.sopra22.rest.dto.UserPostDTO;
 import ch.uzh.ifi.sopra22.service.EventService;
 import ch.uzh.ifi.sopra22.service.FileService;
@@ -438,6 +439,88 @@ class EventControllerTest {
 
         mockMvc.perform(getRequest)
                 .andExpect(status().isBadRequest());
+    }
+    @Test
+    public void getAllUserEvents_sameUser_validInput() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Test User");
+        user.setUsername("testUsername");
+        user.setPassword("password");
+        user.setToken("1");
+
+        UserEventGetDTO userEventGetDTO = new UserEventGetDTO();
+        userEventGetDTO.setId(2L);
+        userEventGetDTO.setTitle("test Event");
+        userEventGetDTO.setType(EventType.PUBLIC);
+        userEventGetDTO.setDescription("test event");
+        userEventGetDTO.setStatus(EventStatus.READY);
+        userEventGetDTO.setEventUserStatus(EventUserStatus.CONFIRMED);
+        userEventGetDTO.setEventUserRole(EventUserRole.ADMIN);
+
+        List<UserEventGetDTO> userEventGetDTOList = Collections.singletonList(userEventGetDTO);
+
+        given(eventService.validateToken(Mockito.any())).willReturn(user);
+        given(userService.getUserByIDNum(Mockito.any())).willReturn(user);
+        given(eventService.generateUserEvents(Mockito.any())).willReturn(userEventGetDTOList);
+
+        MockHttpServletRequestBuilder getRequest = get("/users/1/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", user.getToken());
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id", is(userEventGetDTO.getId().intValue())))
+                .andExpect(jsonPath("$[0].title", is(userEventGetDTO.getTitle())))
+                .andExpect(jsonPath("$[0].type", is(userEventGetDTO.getType().toString())))
+                .andExpect(jsonPath("$[0].description", is(userEventGetDTO.getDescription())))
+                .andExpect(jsonPath("$[0].status", is(userEventGetDTO.getStatus().toString())))
+                .andExpect(jsonPath("$[0].eventUserStatus", is(userEventGetDTO.getEventUserStatus().toString())))
+                .andExpect(jsonPath("$[0].eventUserRole", is(userEventGetDTO.getEventUserRole().toString())));
+    }
+
+    @Test
+    public void getAllUserEvents_differentUser_validInput() throws Exception {
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setName("Test User");
+        user1.setUsername("testUsername");
+        user1.setPassword("password");
+        user1.setToken("1");
+
+        User user2 = new User();
+        user2.setId(3L);
+        user2.setName("Test User2");
+        user2.setUsername("testUsername2");
+        user2.setPassword("password2");
+        user2.setToken("3");
+
+        UserEventGetDTO userEventGetDTO = new UserEventGetDTO();
+        userEventGetDTO.setId(2L);
+        userEventGetDTO.setTitle("test Event");
+        userEventGetDTO.setType(EventType.PUBLIC);
+        userEventGetDTO.setDescription("test event");
+        userEventGetDTO.setStatus(EventStatus.READY);
+        userEventGetDTO.setEventUserStatus(EventUserStatus.CONFIRMED);
+        userEventGetDTO.setEventUserRole(EventUserRole.ADMIN);
+
+        List<UserEventGetDTO> userEventGetDTOList = Collections.singletonList(userEventGetDTO);
+
+        given(eventService.validateToken(Mockito.any())).willReturn(user1);
+        given(userService.getUserByIDNum(Mockito.any())).willReturn(user2);
+        given(eventService.generateUserEvents(Mockito.any())).willReturn(userEventGetDTOList);
+
+        MockHttpServletRequestBuilder getRequest = get("/users/1/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", user1.getToken());
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id", is(userEventGetDTO.getId().intValue())))
+                .andExpect(jsonPath("$[0].title", is(userEventGetDTO.getTitle())))
+                .andExpect(jsonPath("$[0].type", is(userEventGetDTO.getType().toString())))
+                .andExpect(jsonPath("$[0].description", is(userEventGetDTO.getDescription())))
+                .andExpect(jsonPath("$[0].status", is(userEventGetDTO.getStatus().toString())))
+                .andExpect(jsonPath("$[0].eventUserStatus", is(userEventGetDTO.getEventUserStatus().toString())))
+                .andExpect(jsonPath("$[0].eventUserRole", is(userEventGetDTO.getEventUserRole().toString())));
     }
 
     @Test

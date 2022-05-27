@@ -62,7 +62,6 @@ public class FileService {
     }
 
     public String createNameWithTimestampAndID(String originalFilename,Long id) {
-        //String randomString = RandomStringUtils.random(20,true,true);
         String endtype = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         String eventIdString = id.toString();
         String DateString= new java.util.Date().toString();
