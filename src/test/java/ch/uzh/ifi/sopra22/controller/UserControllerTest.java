@@ -264,6 +264,31 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.birthday", is(user.getBirthday())));
     }
 
+    @Test
+    public void getUserFromUserID_validInputs_getUser_withoutToken() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Test User");
+        user.setUsername("testUsername");
+        user.setPassword("password");
+        user.setBiography("It a Wevent User");
+        user.setToken("1");
+
+        given(userService.getUserByIDNum(Mockito.any())).willReturn(user);
+
+        // when/then -> do the request + validate the result
+        MockHttpServletRequestBuilder getRequest = get("/users/1")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        // then
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.name", is(user.getName())))
+                .andExpect(jsonPath("$.username", is(user.getUsername())))
+                .andExpect(jsonPath("$.biography", is(user.getBiography())));
+    }
+
 
     @Test
     public void updateUserFromUserID_validInput() throws Exception {

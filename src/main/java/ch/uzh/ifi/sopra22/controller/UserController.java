@@ -128,13 +128,24 @@ public class UserController {
     @GetMapping(value = "/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserGetDTO getUserByUserID(@Parameter(description = "userId") @PathVariable Long userId, @RequestHeader("Authorization") String token) {
-        userService.checkTokenExists(token);
-        userService.validateToken(token);
+    public UserGetDTO getUserByUserID(@Parameter(description = "userId") @PathVariable Long userId, @RequestHeader(value = "Authorization", required = false) String token) {
+        if (token != null){
+            userService.checkTokenExists(token);
+            userService.validateToken(token);
 
-        User user = userService.getUserByIDNum(userId);
+            User user = userService.getUserByIDNum(userId);
 
-        return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+            return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+        }else{
+            User user = userService.getUserByIDNum(userId);
+            User returnUser = new User();
+            returnUser.setId(user.getId());
+            returnUser.setUsername(user.getUsername());
+            returnUser.setName(user.getName());
+            returnUser.setBiography(user.getBiography());
+            return  UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(returnUser);
+        }
+
     }
 
     @Operation(summary = "Update user with ID")
